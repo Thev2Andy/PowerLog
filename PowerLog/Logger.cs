@@ -40,7 +40,7 @@ namespace PowerLog
         {
             LogEventArgs LogEventParams = new LogEventArgs();
             LogEventParams.LogMessage = LogMessage;
-            LogEventParams.OutputType = MessageType;
+            LogEventParams.MessageType = MessageType;
             LogEventParams.LogTime = DateTime.Now;
             LogEventParams.Timestamped = Timestamp;
 
