@@ -64,7 +64,9 @@ namespace LogTester
 
         public static void OnLog(object sender, LogEventArgs logEventArgs) 
         {
-            Console.Write($"{((logEventArgs.Timestamped) ? $"[{DateTime.Now.ToString("HH:mm:ss")}] " : "")}{((logEventArgs.MessageType != LogType.Null) ? $"{logEventArgs.MessageType.ToString()}: " : "")}{logEventArgs.LogMessage}");
+            Console.Write($"{((logEventArgs.Timestamped) ? $"[{DateTime.Now.ToString("HH:mm:ss")}] " : "")}" +
+                $"{((logEventArgs.MessageType != LogType.Null) ? $"{logEventArgs.MessageType.ToString()}: " : "")}" +
+                $"{logEventArgs.LogMessage}");
             
             if (logEventArgs.MessageType == LogType.Fatal) {
                 Console.WriteLine();
