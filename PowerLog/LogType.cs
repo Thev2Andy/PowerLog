@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace PowerLog
 {
+    /// <summary>
+    /// Log type enumeration.
+    /// </summary>
     public enum LogType
     {
         Info,

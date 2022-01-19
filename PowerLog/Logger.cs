@@ -8,6 +8,9 @@ using System.Threading.Tasks;
 
 namespace PowerLog
 {
+    /// <summary>
+    /// The class used for writing logs.
+    /// </summary>
     public static class Logger
     {
         /// <summary>

@@ -10,7 +10,7 @@ namespace LogTester
         {
             Logger.OnLog += OnLog;
 
-            Log:
+        Log:
             Logger.Log("Enter log type [Null / Info / Warning / Error / Fatal]: ", LogType.Null, false, null);
             LogType MessageType;
 
@@ -38,6 +38,8 @@ namespace LogTester
 
                 default:
                     MessageType = LogType.Null;
+                    Logger.Log("Invalid choice. Log type set to Null.", LogType.Warning, false, null);
+                    Logger.Log(Environment.NewLine, LogType.Null, false, null);
                     break;
             }
 
@@ -65,6 +67,7 @@ namespace LogTester
             Console.Write($"{((logEventArgs.Timestamped) ? $"[{DateTime.Now.ToString("HH:mm:ss")}] " : "")}{((logEventArgs.OutputType != LogType.Null) ? $"{logEventArgs.OutputType.ToString()}: " : "")}{logEventArgs.LogMessage}");
             
             if (logEventArgs.OutputType == LogType.Fatal) {
+                Console.WriteLine();
                 Logger.Log(new Exception("Example exception..").ToString(), LogType.Null, true, null);
             }
         }
