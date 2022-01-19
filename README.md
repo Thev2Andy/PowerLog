@@ -5,7 +5,7 @@ PowerLog is a logging library made in C#, designed to make logging easy, with on
 # Features
 * Logging with only one function. You can read more in the [docs](docs.com).
 ```cs
-PowerLog.Logger.Log("Hello PowerLog!", LogType.Info, this);
+PowerLog.Logger.Log("Hello PowerLog!", LogType.Info, true, this);
 ```
 
 * Has an [`OnLog`](docs.com) Event, which can be used to display logs in your application. (such as a game engine)
