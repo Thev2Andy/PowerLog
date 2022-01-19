@@ -31,7 +31,7 @@ namespace PowerLog
         /// </summary>
         /// <param name="LogMessage">The message of the log.</param>
         /// <param name="MessageType">The type of the log.</param>
-        /// <param name="Timestamp">Timestamp this tog in the file?</param>>
+        /// <param name="Timestamp">Timestamp this log in the file?</param>>
         /// <param name="LogSender">The sender of the log.</param>
         public static void Log(string LogMessage, LogType MessageType, bool Timestamp, object LogSender)
         {
