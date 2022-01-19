@@ -8,9 +8,10 @@ namespace LogTester
         static void Main(string[] args)
         {
             Logger.OnLog += OnLog;
+            Logger.Initialize();
 
         Log:
-            Logger.Log("Enter log type [Null / Info / Warning / Error / Fatal]: ", LogType.Null, false, null);
+            Logger.Log("Enter log type [Null / Info / Warning / Error / Fatal]: ", LogType.Null, true, false, true, null);
             LogType MessageType;
 
             switch (Console.ReadLine().ToUpper())
@@ -37,27 +38,22 @@ namespace LogTester
 
                 default:
                     MessageType = LogType.Null;
-                    Logger.Log("Invalid choice. Log type set to Null.", LogType.Warning, false, null);
-                    Logger.Log(Environment.NewLine, LogType.Null, false, null);
+                    Logger.Log("Invalid choice. Log type set to Null.", LogType.Warning, true, false, true, null);
+                    Logger.Log(Environment.NewLine, LogType.Null, false, false, true, null);
                     break;
             }
 
-            Logger.Log($"Picked {MessageType}.", LogType.Info, false, null);
+            Logger.Log($"Picked {MessageType}.", LogType.Info, true, false, true, null);
 
-            Logger.WriteInLogFile = false;
-            Logger.Log(Environment.NewLine, LogType.Null, false, null);
-            Logger.WriteInLogFile = true;
+            Logger.Log(Environment.NewLine, LogType.Null, false, false, true, null);
 
-            Logger.Log("Enter message: ", LogType.Null, false, null);
+            Logger.Log("Enter message: ", LogType.Null, true, false, true, null);
             string LogText = Console.ReadLine();
 
-            Logger.Log(LogText, MessageType, true, null);
+            Logger.Log(LogText, MessageType, true, true, true, null);
 
-            Logger.WriteInLogFile = false;
-            Logger.Log(Environment.NewLine, LogType.Null, false, null);
-            Logger.WriteInLogFile = true;
-
-            Logger.Log(Environment.NewLine, LogType.Null, false, null);
+            Logger.Log(Environment.NewLine, LogType.Null, true, false, true, null);
+            Logger.Log(Environment.NewLine, LogType.Null, false, false, true, null);
             goto Log;
         }
 
@@ -69,7 +65,8 @@ namespace LogTester
             
             if (logEventArgs.MessageType == LogType.Fatal) {
                 Console.WriteLine();
-                Logger.Log(new Exception("Example exception..").ToString(), LogType.Null, true, null);
+                Logger.Log("Throwing exception..", LogType.Info, true, true, false, null);
+                throw new NullReferenceException();
             }
         }
     }
