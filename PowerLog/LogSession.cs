@@ -111,11 +111,6 @@ namespace PowerLog
             AutoCacheClearLoop();
         }
 
-        #region AnalyzeLaunchParameters Method XML
-        /// <summary>
-        /// Analyzes the entry assembly launch parameters.
-        /// </summary>
-        #endregion
         private static void AnalyzeLaunchParameters()
         {
             string[] LaunchParams = Environment.GetCommandLineArgs();
