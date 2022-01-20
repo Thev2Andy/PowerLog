@@ -6,9 +6,11 @@ using System.Threading.Tasks;
 
 namespace PowerLog
 {
+    #region LogEventArgs Class XML
     /// <summary>
-    /// Log Event Arguments holder.
+    /// Log event arguments holder.
     /// </summary>
+    #endregion
     public class LogEventArgs : EventArgs
     {
         public string LogMessage;

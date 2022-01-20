@@ -8,10 +8,10 @@ namespace LogTester
         static void Main(string[] args)
         {
             Logger.OnLog += OnLog;
-            Logger.Initialize();
+            LogSession.Initialize();
 
         Log:
-            Logger.Log("Enter log type [Null / Info / Warning / Error / Fatal]: ", LogType.Null, true, false, true, null);
+            Logger.Log("Enter log type [Null / Info / Warning / Error / Network / Fatal]: ", LogType.Null, false, true, true, null);
             LogType MessageType;
 
             switch (Console.ReadLine().ToUpper())
@@ -32,28 +32,32 @@ namespace LogTester
                     MessageType = LogType.Error;
                     break;
 
+                case "NETWORK":
+                    MessageType = LogType.Network;
+                    break;
+
                 case "FATAL":
                     MessageType = LogType.Fatal;
                     break;
 
                 default:
                     MessageType = LogType.Null;
-                    Logger.Log("Invalid choice. Log type set to Null.", LogType.Warning, true, false, true, null);
-                    Logger.Log(Environment.NewLine, LogType.Null, false, false, true, null);
+                    Logger.Log("Invalid choice. Log type set to Null.", LogType.Warning, false, true, true, null);
+                    Logger.Log(Environment.NewLine, LogType.Null, false, true, true, null);
                     break;
             }
 
-            Logger.Log($"Picked {MessageType}.", LogType.Info, true, false, true, null);
+            Logger.Log($"Picked {MessageType}.", LogType.Info, false, true, true, null);
 
-            Logger.Log(Environment.NewLine, LogType.Null, false, false, true, null);
+            Logger.Log(Environment.NewLine, LogType.Null, false, true, true, null);
 
-            Logger.Log("Enter message: ", LogType.Null, true, false, true, null);
+            Logger.Log("Enter message: ", LogType.Null, false, true, true, null);
             string LogText = Console.ReadLine();
 
             Logger.Log(LogText, MessageType, true, true, true, null);
 
-            Logger.Log(Environment.NewLine, LogType.Null, true, false, true, null);
-            Logger.Log(Environment.NewLine, LogType.Null, false, false, true, null);
+            Logger.Log(Environment.NewLine, LogType.Null, false, true, true, null);
+            Logger.Log(Environment.NewLine, LogType.Null, false, true, true, null);
             goto Log;
         }
 

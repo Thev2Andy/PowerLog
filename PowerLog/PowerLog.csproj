@@ -43,6 +43,7 @@
   <ItemGroup>
     <Compile Include="LogEventArgs.cs" />
     <Compile Include="Logger.cs" />
+    <Compile Include="LogSession.cs" />
     <Compile Include="LogType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

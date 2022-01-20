@@ -6,14 +6,17 @@ using System.Threading.Tasks;
 
 namespace PowerLog
 {
+    #region LogType Enum XML
     /// <summary>
     /// Log type enumeration.
     /// </summary>
+    #endregion
     public enum LogType
     {
         Info,
         Warning,
         Error,
+        Network,
         Fatal,
         Null
     }
