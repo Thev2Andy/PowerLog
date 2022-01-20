@@ -33,6 +33,7 @@ namespace PowerLog
         /// The log file location.
         /// </summary>
         #endregion
+        [Obsolete("Log paths can be buggy and are being rewritten for version 1.1 patch 3.", false)]
         public static string LogPath;
 
         #region AutoCacheClear Boolean XML
