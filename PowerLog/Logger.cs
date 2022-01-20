@@ -26,7 +26,7 @@ namespace PowerLog
         /// Invoked on <c>ClearLog()</c> call.
         /// </summary>
         #endregion
-        public static event EventHandler<EventArgs> OnClear;
+        public static event EventHandler OnClear;
 
 
         #region Log Function XML
