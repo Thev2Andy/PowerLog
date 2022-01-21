@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Reflection;
 using System.Collections.Generic;
 using System.Linq;
@@ -33,8 +34,21 @@ namespace PowerLog
         /// The log file location.
         /// </summary>
         #endregion
-        [Obsolete("Log paths can be buggy and are being rewritten for version 1.1 patch 3.", false)]
         public static string LogPath;
+
+        #region LogFileName String XML
+        /// <summary>
+        /// The log file name.
+        /// </summary>
+        #endregion
+        public static string LogFileName;
+
+        #region LogFileName String XML
+        /// <summary>
+        /// The log file extension.
+        /// </summary>
+        #endregion
+        public static string LogFileExtension;
 
         #region AutoCacheClear Boolean XML
         /// <summary>
@@ -76,13 +90,23 @@ namespace PowerLog
 
                 AppDomain.CurrentDomain.UnhandledException += Logger.LogException;
                 AppDomain.CurrentDomain.UnhandledException += Logger.SaveLog;
+                
 
-                LogPath = Assembly.GetEntryAssembly().Location;
+                LogPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $"Logs");
+                LogFileName = "PowerLog Output";
+                LogFileExtension = "txt";
+
+                if (!Directory.Exists(LogPath)) {
+                    Directory.CreateDirectory(LogPath);
+                }
+
 
                 AnalyzeLaunchParameters();
 
+
                 Logger.ClearLog(true, false);
                 Initialized = true;
+
 
                 AutoCacheClearLoop();
             }

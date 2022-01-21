@@ -85,7 +85,7 @@ namespace PowerLog
                 {
                     if (LogSession.WriteInLogFile)
                     {
-                        string LogFilePath = Path.Combine(Path.GetDirectoryName(LogSession.LogPath), "PowerLog Output.txt");
+                        string LogFilePath = Path.Combine(LogSession.LogPath, $"{LogSession.LogFileName}.{LogSession.LogFileExtension}");
                         string LogFileContent = ((File.Exists(LogFilePath)) ? File.ReadAllText(LogFilePath) : "");
                         
                         string LogOutput = $"{((LogFileContent.Length > 0) ? LogFileContent : "")}" +
@@ -116,7 +116,7 @@ namespace PowerLog
         {
             try {
                 if (DeleteFile) {
-                    string LogFilePath = Path.Combine(Path.GetDirectoryName(LogSession.LogPath), "PowerLog Output.txt");
+                    string LogFilePath = Path.Combine(LogSession.LogPath, $"{LogSession.LogFileName}.{LogSession.LogFileExtension}");
                     File.Delete(LogFilePath);
                 }
             }catch (FileNotFoundException) {
