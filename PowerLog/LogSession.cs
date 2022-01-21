@@ -93,10 +93,6 @@ namespace PowerLog
                 
 
                 LogPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $"Logs");
-                if (!Directory.Exists(LogPath)) {
-                    Directory.CreateDirectory(LogPath);
-                }
-
                 LogFileName = "PowerLog Output";
                 LogFileExtension = "txt";
 

@@ -87,11 +87,13 @@ namespace PowerLog
                     {
                         string LogFilePath = Path.Combine(LogSession.LogPath, $"{LogSession.LogFileName}.{LogSession.LogFileExtension}");
                         string LogFileContent = ((File.Exists(LogFilePath)) ? File.ReadAllText(LogFilePath) : "");
-                        
                         string LogOutput = $"{((LogFileContent.Length > 0) ? LogFileContent : "")}" +
                             $"{((!LogFileContent.EndsWith(Environment.NewLine) && LogFileContent.Length > 0) ? $"{Environment.NewLine}" : "")}" +
                             $"{LogSession.LogCache}";
 
+                        if (!Directory.Exists(LogSession.LogPath)) {
+                            Directory.CreateDirectory(LogSession.LogPath);
+                        }
 
                         File.WriteAllText(LogFilePath, LogOutput);
                     }
@@ -119,10 +121,13 @@ namespace PowerLog
                     string LogFilePath = Path.Combine(LogSession.LogPath, $"{LogSession.LogFileName}.{LogSession.LogFileExtension}");
                     File.Delete(LogFilePath);
                 }
-            }catch (FileNotFoundException) {
-                Log("No log file found.");
-            }catch (Exception Ex) {
-                Log($"{Ex.GetType()}: {Ex.Message}", LogType.Null);
+            }catch (Exception Ex) 
+            {
+                if(Ex is FileNotFoundException || Ex is DirectoryNotFoundException) {
+                    if(LogSession.Initialized) Log("No log file found.");
+                }else {
+                    if (LogSession.Initialized) Log($"{Ex.GetType()}: {Ex.Message}", LogType.Null);
+                }
             }
 
             if(InvokeClearEvent) OnClear?.Invoke(null, EventArgs.Empty);
