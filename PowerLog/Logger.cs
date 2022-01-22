@@ -96,6 +96,7 @@ namespace PowerLog
                         }
 
                         File.WriteAllText(LogFilePath, LogOutput);
+                        ClearLog(false, false);
                     }
                     else {
                         Log("Log saving is currently disabled.", LogType.Error, true, true, true, null);
