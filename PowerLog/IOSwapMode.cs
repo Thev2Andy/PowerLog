@@ -6,20 +6,17 @@ using System.Threading.Tasks;
 
 namespace PowerLog
 {
-    #region LogType Enum XML
+    #region IOSwapMode Enum XML
     /// <summary>
-    /// Log type enumeration.
+    /// IO swap mode enumeration.
     /// </summary>
     #endregion
-    public enum LogType
+    [Flags]
+    public enum IOSwapMode
     {
-        Trace,
-        Debug,
-        Info,
-        Warning,
-        Error,
-        Network,
-        Fatal,
-        Null
+        None = 0,
+        Override = 1,
+        Migrate = 2,
+        KeepOldFile = 4
     }
 }

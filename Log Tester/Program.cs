@@ -7,71 +7,103 @@ namespace LogTester
     {
         static void Main(string[] args)
         {
-            Logger.OnLog += OnLog;
+            Log.OnLog += OnLog;
+            // Log.OnSave += OnSave;
             LogSession.Initialize();
+            LogSession.LogSizeThreshold = 128;
 
-        Log:
-            Logger.Log("Enter log type [Null / Info / Warning / Error / Network / Fatal]: ", LogType.Null, false, true, true, null);
-            LogType MessageType;
+            Log.Trace("Trace message..");
+            Log.Debug("Debug message..");
+            Log.Info("Info message..");
+            Log.Warning("Warning message..");
+            Log.Error("Error message..");
+            Log.Network("Network message..");
+            Log.Fatal("Fatal message..");
+            Log.Null("Null (No-Header) message..");
 
-            switch (Console.ReadLine().ToUpper())
-            {
-                case "NULL":
-                    MessageType = LogType.Null;
-                    break;
+            // int Tries = 0;
 
-                case "INFO":
-                    MessageType = LogType.Info;
-                    break;
+            Array LogValues = Enum.GetValues(typeof(LogType));
+            Random RNG = new Random();
+            Log.LogL("Dynamic log message..", (LogType)(LogValues.GetValue(RNG.Next(LogValues.Length))));
 
-                case "WARNING":
-                    MessageType = LogType.Warning;
-                    break;
+            // Log:
+            // Console.Write("Enter message: ");
+            // Log.LogL(Console.ReadLine(), (LogType)(LogValues.GetValue(RNG.Next(LogValues.Length))), LogMode.Default, null);
 
-                case "ERROR":
-                    MessageType = LogType.Error;
-                    break;
+            // if(Tries == 4) {
+            // LogSession.SwapLogIO(new LogIO(LogSession.LogPath.LogPath, "joe mama", LogSession.LogPath.LogFileExtension), (IOSwapMode.Migrate));
+            // throw new OutOfMemoryException();
+            // throw new AccessViolationException();
+            // throw new StackOverflowException();
+            // }
 
-                case "NETWORK":
-                    MessageType = LogType.Network;
-                    break;
+            // Tries++;
 
-                case "FATAL":
-                    MessageType = LogType.Fatal;
-                    break;
+            // Console.WriteLine($"Current log size: {(LogSession.CheckLogSize() / 1000000f)} MB / {(LogSession.LogSizeThreshold / 1000000f)} MB.");
+            // Console.WriteLine($"Last log: {LogSession.LastLog}");
 
-                default:
-                    MessageType = LogType.Null;
-                    Logger.Log("Invalid choice. Log type set to Null.", LogType.Warning, false, true, true, null);
-                    Logger.Log(Environment.NewLine, LogType.Null, false, true, true, null);
-                    break;
-            }
+            Console.ReadKey();
 
-            Logger.Log($"Picked {MessageType}.", LogType.Info, false, true, true, null);
+            // goto Log;
+        }
 
-            Logger.Log(Environment.NewLine, LogType.Null, false, true, true, null);
-
-            Logger.Log("Enter message: ", LogType.Null, false, true, true, null);
-            string LogText = Console.ReadLine();
-
-            Logger.Log(LogText, MessageType, true, true, true, null);
-
-            Logger.Log(Environment.NewLine, LogType.Null, false, true, true, null);
-            Logger.Log(Environment.NewLine, LogType.Null, false, true, true, null);
-            goto Log;
+        private static void OnSave(object Sender, EventArgs E)
+        {
+            Log.LogL("The log just got saved.", LogType.Info, (LogMode.Default | LogMode.NoSizeCheck));
         }
 
         public static void OnLog(object sender, LogEventArgs logEventArgs) 
         {
-            Console.Write($"{((logEventArgs.Timestamped) ? $"[{DateTime.Now.ToString("HH:mm:ss")}] " : "")}" +
-                $"{((logEventArgs.MessageType != LogType.Null) ? $"{logEventArgs.MessageType.ToString()}: " : "")}" +
-                $"{logEventArgs.LogMessage}");
-            
-            if (logEventArgs.MessageType == LogType.Fatal) {
-                Console.WriteLine();
-                Logger.Log("Throwing exception..", LogType.Info, true, true, false, null);
-                throw new NullReferenceException();
+            ConsoleColor BackupColor = Console.ForegroundColor;
+            ConsoleColor TargetColor;
+
+            switch (logEventArgs.LogLevel)
+            {
+                case LogType.Trace:
+                    TargetColor = ConsoleColor.Gray;
+                    break;
+
+                case LogType.Debug:
+                    TargetColor = ConsoleColor.DarkGray;
+                    break;
+
+                case LogType.Info:
+                    TargetColor = ConsoleColor.White;
+                    break;
+
+                case LogType.Warning:
+                    TargetColor = ConsoleColor.Yellow;
+                    break;
+
+                case LogType.Error:
+                    TargetColor = ConsoleColor.Red;
+                    break;
+
+                case LogType.Network:
+                    TargetColor = ConsoleColor.Blue;
+                    break;
+
+                case LogType.Fatal:
+                    TargetColor = ConsoleColor.DarkRed;
+                    break;
+
+                case LogType.Null:
+                    TargetColor = BackupColor;
+                    break;
+
+
+                default:
+                    TargetColor = BackupColor;
+                    break;
             }
+
+            Console.ForegroundColor = TargetColor;
+            Console.WriteLine($"{((logEventArgs.Timestamped) ? $"[{DateTime.Now.ToString("HH:mm:ss")}] " : String.Empty)}" +
+                $"{((logEventArgs.LogLevel != LogType.Null) ? $"{logEventArgs.LogLevel.ToString()}: " : String.Empty)}" +
+                $"{logEventArgs.LogMessage}");
+
+            Console.ForegroundColor = BackupColor;
         }
     }
 }

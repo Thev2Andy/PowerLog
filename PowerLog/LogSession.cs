@@ -29,105 +29,128 @@ namespace PowerLog
         #endregion
         public static bool LogExceptions = true;
 
-        #region LogPath String XML
+        #region LogSizeThreshold UInt64 XML
         /// <summary>
-        /// The log file location.
+        /// Determines the log cache size in bytes.
         /// </summary>
         #endregion
-        public static string LogPath;
+        public static UInt64 LogSizeThreshold = 15000000;
 
-        #region LogFileName String XML
+
+        // Private / Internal variables.
+        #region LogPath LogIO XML
         /// <summary>
-        /// The log file name.
+        /// Holds data regarding log file paths.
         /// </summary>
         #endregion
-        public static string LogFileName;
+        public static LogIO LogPath { get; internal set; }
 
-        #region LogFileName String XML
+        #region LogCache String XML
         /// <summary>
-        /// The log file extension.
+        /// Contains the log cache to be written to the log file.
         /// </summary>
         #endregion
-        public static string LogFileExtension;
+        public static string LogCache { get; internal set; }
 
-        #region AutoCacheClear Boolean XML
+        #region LastLog String XML
         /// <summary>
-        /// Allow automatic log cache clear?
+        /// Contains the last log call as saved in the log file.
         /// </summary>
         #endregion
-        public static bool AutoCacheClear = true;
+        public static string LastLog { get; internal set; }
 
-        #region CacheClearInterval Float XML
+        #region Initialized Boolean XML
         /// <summary>
-        /// The interval between cache clear calls.
+        /// Is the logging session initialized?
         /// </summary>
         #endregion
-        public static float CacheClearInterval = 7.5f;
-
+        public static bool Initialized { get; internal set; }
 
         #region LoggingStripped Boolean XML
         /// <summary>
-        /// Is the "-nolog" launch parameter active?
+        /// If active (application launched with "-nolog" parameter), all functionality of PowerLog is disabled.
         /// </summary>
         #endregion
         public static bool LoggingStripped { get; internal set; }
 
 
-        // Private variables.
-        public static string LogCache { get; internal set; }
-        public static bool Initialized { get; internal set; }
 
         #region Initialize Method XML
         /// <summary>
-        /// Initializes the logger.
+        /// Initializes the log session.
         /// </summary>
+        /// <param name="AllowLaunchParameters">Enable checking of launch parameters?</param>
         #endregion
-        public static void Initialize()
+        public static void Initialize(bool AllowLaunchParameters = true)
         {
             if (!Initialized)
             {
-                AppDomain.CurrentDomain.ProcessExit += Logger.SaveLog;
+                AppDomain.CurrentDomain.ProcessExit += Log.SaveLog;
 
-                AppDomain.CurrentDomain.UnhandledException += Logger.LogException;
-                AppDomain.CurrentDomain.UnhandledException += Logger.SaveLog;
-                
+                AppDomain.CurrentDomain.UnhandledException += Log.LogException;
+                AppDomain.CurrentDomain.UnhandledException += Log.SaveLog;
 
-                LogPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $"Logs");
-                LogFileName = "PowerLog Output";
-                LogFileExtension = "txt";
+                if(LogPath == null) SwapLogIO(new LogIO(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $"Logs"), 
+                    $"Log Output - ({DateTime.Now.ToString("HH-mm-ss tt, dd MMMM yyyy")})", "txt"), 
+                    (IOSwapMode.KeepOldFile));
 
+                LogCache = String.Empty;
 
-                AnalyzeLaunchParameters();
+                if (AllowLaunchParameters) AnalyzeLaunchParameters();
 
-                Logger.ClearLog(true, false);
                 Initialized = true;
-
-                AutoCacheClearLoop();
             }
             else
             {
-                throw new InvalidOperationException("Logger already initialized.");
+                throw new InvalidOperationException("LogSession already initialized.");
             }
         }
 
-        #region ClearCache Method XML
+        #region SwapLogIO Method XML
         /// <summary>
-        /// Clear the log cache.
+        /// Sets a new LogIO object as log path data.
         /// </summary>
+        /// <param name="NewIO">The 'LogIO' object to swap to.</param>
+        /// <param name="SwapMode">The 'LogIO' swap mode.</param>
         #endregion
-        public static void ClearCache() {
-            Logger.SaveLog(null, EventArgs.Empty);
-            Logger.ClearLog(false, false);
-        }
+        public static void SwapLogIO(LogIO NewIO, IOSwapMode SwapMode) {
+            if (LogPath != null) {
+                if (!SwapMode.HasFlag(IOSwapMode.None)) {
+                    if(SwapMode.HasFlag(IOSwapMode.Override)) {
+                        if (SwapMode.HasFlag(IOSwapMode.Migrate)) {
+                            if (File.Exists(NewIO.GetLogPath())) File.Delete(NewIO.GetLogPath());
 
-        private static async void AutoCacheClearLoop()
-        {
-            await Task.Delay((int)Math.Round((CacheClearInterval * 1000)));
-            if (AutoCacheClear) {
-                ClearCache();
+                            if (File.Exists(LogPath.GetLogPath())) {
+                                File.Copy(LogPath.GetLogPath(), NewIO.GetLogPath());
+                            }
+                        }else {
+                            if (File.Exists(NewIO.GetLogPath())) File.Delete(NewIO.GetLogPath());
+                        }
+                    }else {
+                        if (SwapMode.HasFlag(IOSwapMode.Migrate)) {
+                            string OldLogContents = (File.Exists(LogPath.GetLogPath()) ? File.ReadAllText(LogPath.GetLogPath()) : String.Empty);
+                            File.AppendAllText(NewIO.GetLogPath(), 
+                                $"{OldLogContents}{((OldLogContents.EndsWith(Environment.NewLine)) ? String.Empty : Environment.NewLine)}");
+                        }
+                    }
+                }
+
+                if (!SwapMode.HasFlag(IOSwapMode.KeepOldFile) || SwapMode.HasFlag(IOSwapMode.None)) File.Delete(LogPath.GetLogPath());
+            }else {
+                if(File.Exists(NewIO.GetLogPath()) && SwapMode.HasFlag(IOSwapMode.Override) && !SwapMode.HasFlag(IOSwapMode.None)) File.Delete(NewIO.GetLogPath());
             }
 
-            AutoCacheClearLoop();
+            LogPath = NewIO;
+        }
+
+        #region CheckLogSize Method XML
+        /// <summary>
+        /// Gets the log size in memory.
+        /// </summary>
+        /// <returns>The log size in memory, in bytes.</returns>
+        #endregion
+        public static UInt64 CheckLogSize() {
+            return (UInt64)(sizeof(char) * ((LogCache != null) ? LogCache.Length : 0f));
         }
 
         private static void AnalyzeLaunchParameters()

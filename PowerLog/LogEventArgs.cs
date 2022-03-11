@@ -14,9 +14,10 @@ namespace PowerLog
     public class LogEventArgs : EventArgs
     {
         public string LogMessage;
-        public LogType MessageType;
+        public LogType LogLevel;
         public DateTime LogTime;
         public bool Timestamped;
+        public LogMode LoggingMode;
         public object LogSender;
     }
 }
