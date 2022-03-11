@@ -19,7 +19,7 @@ namespace PowerLog
         /// Invoked on <c>Log()</c> call.
         /// </summary>
         #endregion
-        public static event EventHandler<LogEventArgs> OnLog;
+        public static event EventHandler<LogArgs> OnLog;
 
         #region OnSave Event XML
         /// <summary>
@@ -51,13 +51,13 @@ namespace PowerLog
             {
                 if (LogSession.Initialized)
                 {
-                    LogEventArgs LogEventParams = new LogEventArgs
+                    LogArgs LogEventParams = new LogArgs
                     {
                         LogMessage = LogMessage,
                         LogLevel = MessageType,
                         LogTime = DateTime.Now,
-                        Timestamped = LoggingMode.HasFlag(LogMode.Timestamp),
-                        LoggingMode = LoggingMode
+                        LoggingMode = LoggingMode,
+                        LogSender = LogSender
                     };
 
                     if (LoggingMode.HasFlag(LogMode.Save))
@@ -74,9 +74,7 @@ namespace PowerLog
                     }
 
                     if (LoggingMode.HasFlag(LogMode.InvokeEvent)) OnLog?.Invoke(LogSender, LogEventParams);
-                    LogSession.LastLog = $"{((LoggingMode.HasFlag(LogMode.Timestamp)) ? $"[{DateTime.Now.ToString("HH:mm:ss")}] " : String.Empty)}" +
-                            $"{((MessageType != LogType.Null) ? $"{MessageType.ToString()}: " : String.Empty)}" +
-                            $"{LogMessage}";
+                    LogSession.LastLog = LogEventParams;
                 }else {
                     throw new InvalidOperationException("LogSession not initialized. Did you forget to initialize the LogSession?");
                 }

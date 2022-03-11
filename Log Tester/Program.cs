@@ -53,7 +53,7 @@ namespace LogTester
             Log.LogL("The log just got saved.", LogType.Info, (LogMode.Default | LogMode.NoSizeCheck));
         }
 
-        public static void OnLog(object sender, LogEventArgs logEventArgs) 
+        public static void OnLog(object sender, LogArgs logEventArgs) 
         {
             ConsoleColor BackupColor = Console.ForegroundColor;
             ConsoleColor TargetColor;
@@ -99,7 +99,7 @@ namespace LogTester
             }
 
             Console.ForegroundColor = TargetColor;
-            Console.WriteLine($"{((logEventArgs.Timestamped) ? $"[{DateTime.Now.ToString("HH:mm:ss")}] " : String.Empty)}" +
+            Console.WriteLine($"{((logEventArgs.LoggingMode.HasFlag(LogMode.Timestamp)) ? $"[{DateTime.Now.ToString("HH:mm:ss")}] " : String.Empty)}" +
                 $"{((logEventArgs.LogLevel != LogType.Null) ? $"{logEventArgs.LogLevel.ToString()}: " : String.Empty)}" +
                 $"{logEventArgs.LogMessage}");
 

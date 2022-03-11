@@ -52,12 +52,12 @@ namespace PowerLog
         #endregion
         public static string LogCache { get; internal set; }
 
-        #region LastLog String XML
+        #region LastLog LogArgs XML
         /// <summary>
-        /// Contains the last log call as saved in the log file.
+        /// Contains the last log call data.
         /// </summary>
         #endregion
-        public static string LastLog { get; internal set; }
+        public static LogArgs LastLog { get; internal set; }
 
         #region Initialized Boolean XML
         /// <summary>
