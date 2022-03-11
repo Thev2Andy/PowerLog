@@ -14,10 +14,10 @@ namespace PowerLog
     [Flags]
     public enum LogMode
     {
-        Timestamp = 0,
-        Save = 1,
-        InvokeEvent = 2,
-        NoSizeCheck = 3,
+        Timestamp = 1,
+        Save = 2,
+        InvokeEvent = 4,
+        NoSizeCheck = 8,
         Default = (Timestamp | Save | InvokeEvent)
     }
 }

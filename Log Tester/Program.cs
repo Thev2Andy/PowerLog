@@ -12,6 +12,8 @@ namespace LogTester
             LogSession.Initialize();
             LogSession.LogSizeThreshold = 128;
 
+            // LogImplementation.Initialize();
+
             Log.Trace("Trace message..");
             Log.Debug("Debug message..");
             Log.Info("Info message..");
@@ -21,31 +23,35 @@ namespace LogTester
             Log.Fatal("Fatal message..");
             Log.Null("Null (No-Header) message..");
 
-            // int Tries = 0;
+            int Tries = 0;
 
             Array LogValues = Enum.GetValues(typeof(LogType));
             Random RNG = new Random();
             Log.LogL("Dynamic log message..", (LogType)(LogValues.GetValue(RNG.Next(LogValues.Length))));
 
-            // Log:
-            // Console.Write("Enter message: ");
-            // Log.LogL(Console.ReadLine(), (LogType)(LogValues.GetValue(RNG.Next(LogValues.Length))), LogMode.Default, null);
+            Log.Null("", (LogMode.Save | LogMode.InvokeEvent));
 
-            // if(Tries == 4) {
-            // LogSession.SwapLogIO(new LogIO(LogSession.LogPath.LogPath, "joe mama", LogSession.LogPath.LogFileExtension), (IOSwapMode.Migrate));
-            // throw new OutOfMemoryException();
-            // throw new AccessViolationException();
-            // throw new StackOverflowException();
-            // }
+            Log:
+            Console.Write("Enter message: ");
+            Log.LogL(Console.ReadLine(), (LogType)(LogValues.GetValue(RNG.Next(LogValues.Length))), LogMode.Default, null);
 
-            // Tries++;
+            if (Tries == 4)
+            {
+                // Log.Clear();
+                // LogSession.SwapLogIO(new LogIO(LogSession.LogPath.LogPath, "joe mama", LogSession.LogPath.LogFileExtension), (IOSwapMode.Migrate));
+                // throw new OutOfMemoryException();
+                // throw new AccessViolationException();
+                // throw new StackOverflowException();
+            }
+
+            Tries++;
 
             // Console.WriteLine($"Current log size: {(LogSession.CheckLogSize() / 1000000f)} MB / {(LogSession.LogSizeThreshold / 1000000f)} MB.");
             // Console.WriteLine($"Last log: {LogSession.LastLog}");
 
-            Console.ReadKey();
+            // Console.ReadKey();
 
-            // goto Log;
+            goto Log;
         }
 
         private static void OnSave(object Sender, EventArgs E)

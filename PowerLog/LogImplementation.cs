@@ -13,7 +13,7 @@ namespace PowerLog
     #endregion
     public static class LogImplementation
     {
-        public static void InitializeSession(bool UseDefaultLogFunctions = true)
+        public static void Initialize()
         {
             // Most of the time, default launch parameters are fine.
             LogSession.Initialize(true);
@@ -22,11 +22,8 @@ namespace PowerLog
             LogSession.LogSizeThreshold = 5000000;
 
             // Subscribe to events using default functions.
-            if (UseDefaultLogFunctions)
-            {
-                Log.OnLog += OnLog;
-                Log.OnClear += OnClear;
-            }
+            Log.OnLog += OnLog;
+            Log.OnClear += OnClear;
         }
 
         private static void OnClear(object Sender, EventArgs E) {

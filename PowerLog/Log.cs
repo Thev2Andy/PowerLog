@@ -212,12 +212,12 @@ namespace PowerLog
             }
         }
 
-        #region ClearLog Function XML
+        #region Clear Function XML
         /// <summary>
         /// Invokes the <c>OnClear</c> event.
         /// </summary>
         #endregion
-        public static void ClearLog() {
+        public static void Clear() {
             if (LogSession.Initialized) {
                 OnClear?.Invoke(null, EventArgs.Empty);
             }else {

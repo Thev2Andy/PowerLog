@@ -14,9 +14,9 @@ namespace PowerLog
     [Flags]
     public enum IOSwapMode
     {
-        None = 0,
-        Override = 1,
-        Migrate = 2,
-        KeepOldFile = 4
+        None = 1,
+        Override = 2,
+        Migrate = 4,
+        KeepOldFile = 8
     }
 }
