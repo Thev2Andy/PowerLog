@@ -40,12 +40,12 @@ namespace PowerLog
         /// <summary>
         /// Calls a fully-customizable log, sent over to the <c>OnLog</c> event.
         /// </summary>
-        /// <param name="LogMessage">The message of the log.</param>
-        /// <param name="MessageType">The type of the log.</param>
+        /// <param name="LogContent">The content of the log.</param>
+        /// <param name="LogLevel">The type of the log.</param>
         /// <param name="LoggingMode">The log options.</param>
         /// <param name="LogSender">The sender of the log.</param>
         #endregion
-        public static void LogL(string LogMessage, LogType MessageType, LogMode LoggingMode = LogMode.Default, object LogSender = null)
+        public static void LogL(string LogContent, LogType LogLevel, LogMode LoggingMode = LogMode.Default, object LogSender = null)
         {
             if (!LogSession.LoggingStripped)
             {
@@ -53,8 +53,8 @@ namespace PowerLog
                 {
                     LogArgs LogEventParams = new LogArgs
                     {
-                        LogMessage = LogMessage,
-                        LogLevel = MessageType,
+                        LogMessage = LogContent,
+                        LogLevel = LogLevel,
                         LogTime = DateTime.Now,
                         LoggingMode = LoggingMode,
                         LogSender = LogSender
@@ -65,11 +65,11 @@ namespace PowerLog
                         LogSession.LogCache = $"{((LogSession.LogCache.Length > 0) ? LogSession.LogCache : String.Empty)}" +
                             $"{((!LogSession.LogCache.EndsWith(Environment.NewLine) && LogSession.LogCache.Length > 0) ? $"{Environment.NewLine}" : String.Empty)}" +
                             $"{((LoggingMode.HasFlag(LogMode.Timestamp)) ? $"[{DateTime.Now.ToString("HH:mm:ss")}] " : String.Empty)}" +
-                            $"{((MessageType != LogType.Null) ? $"{MessageType.ToString()}: " : String.Empty)}" +
-                            $"{LogMessage}";
+                            $"{((LogLevel != LogType.Null) ? $"{LogLevel.ToString()}: " : String.Empty)}" +
+                            $"{LogContent}";
 
                         if (LogSession.CheckLogSize() >= LogSession.LogSizeThreshold && (!LoggingMode.HasFlag(LogMode.NoSizeCheck))) {
-                            SaveLog(null, EventArgs.Empty);
+                            Save(null, EventArgs.Empty);
                         }
                     }
 
@@ -180,12 +180,12 @@ namespace PowerLog
         #endregion
 
 
-        #region SaveLogs Function XML
+        #region Save Function XML
         /// <summary>
         /// Saves the log in a file.
         /// </summary>
         #endregion
-        public static void SaveLog(object Sender = null, EventArgs Args = null)
+        public static void Save(object Sender = null, EventArgs Args = null)
         {
             if (!LogSession.LoggingStripped)
             {

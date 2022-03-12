@@ -85,10 +85,10 @@ namespace PowerLog
         {
             if (!Initialized)
             {
-                AppDomain.CurrentDomain.ProcessExit += Log.SaveLog;
+                AppDomain.CurrentDomain.ProcessExit += Log.Save;
 
                 AppDomain.CurrentDomain.UnhandledException += Log.LogException;
-                AppDomain.CurrentDomain.UnhandledException += Log.SaveLog;
+                AppDomain.CurrentDomain.UnhandledException += Log.Save;
 
                 if(LogPath == null) SwapLogIO(new LogIO(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $"Logs"), 
                     $"Log Output - ({DateTime.Now.ToString("HH-mm-ss tt, dd MMMM yyyy")})", "txt"), 
