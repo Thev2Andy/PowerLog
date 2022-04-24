@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace PowerLog
 {
+    // TODO: Merge LogSession with Log, to allow for separate logger instances.
     #region LogSession Class XML
     /// <summary>
     /// Holds information regarding the current logging session.
@@ -15,6 +16,7 @@ namespace PowerLog
     #endregion
     public static class LogSession
     {
+        // Public / Accessible variables.
         #region WriteLogInFile Boolean XML
         /// <summary>
         /// Toggle writing logs to a file.
@@ -83,14 +85,14 @@ namespace PowerLog
         #endregion
         public static void Initialize(bool AllowLaunchParameters = true)
         {
-            if (!Initialized)
-            {
+            if (!Initialized) {
                 AppDomain.CurrentDomain.ProcessExit += Log.Save;
 
                 AppDomain.CurrentDomain.UnhandledException += Log.LogException;
                 AppDomain.CurrentDomain.UnhandledException += Log.Save;
 
-                if(LogPath == null) SwapLogIO(new LogIO(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $"Logs"), 
+                if (string.IsNullOrEmpty(LogFormat.LogTemplate) || string.IsNullOrEmpty(LogFormat.DateTemplate)) LogFormat.SetTemplates("|[T] ||[S] ||[L]: ||[C]|", "HH:mm:ss");
+                if(LogPath == null) SwapIO(new LogIO(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $"Logs"), 
                     $"Log Output - ({DateTime.Now.ToString("HH-mm-ss tt, dd MMMM yyyy")})", "txt"), 
                     (IOSwapMode.KeepOldFile));
 
@@ -100,20 +102,20 @@ namespace PowerLog
 
                 Initialized = true;
             }
-            else
-            {
+
+            else {
                 throw new InvalidOperationException("LogSession already initialized.");
             }
         }
 
-        #region SwapLogIO Method XML
+        #region SwapIO Method XML
         /// <summary>
         /// Sets a new LogIO object as log path data.
         /// </summary>
         /// <param name="NewIO">The 'LogIO' object to swap to.</param>
         /// <param name="SwapMode">The 'LogIO' swap mode.</param>
         #endregion
-        public static void SwapLogIO(LogIO NewIO, IOSwapMode SwapMode) {
+        public static void SwapIO(LogIO NewIO, IOSwapMode SwapMode) {
             if (LogPath != null) {
                 if (!SwapMode.HasFlag(IOSwapMode.None)) {
                     if(SwapMode.HasFlag(IOSwapMode.Override)) {
@@ -143,13 +145,13 @@ namespace PowerLog
             LogPath = NewIO;
         }
 
-        #region CheckLogSize Method XML
+        #region CheckSize Method XML
         /// <summary>
         /// Gets the log size in memory.
         /// </summary>
         /// <returns>The log size in memory, in bytes.</returns>
         #endregion
-        public static UInt64 CheckLogSize() {
+        public static UInt64 CheckSize() {
             return (UInt64)(sizeof(char) * ((LogCache != null) ? LogCache.Length : 0f));
         }
 

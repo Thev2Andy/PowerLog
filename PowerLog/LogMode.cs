@@ -11,8 +11,7 @@ namespace PowerLog
     /// Log mode enumeration.
     /// </summary>
     #endregion
-    [Flags]
-    public enum LogMode
+    [Flags] public enum LogMode
     {
         Timestamp = 1,
         Save = 2,

@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <RootNamespace>PowerLog</RootNamespace>
     <AssemblyVersion>1.2.1.0</AssemblyVersion>
     <FileVersion>1.2.1.0</FileVersion>
@@ -15,8 +15,13 @@
     <SignAssembly>false</SignAssembly>
 	<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
 	<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-	<PackageTags>Log, Logger, PowerLog, Power, Sharp, CSharp, C#, Modular, Library Lib, Lightweight</PackageTags>
+	<PackageTags>Log, Logger, PowerLog, Power, Sharp, CSharp, C#, Modular, Library, Lib, Lightweight</PackageTags>
 	<PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+	<Nullable>disable</Nullable>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DocumentationFile>..\PowerLog\PowerLog\XML Docs\PowerLog XML.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>

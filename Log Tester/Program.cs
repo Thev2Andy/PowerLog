@@ -12,28 +12,27 @@ namespace LogTester
             LogSession.Initialize();
             LogSession.LogSizeThreshold = 128;
 
-            // LogImplementation.Initialize();
-
-            Log.Trace("Trace message..");
-            Log.Debug("Debug message..");
-            Log.Info("Info message..");
-            Log.Warning("Warning message..");
-            Log.Error("Error message..");
-            Log.Network("Network message..");
-            Log.Fatal("Fatal message..");
-            Log.Null("Null (No-Header) message..");
+            Log.Trace("Trace message..", LogMode.Default, "Startup");
+            Log.Debug("Debug message..", LogMode.Default, "Startup");
+            Log.Info("Info message..", LogMode.Default, "Startup");
+            Log.Warning("Warning message..", LogMode.Default, "Startup");
+            Log.Error("Error message..", LogMode.Default, "Startup");
+            Log.Network("Network message..", LogMode.Default, "Startup");
+            Log.Fatal("Fatal message..", LogMode.Default, "Startup");
+            Log.Null("Null (No-Header) message..", LogMode.Default, "Startup");
 
             int Tries = 0;
 
             Array LogValues = Enum.GetValues(typeof(LogType));
             Random RNG = new Random();
-            Log.LogL("Dynamic log message..", (LogType)(LogValues.GetValue(RNG.Next(LogValues.Length))));
+            Log.Write("Dynamic log message..", (LogType)(LogValues.GetValue(RNG.Next(LogValues.Length))));
 
             Log.Null("", (LogMode.Save | LogMode.InvokeEvent));
+            // Log.Null("", LogMode.Default);
 
             Log:
             Console.Write("Enter message: ");
-            Log.LogL(Console.ReadLine(), (LogType)(LogValues.GetValue(RNG.Next(LogValues.Length))), LogMode.Default, null);
+            Log.Write(Console.ReadLine(), (LogType)(LogValues.GetValue(RNG.Next(LogValues.Length))), LogMode.Default, null);
 
             if (Tries == 4)
             {
@@ -56,7 +55,7 @@ namespace LogTester
 
         private static void OnSave(object Sender, EventArgs E)
         {
-            Log.LogL("The log just got saved.", LogType.Info, (LogMode.Default | LogMode.NoSizeCheck));
+            Log.Write("The log just got saved.", LogType.Info, (LogMode.Default | LogMode.NoSizeCheck));
         }
 
         public static void OnLog(object sender, LogArgs logEventArgs) 
@@ -105,9 +104,7 @@ namespace LogTester
             }
 
             Console.ForegroundColor = TargetColor;
-            Console.WriteLine($"{((logEventArgs.LoggingMode.HasFlag(LogMode.Timestamp)) ? $"[{DateTime.Now.ToString("HH:mm:ss")}] " : String.Empty)}" +
-                $"{((logEventArgs.LogLevel != LogType.Null) ? $"{logEventArgs.LogLevel.ToString()}: " : String.Empty)}" +
-                $"{logEventArgs.LogMessage}");
+            Console.WriteLine(logEventArgs.FormattedLog);
 
             Console.ForegroundColor = BackupColor;
         }

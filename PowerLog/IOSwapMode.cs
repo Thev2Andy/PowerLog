@@ -11,8 +11,7 @@ namespace PowerLog
     /// IO swap mode enumeration.
     /// </summary>
     #endregion
-    [Flags]
-    public enum IOSwapMode
+    [Flags] public enum IOSwapMode
     {
         None = 1,
         Override = 2,

@@ -13,24 +13,11 @@ namespace PowerLog
     #endregion
     public static class LogImplementation
     {
-        public static void Initialize()
-        {
-            // Most of the time, default launch parameters are fine.
-            LogSession.Initialize(true);
-
-            // Set the log size threshold to 5 MB.
-            LogSession.LogSizeThreshold = 5000000;
-
-            // Subscribe to events using default functions.
-            Log.OnLog += OnLog;
-            Log.OnClear += OnClear;
-        }
-
-        private static void OnClear(object Sender, EventArgs E) {
+        private static void OnClearConsole(object Sender, EventArgs E) {
             Console.Clear();
         }
 
-        private static void OnLog(object Sender, LogArgs LogArgs)
+        private static void OnLogConsole(object Sender, LogArgs LogArgs)
         {
             ConsoleColor BackupColor = Console.ForegroundColor;
             ConsoleColor TargetColor;
@@ -76,9 +63,7 @@ namespace PowerLog
             }
 
             Console.ForegroundColor = TargetColor;
-            Console.WriteLine($"{((LogArgs.LoggingMode.HasFlag(LogMode.Timestamp)) ? $"[{DateTime.Now.ToString("HH:mm:ss")}] " : String.Empty)}" +
-                $"{((LogArgs.LogLevel != LogType.Null) ? $"{LogArgs.LogLevel.ToString()}: " : String.Empty)}" +
-                $"{LogArgs.LogMessage}");
+            Console.WriteLine(LogArgs.FormattedLog);
 
             Console.ForegroundColor = BackupColor;
         }
