@@ -1,5 +1,5 @@
 # PowerLog
-PowerLog is a lightweight logging library made in C#, designed to make logging easy, with only one function call.
+PowerLog is a lightweight logging library made in C#, that is just built different.
 
 # Features
 * Logging with only one function. You can read more in the [docs](https://github.com/Thev2Andy/PowerLog/wiki).
