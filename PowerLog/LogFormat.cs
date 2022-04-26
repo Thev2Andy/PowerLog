@@ -7,10 +7,18 @@ using System.Threading.Tasks;
 
 namespace PowerLog
 {
-    // Missing XML
+    #region LogFormat Class XML
+    /// <summary>
+    /// The class used for formatting logs.
+    /// </summary>
+    #endregion
     public class LogFormat
     {
-        // Missing XML.
+        #region Format Function XML
+        /// <summary>
+        /// Formats a log string using Regex, then returns it.
+        /// </summary>
+        #endregion
         public static string Format(LogArgs Log, string LogTemplate, string DateTemplate)
         {
             if (!String.IsNullOrEmpty(LogTemplate) && !String.IsNullOrEmpty(DateTemplate))

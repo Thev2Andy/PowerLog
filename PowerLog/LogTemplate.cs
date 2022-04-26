@@ -6,7 +6,11 @@ using System.Threading.Tasks;
 
 namespace PowerLog
 {
-    // Missing XML
+    #region LogTemplate Class XML
+    /// <summary>
+    /// Holds data related to the formatting of the logs.
+    /// </summary>
+    #endregion
     [Serializable] public class LogTemplate
     {
         #region DateFormat String XML

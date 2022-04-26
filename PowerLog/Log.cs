@@ -55,14 +55,14 @@ namespace PowerLog
 
         #region OnClear Event XML
         /// <summary>
-        /// Invoked on <c>ClearLog()</c> call.
+        /// Invoked on <c>Clear()</c> call.
         /// </summary>
         #endregion
         public event Action OnClear;
 
         #region OnDelete Event XML
         /// <summary>
-        /// Invoked when this logger is collected by the GC.
+        /// Invoked when this logger is deleted / destroyed.
         /// </summary>
         #endregion
         public event Action<Object> OnDelete;
@@ -340,7 +340,7 @@ namespace PowerLog
         public Log(string Identifier) {
             this.Identifier = Identifier;
 
-            AppDomain.CurrentDomain.UnhandledException += this.LogException;
+            // AppDomain.CurrentDomain.UnhandledException += this.LogException;
             AppDomain.CurrentDomain.UnhandledException += EventSaveLog;
 
             AppDomain.CurrentDomain.ProcessExit += EventSaveLog;

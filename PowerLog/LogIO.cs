@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace PowerLog
 {
+    // Missing XML.
     [Serializable] public class LogIO
     {
         #region LogPath String XML
