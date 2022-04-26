@@ -51,14 +51,14 @@ namespace PowerLog
         /// Invoked when the log is saved.
         /// </summary>
         #endregion
-        public event Action<Object> OnSave;
+        public event Action OnSave;
 
         #region OnClear Event XML
         /// <summary>
         /// Invoked on <c>ClearLog()</c> call.
         /// </summary>
         #endregion
-        public event Action<Object> OnClear;
+        public event Action OnClear;
 
         #region OnDelete Event XML
         /// <summary>
@@ -146,7 +146,7 @@ namespace PowerLog
         /// <summary>
         /// Calls a trace log, sent over to the <c>OnLog</c> event.
         /// </summary>
-        /// <param name="LogContent">The message of the this.</param>
+        /// <param name="LogContent">The message of the log.</param>
         /// <param name="LoggingData">The log options.</param>
         /// <param name="LogSender">The sender of the this.</param>
         #endregion
@@ -158,7 +158,7 @@ namespace PowerLog
         /// <summary>
         /// Calls a debug log, sent over to the <c>OnLog</c> event.
         /// </summary>
-        /// <param name="LogContent">The message of the this.</param>
+        /// <param name="LogContent">The message of the log.</param>
         /// <param name="LoggingData">The log options.</param>
         /// <param name="LogSender">The sender of the this.</param>
         #endregion
@@ -170,7 +170,7 @@ namespace PowerLog
         /// <summary>
         /// Calls an info log, sent over to the <c>OnLog</c> event.
         /// </summary>
-        /// <param name="LogContent">The message of the this.</param>
+        /// <param name="LogContent">The message of the log.</param>
         /// <param name="LoggingData">The log options.</param>
         /// <param name="LogSender">The sender of the this.</param>
         #endregion
@@ -182,7 +182,7 @@ namespace PowerLog
         /// <summary>
         /// Calls a warning log, sent over to the <c>OnLog</c> event.
         /// </summary>
-        /// <param name="LogContent">The message of the this.</param>
+        /// <param name="LogContent">The message of the log.</param>
         /// <param name="LoggingData">The log options.</param>
         /// <param name="LogSender">The sender of the this.</param>
         #endregion
@@ -194,7 +194,7 @@ namespace PowerLog
         /// <summary>
         /// Calls an error log, sent over to the <c>OnLog</c> event.
         /// </summary>
-        /// <param name="LogContent">The message of the this.</param>
+        /// <param name="LogContent">The message of the log.</param>
         /// <param name="LoggingData">The log options.</param>
         /// <param name="LogSender">The sender of the this.</param>
         #endregion
@@ -206,7 +206,7 @@ namespace PowerLog
         /// <summary>
         /// Calls a network log, sent over to the <c>OnLog</c> event.
         /// </summary>
-        /// <param name="LogContent">The message of the this.</param>
+        /// <param name="LogContent">The message of the log.</param>
         /// <param name="LoggingData">The log options.</param>
         /// <param name="LogSender">The sender of the this.</param>
         #endregion
@@ -218,7 +218,7 @@ namespace PowerLog
         /// <summary>
         /// Calls a fatal log, sent over to the <c>OnLog</c> event.
         /// </summary>
-        /// <param name="LogContent">The message of the this.</param>
+        /// <param name="LogContent">The message of the log.</param>
         /// <param name="LoggingData">The log options.</param>
         /// <param name="LogSender">The sender of the this.</param>
         #endregion
@@ -226,11 +226,11 @@ namespace PowerLog
             this.Write(LogContent, LogType.Fatal, LoggingData, LogSender);
         }
 
-        #region null Function XML
+        #region NA Function XML
         /// <summary>
-        /// Calls a null (no-header) log, sent over to the <c>OnLog</c> event.
+        /// Calls a NA (no-header) log, sent over to the <c>OnLog</c> event.
         /// </summary>
-        /// <param name="LogContent">The message of the this.</param>
+        /// <param name="LogContent">The message of the log.</param>
         /// <param name="LoggingData">The log options.</param>
         /// <param name="LogSender">The sender of the this.</param>
         #endregion
@@ -258,7 +258,7 @@ namespace PowerLog
 
                 File.AppendAllText(LogFilePath, $"{LogCache}{((LogCache.EndsWith(Environment.NewLine) || LogCache.Length <= 0) ? String.Empty : Environment.NewLine)}");
                 LogCache = String.Empty;
-                OnSave?.Invoke(Sender);
+                OnSave?.Invoke();
             }
 
             else {
@@ -272,7 +272,7 @@ namespace PowerLog
         /// </summary>
         #endregion
         public void Clear(object Sender = null) {
-            OnClear?.Invoke(Sender);
+            OnClear?.Invoke();
         }
 
 
