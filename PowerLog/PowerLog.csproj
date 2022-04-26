@@ -17,7 +17,7 @@
 	<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 	<PackageTags>Log, Logger, PowerLog, Power, Sharp, CSharp, C#, Modular, Library, Lib, Lightweight</PackageTags>
 	<PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
-	<Nullable>disable</Nullable>
+	<nullable>disable</nullable>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">

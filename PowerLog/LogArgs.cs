@@ -13,14 +13,18 @@ namespace PowerLog
     #endregion
     [Serializable] public class LogArgs : EventArgs
     {
-        public string FormattedLog;
+        public string FormattedLog {
+            get {
+                return LogFormat.Format(this, LoggingData.LogTemplate.LogFormat, LoggingData.LogTemplate.DateFormat);
+            }
+        }
 
         public string LogContent;
         public LogType LogLevel;
         public DateTime LogTime;
-        public LogMode LoggingMode;
+        public LogData LoggingData;
         public object LogSender;
 
-        // public Log Logger;
+        public Log Logger;
     }
 }

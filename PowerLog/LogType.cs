@@ -20,6 +20,6 @@ namespace PowerLog
         Error,
         Network,
         Fatal,
-        Null
+        NA,
     }
 }

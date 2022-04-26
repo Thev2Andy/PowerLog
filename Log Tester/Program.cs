@@ -5,34 +5,38 @@ namespace LogTester
 {
     class Program
     {
+        public static Log Log;
+
         static void Main(string[] args)
         {
-            Log.OnLog += OnLog;
-            // Log.OnSave += OnSave;
-            LogSession.Initialize();
-            LogSession.LogSizeThreshold = 128;
+            Log = new Log("PL");
 
-            Log.Trace("Trace message..", LogMode.Default, "Startup");
-            Log.Debug("Debug message..", LogMode.Default, "Startup");
-            Log.Info("Info message..", LogMode.Default, "Startup");
-            Log.Warning("Warning message..", LogMode.Default, "Startup");
-            Log.Error("Error message..", LogMode.Default, "Startup");
-            Log.Network("Network message..", LogMode.Default, "Startup");
-            Log.Fatal("Fatal message..", LogMode.Default, "Startup");
-            Log.Null("Null (No-Header) message..", LogMode.Default, "Startup");
+            Log.OnLog += OnLog;
+            Log.LogSizeThreshold = 128;
+
+            Log.Trace("Trace message..", LogData.Default, "Startup");
+            Log.Debug("Debug message..", LogData.Default, "Startup");
+            Log.Info("Info message..", LogData.Default, "Startup");
+            Log.Warning("Warning message..", LogData.Default, "Startup");
+            Log.Error("Error message..", LogData.Default, "Startup");
+            Log.Network("Network message..", LogData.Default, "Startup");
+            Log.Fatal("Fatal message..", LogData.Default, "Startup");
+            Log.NA("NA (No-Header) message..", LogData.Default, "Startup");
 
             int Tries = 0;
 
             Array LogValues = Enum.GetValues(typeof(LogType));
             Random RNG = new Random();
-            Log.Write("Dynamic log message..", (LogType)(LogValues.GetValue(RNG.Next(LogValues.Length))));
+            Log.Write("Dynamic log message..", (LogType)(LogValues.GetValue(RNG.Next(LogValues.Length))), LogData.Default);
 
-            Log.Null("", (LogMode.Save | LogMode.InvokeEvent));
-            // Log.Null("", LogMode.Default);
+            Log.Info("API Test", LogData.Default);
+
+            Log.NA("", LogData.EmptyLine);
+            // Log.NA(Environment.NewLine, LogData.Default);
 
             Log:
             Console.Write("Enter message: ");
-            Log.Write(Console.ReadLine(), (LogType)(LogValues.GetValue(RNG.Next(LogValues.Length))), LogMode.Default, null);
+            Log.Write(Console.ReadLine(), (LogType)(LogValues.GetValue(RNG.Next(LogValues.Length))), LogData.Default, null);
 
             if (Tries == 4)
             {
@@ -53,12 +57,7 @@ namespace LogTester
             goto Log;
         }
 
-        private static void OnSave(object Sender, EventArgs E)
-        {
-            Log.Write("The log just got saved.", LogType.Info, (LogMode.Default | LogMode.NoSizeCheck));
-        }
-
-        public static void OnLog(object sender, LogArgs logEventArgs) 
+        public static void OnLog(LogArgs logEventArgs) 
         {
             ConsoleColor BackupColor = Console.ForegroundColor;
             ConsoleColor TargetColor;
@@ -93,7 +92,7 @@ namespace LogTester
                     TargetColor = ConsoleColor.DarkRed;
                     break;
 
-                case LogType.Null:
+                case LogType.NA:
                     TargetColor = BackupColor;
                     break;
 

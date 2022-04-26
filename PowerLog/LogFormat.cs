@@ -8,36 +8,35 @@ using System.Threading.Tasks;
 namespace PowerLog
 {
     // Missing XML
-    public static class LogFormat
+    public class LogFormat
     {
-        // Private / Internal variables.
         // Missing XML.
-        public static string DateTemplate { get; internal set; }
+        public static string Format(LogArgs Log, string LogTemplate, string DateTemplate)
+        {
+            if (!String.IsNullOrEmpty(LogTemplate) && !String.IsNullOrEmpty(DateTemplate))
+            {
+                Regex TimeRegex = new Regex(@"\|([^|]*)T([^|]*)\|", RegexOptions.Multiline);
+                string Result = TimeRegex.Replace(LogTemplate, ("${1}" + $"{Log.LogTime.ToString(DateTemplate)}" + "${2}"));
+                
 
-        // Missing XML.
-        public static string LogTemplate { get; internal set; }
+                Regex LogRegex = new Regex(@"\|([^|]*)N([^|]*)\|", RegexOptions.Multiline);
+                Result = LogRegex.Replace(Result, ((Log.Logger != null && !String.IsNullOrEmpty(Log.Logger.Identifier)) ? ("${1}" + $"{Log.Logger.Identifier}" + "${2}") : String.Empty));
 
+                Regex LevelRegex = new Regex(@"\|([^|]*)L([^|]*)\|", RegexOptions.Multiline);
+                Result = LevelRegex.Replace(Result, ((Log.LogLevel != LogType.NA) ? ("${1}" + $"{Log.LogLevel.ToString()}" + "${2}") : String.Empty));
 
+                Regex ContentRegex = new Regex(@"\|([^|]*)C([^|]*)\|", RegexOptions.Multiline);
+                Result = ContentRegex.Replace(Result, ("${1}" + $"{Log.LogContent}" + "${2}"));
+                
+                Regex SenderRegex = new Regex(@"\|([^|]*)S([^|]*)\|", RegexOptions.Multiline);
+                Result = SenderRegex.Replace(Result, ((Log.LogSender != null) ? ("${1}" + $"{Log.LogSender}" + "${2}") : String.Empty));
 
-        // Missing XML.
-        public static void SetTemplates(string NewLogTemplate, string NewDateTemplate) {
-            DateTemplate = NewDateTemplate;
-            LogTemplate = NewLogTemplate;
-        }
-
-        // TODO: Rewrite the formatting using Regex.
-        // Missing XML.
-        public static string Format(string LogContent, LogType LogLevel, bool Timestamped, object LogSender = null) {
-            if (!string.IsNullOrEmpty(LogFormat.LogTemplate) && !string.IsNullOrEmpty(LogFormat.DateTemplate)) {
-                // Regex Regex = new Regex("", RegexOptions.IgnoreCase, Regex.InfiniteMatchTimeout);
-
-                return $"{((Timestamped) ? $"[{DateTime.Now.ToString(DateTemplate)}] " : String.Empty)}" +
-                $"{((LogLevel != LogType.Null) ? $"{LogLevel.ToString()}: " : String.Empty)}" +
-                $"{LogContent}";
-            }else {
-                throw new InvalidOperationException("Log formats are empty.");
+                return Result;
+            }
+            
+            else {
+                throw new ArgumentException("One / Both of the log formats are empty.");
             }
         }
-
     }
 }

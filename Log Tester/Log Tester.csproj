@@ -5,7 +5,7 @@
     <TargetFramework>net6.0</TargetFramework>
     <RootNamespace>LogTester</RootNamespace>
     <Authors>Thev2Andy</Authors>
-    <Nullable>disable</Nullable>
+    <nullable>disable</nullable>
   </PropertyGroup>
 
   <ItemGroup>
