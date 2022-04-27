@@ -33,7 +33,13 @@ namespace PowerLog
         #endregion
         public string LogFormat { get; private set; }
 
-
+        #region LogTemplate Constructor XML
+        /// <summary>
+        /// The default <c>LogTemplate</c> constructor.
+        /// </summary>
+        /// <param name="LogFormat">The log formatting template.</param>
+        /// <param name="DateFormat">The date formatting template.</param>
+        #endregion
         public LogTemplate(string LogFormat, string DateFormat = "HH:mm:ss") {
             this.DateFormat = DateFormat;
             this.LogFormat = LogFormat;

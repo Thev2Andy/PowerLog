@@ -317,7 +317,7 @@ namespace PowerLog
                     }
                 }
 
-                if (!SwapMode.HasFlag(IOSwapMode.KeepOldFile) || SwapMode.HasFlag(IOSwapMode.None)) File.Delete(LogPath.GetLogPath());
+                if (!SwapMode.HasFlag(IOSwapMode.Keep) || SwapMode.HasFlag(IOSwapMode.None)) File.Delete(LogPath.GetLogPath());
             }
 
             else {
@@ -337,37 +337,44 @@ namespace PowerLog
             return (UInt64)(sizeof(char) * ((LogCache != null) ? LogCache.Length : 0f));
         }
 
+        #region Log Constructor XML
+        /// <summary>
+        /// The default <c>Log</c> constructor.
+        /// </summary>
+        /// <param name="Identifier">The identifier / name of this logger.</param>
+        #endregion
         public Log(string Identifier) {
             this.Identifier = Identifier;
 
-            // AppDomain.CurrentDomain.UnhandledException += this.LogException;
             AppDomain.CurrentDomain.UnhandledException += EventSaveLog;
-
             AppDomain.CurrentDomain.ProcessExit += EventSaveLog;
 
 
             if (LogPath == null) SwapIO(new LogIO(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $"Logs", $"{((Identifier.IndexOfAny(Path.GetInvalidPathChars()) == -1) ? Identifier : "Miscellaneous")}"),
                  $"{((Identifier.IndexOfAny(Path.GetInvalidFileNameChars()) == -1) ? Identifier : "Log")} Output - ({DateTime.Now.ToString("HH-mm-ss tt, dd MMMM yyyy")})", "txt"),
-                 (IOSwapMode.KeepOldFile));
+                 (IOSwapMode.Keep));
 
 
             LogCache = String.Empty;
         }
 
+        #region Log Finalizer XML
+        /// <summary>
+        /// The default <c>Log</c> finalizer.
+        /// </summary>
+        #endregion
         ~Log() {
-            AppDomain.CurrentDomain.ProcessExit -= this.EventSaveLog;
-
-            // AppDomain.CurrentDomain.UnhandledException -= this.LogException;
             AppDomain.CurrentDomain.UnhandledException -= this.EventSaveLog;
+            AppDomain.CurrentDomain.ProcessExit -= this.EventSaveLog;
 
             OnDelete?.Invoke(this);
             this.Save(this);
         }
 
+
         private void EventSaveLog(Object S, EventArgs E) {
             this.Save(S);
         }
-
 
         private void LogException(object Sender, UnhandledExceptionEventArgs ExceptionArgs)
         {
