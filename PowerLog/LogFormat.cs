@@ -12,7 +12,7 @@ namespace PowerLog
     /// The class used for formatting logs.
     /// </summary>
     #endregion
-    public class LogFormat
+    [Serializable] public static class LogFormat
     {
         #region Format Function XML
         /// <summary>
