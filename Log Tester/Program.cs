@@ -9,7 +9,7 @@ namespace LogTester
 
         static void Main(string[] args)
         {
-            Log = new Log("PL");
+            Log = new Log("LOG");
 
             Log.OnLog += OnLog;
             Log.LogSizeThreshold = 128;
@@ -28,8 +28,6 @@ namespace LogTester
             Array LogValues = Enum.GetValues(typeof(LogType));
             Random RNG = new Random();
             Log.Write("Dynamic log message..", (LogType)(LogValues.GetValue(RNG.Next(LogValues.Length))), LogData.Default);
-
-            Log.Info("API Test", LogData.Default);
 
             Log.NA("", LogData.EmptyLine);
             // Log.NA(Environment.NewLine, LogData.Default);

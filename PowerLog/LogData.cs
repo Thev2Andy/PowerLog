@@ -34,7 +34,7 @@ namespace PowerLog
         #endregion
         public static LogData Default {
             get {
-                return new LogData(LogMode.Default, new LogTemplate("|[T] ||N ||L: ||C|| (S)|", "HH:mm:ss"));
+                return new LogData(LogMode.Default, new LogTemplate("|[T] |||N |L: ||C|| (S)|", "HH:mm:ss"));
             }
         }
 
