@@ -7,8 +7,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PowerLog", "PowerLog\PowerL
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Log Tester", "Log Tester\Log Tester.csproj", "{338861AA-2D7D-4B22-A840-C9ECB13FC0AB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DocFX", "DocFX\DocFX.csproj", "{68C5016C-A8B1-471E-B346-784A3D8AD16F}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,10 +21,6 @@ Global
 		{338861AA-2D7D-4B22-A840-C9ECB13FC0AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{338861AA-2D7D-4B22-A840-C9ECB13FC0AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{338861AA-2D7D-4B22-A840-C9ECB13FC0AB}.Release|Any CPU.Build.0 = Release|Any CPU
-		{68C5016C-A8B1-471E-B346-784A3D8AD16F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{68C5016C-A8B1-471E-B346-784A3D8AD16F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{68C5016C-A8B1-471E-B346-784A3D8AD16F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{68C5016C-A8B1-471E-B346-784A3D8AD16F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

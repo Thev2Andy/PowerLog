@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Diagnostics;
 
 namespace PowerLog
 {
@@ -53,12 +54,20 @@ namespace PowerLog
         #endregion
         public LogData LoggingData;
 
+        #region LogStacktrace StackTrace XML
+        /// <summary>
+        /// The stacktrace of the log.
+        /// </summary>
+        #endregion
+        public StackTrace LogStacktrace;
+
         #region LogSender Object XML
         /// <summary>
         /// The sender of the log.
         /// </summary>
         #endregion
         public object LogSender;
+
 
         #region Logger Log XML
         /// <summary>
