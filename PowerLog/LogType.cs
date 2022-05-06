@@ -11,7 +11,7 @@ namespace PowerLog
     /// Log type enumeration.
     /// </summary>
     #endregion
-    public enum LogType
+    [Serializable] public enum LogType
     {
         #region Verbose EnumEntry XML
         /// <summary>
