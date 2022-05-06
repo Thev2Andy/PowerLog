@@ -21,7 +21,7 @@ namespace PowerLog
         #endregion
         public string FormattedLog {
             get {
-                return LogFormat.Format(this, LoggingData.LogTemplate.LogFormat, LoggingData.LogTemplate.DateFormat);
+                return LogFormat.Postprocess(LogFormat.Preprocess(this), LoggingData.LogTemplate.LogFormat, LoggingData.LogTemplate.DateFormat);
             }
         }
 
@@ -66,7 +66,14 @@ namespace PowerLog
         /// The sender of the log.
         /// </summary>
         #endregion
-        public object LogSender;
+        public Object LogSender;
+
+        #region LogParameters LogParameter List XML
+        /// <summary>
+        /// The additional log parameters.
+        /// </summary>
+        #endregion
+        public List<LogParameter> LogParameters;
 
 
         #region Logger Log XML

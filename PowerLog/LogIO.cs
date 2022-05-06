@@ -49,13 +49,13 @@ namespace PowerLog
             this.LogFileExtension = LogFileExtension;
         }
 
-        #region GetLogPath Method XML
+        #region Get Method XML
         /// <summary>
         /// Gets the complete log path.
         /// </summary>
         /// <returns>The complete log path.</returns>
         #endregion
-        public string GetLogPath() {
+        public string Get() {
             return Path.Combine(LogPath, $"{LogFileName}.{LogFileExtension}");
         }
     }

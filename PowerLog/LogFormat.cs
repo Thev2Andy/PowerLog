@@ -14,12 +14,16 @@ namespace PowerLog
     #endregion
     [Serializable] public static class LogFormat
     {
-        #region Format Function XML
+        #region Postproces Function XML
         /// <summary>
         /// Formats a log string using Regex, then returns it.
         /// </summary>
+        /// <returns>The formatted log string.</returns>
+        /// <param name="Log">The log to postprocess.</param>
+        /// <param name="LogTemplate">The log template.</param>
+        /// <param name="DateTemplate">The log date template.</param>
         #endregion
-        public static string Format(LogArgs Log, string LogTemplate, string DateTemplate)
+        public static string Postprocess(LogArgs Log, string LogTemplate, string DateTemplate)
         {
             Regex TimeRegex = new Regex(@"\|([^|]*)T([^|]*)\|", RegexOptions.Multiline);
             string Result = TimeRegex.Replace(LogTemplate, ("${1}" + $"{Log.LogTime.ToString(DateTemplate)}" + "${2}"));
@@ -38,6 +42,24 @@ namespace PowerLog
             Result = SenderRegex.Replace(Result, ("${1}" + $"{((Log.LogSender != null) ? Log.LogSender : "N/A")}" + "${2}"));
 
             return Result;
+        }
+
+        #region Postproces Function XML
+        /// <summary>
+        /// Preprocesses a raw log object, then returns it.
+        /// </summary>
+        /// <returns>The preprocessed log.</returns>
+        /// <param name="Log">The log to preprocess.</param>
+        #endregion
+        public static LogArgs Preprocess(LogArgs Log)
+        {
+            LogArgs PreprocessedLog = Log;
+            for (int i = 0; i < PreprocessedLog.LogParameters.Count; i++)
+            {
+                PreprocessedLog.LogContent = Log.LogContent.Replace($"~{PreprocessedLog.LogParameters[i].Identifier}~", PreprocessedLog.LogParameters[i].Value.ToString());
+            }
+
+            return PreprocessedLog;
         }
     }
 }

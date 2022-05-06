@@ -13,6 +13,7 @@ namespace PowerLog
     #endregion
     [Serializable] public class LogData
     {
+        // Public / Accessible variables..
         #region LogTemplate LogTemplate XML
         /// <summary>
         /// The format of the log and date.
@@ -25,8 +26,10 @@ namespace PowerLog
         /// The mode of the log.
         /// </summary>
         #endregion
-        public LogMode LogMode { get; private set; }
+        public LogOptions LogOptions { get; private set; }
 
+        
+        // Predefined profiles..
         #region Default LogData XML
         /// <summary>
         /// The default <c>LogData</c> profile, with it's default templates.
@@ -34,7 +37,7 @@ namespace PowerLog
         #endregion
         public static LogData Default {
             get {
-                return new LogData(LogMode.Default, new LogTemplate("|[T] |||N |L: ||C|| (S)|", "HH:mm:ss"));
+                return new LogData(LogOptions.Default, new LogTemplate("|[T] |||N |L: ||C|| (S)|", "HH:mm:ss"));
             }
         }
 
@@ -45,20 +48,22 @@ namespace PowerLog
         #endregion
         public static LogData EmptyLine {
             get {
-                return new LogData(LogMode.Default, new LogTemplate("", ""));
+                return new LogData(LogOptions.Default, new LogTemplate("", ""));
             }
         }
+
+
 
         #region LogData Constructor XML
         /// <summary>
         /// The default <c>LogData</c> constructor.
         /// </summary>
-        /// <param name="LogMode">The logging mode to use.</param>
+        /// <param name="LogOptions">The logging options to use.</param>
         /// <param name="LogTemplate">The log formats.</param>
         #endregion
-        public LogData(LogMode LogMode, LogTemplate LogTemplate) {
+        public LogData(LogOptions LogOptions, LogTemplate LogTemplate) {
             this.LogTemplate = LogTemplate;
-            this.LogMode = LogMode;
+            this.LogOptions = LogOptions;
         }
     }
 }

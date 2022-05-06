@@ -6,13 +6,21 @@ using System.Threading.Tasks;
 
 namespace PowerLog
 {
-    #region LogMode Enum XML
+    #region LogOptions Enum XML
     /// <summary>
-    /// Log mode enumeration.
+    /// Log option enumeration.
     /// </summary>
     #endregion
-    [Serializable] [Flags] public enum LogMode
+    [Serializable] [Flags] public enum LogOptions
     {
+        #region Default EnumEntry XML
+        /// <summary>
+        /// The default log options.
+        /// </summary>
+        #endregion
+        Default = (Save | InvokeEvent),
+
+
         #region Save EnumEntry XML
         /// <summary>
         /// Save the log to the log file.
@@ -33,12 +41,5 @@ namespace PowerLog
         /// </summary>
         #endregion
         NoSizeCheck = 2,
-
-        #region Default EnumEntry XML
-        /// <summary>
-        /// The default log mode.
-        /// </summary>
-        #endregion
-        Default = (Save | InvokeEvent),
     }
 }

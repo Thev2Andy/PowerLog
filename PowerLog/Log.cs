@@ -18,11 +18,10 @@ namespace PowerLog
         // Public / Accessible variables.
         #region Identifier String XML
         /// <summary>
-        /// Contains the identifier / name of the current logger object.
+        /// Contains the identifier / name of the current logger Object.
         /// </summary>
         #endregion
         public string Identifier { get; private set; }
-
 
         #region WriteLogInFile Boolean XML
         /// <summary>
@@ -102,9 +101,10 @@ namespace PowerLog
         /// <param name="LogContent">The content of the this.</param>
         /// <param name="LogLevel">The type / level of the this.</param>
         /// <param name="LoggingData">The log options.</param>
+        /// <param name="LogParameters">The additional log parameters.</param>
         /// <param name="LogSender">The sender of the this.</param>
         #endregion
-        public void Write(string LogContent, LogType LogLevel, LogData LoggingData, object LogSender = null)
+        public void Write(string LogContent, LogType LogLevel, LogData LoggingData, List<LogParameter> LogParameters = null, Object LogSender = null)
         {
             LogArgs LogEventParams = new LogArgs()
             {
@@ -114,33 +114,34 @@ namespace PowerLog
                 LoggingData = LoggingData,
                 LogSender = LogSender,
                 LogStacktrace = new StackTrace(),
+                LogParameters = LogParameters,
 
                 Logger = this
             };
 
-            if (LoggingData.LogMode.HasFlag(LogMode.Save))
+            if (LoggingData.LogOptions.HasFlag(LogOptions.Save))
             {
                 LogCache = $"{((LogCache.Length > 0) ? LogCache : String.Empty)}" +
                     $"{((LogCache.Length > 0) ? $"{Environment.NewLine}" : String.Empty)}" +
                     $"{LogEventParams.FormattedLog}";
 
-                if (this.CheckLogSize() >= LogSizeThreshold && (!LoggingData.LogMode.HasFlag(LogMode.NoSizeCheck))) {
+                if (this.CheckLogSize() >= LogSizeThreshold && (!LoggingData.LogOptions.HasFlag(LogOptions.NoSizeCheck))) {
                     this.Save(null);
                 }
             }
 
-            if (LoggingData.LogMode.HasFlag(LogMode.InvokeEvent)) OnLog?.Invoke(LogEventParams);
+            if (LoggingData.LogOptions.HasFlag(LogOptions.InvokeEvent)) OnLog?.Invoke(LogEventParams);
             LastLog = LogEventParams;
         }
 
         #region LogArguments Function XML
         /// <summary>
-        /// Calls a log by passing a <c>LogArgs</c> object.
+        /// Calls a log by passing a <c>LogArgs</c> Object.
         /// </summary>
-        /// <param name="Arguments">The log arguments object to this.</param>
+        /// <param name="Arguments">The log arguments Object to this.</param>
         #endregion
         public void LogArguments(LogArgs Arguments) {
-            this.Write(Arguments.LogContent, Arguments.LogLevel, Arguments.LoggingData, Arguments.LogSender);
+            this.Write(Arguments.LogContent, Arguments.LogLevel, Arguments.LoggingData, Arguments.LogParameters, Arguments.LogSender);
         }
 
         #region Log Overloads
@@ -150,10 +151,11 @@ namespace PowerLog
         /// </summary>
         /// <param name="LogContent">The message of the log.</param>
         /// <param name="LoggingData">The log options.</param>
+        /// <param name="LogParameters">The additional log parameters.</param>
         /// <param name="LogSender">The sender of the this.</param>
         #endregion
-        public void Trace(string LogContent, LogData LoggingData, object LogSender = null) {
-            this.Write(LogContent, LogType.Trace, LoggingData, LogSender);
+        public void Trace(string LogContent, LogData LoggingData, List<LogParameter> LogParameters = null, Object LogSender = null) {
+            this.Write(LogContent, LogType.Trace, LoggingData, LogParameters, LogSender);
         }
 
         #region Debug Function XML
@@ -162,10 +164,11 @@ namespace PowerLog
         /// </summary>
         /// <param name="LogContent">The message of the log.</param>
         /// <param name="LoggingData">The log options.</param>
+        /// <param name="LogParameters">The additional log parameters.</param>
         /// <param name="LogSender">The sender of the this.</param>
         #endregion
-        public void Debug(string LogContent, LogData LoggingData, object LogSender = null) {
-            this.Write(LogContent, LogType.Debug, LoggingData, LogSender);
+        public void Debug(string LogContent, LogData LoggingData, List<LogParameter> LogParameters = null, Object LogSender = null) {
+            this.Write(LogContent, LogType.Debug, LoggingData, LogParameters, LogSender);
         }
 
         #region Info Function XML
@@ -174,10 +177,11 @@ namespace PowerLog
         /// </summary>
         /// <param name="LogContent">The message of the log.</param>
         /// <param name="LoggingData">The log options.</param>
+        /// <param name="LogParameters">The additional log parameters.</param>
         /// <param name="LogSender">The sender of the this.</param>
         #endregion
-        public void Info(string LogContent, LogData LoggingData, object LogSender = null) {
-            this.Write(LogContent, LogType.Info, LoggingData, LogSender);
+        public void Info(string LogContent, LogData LoggingData, List<LogParameter> LogParameters = null, Object LogSender = null) {
+            this.Write(LogContent, LogType.Info, LoggingData, LogParameters, LogSender);
         }
 
         #region Warning Function XML
@@ -186,10 +190,11 @@ namespace PowerLog
         /// </summary>
         /// <param name="LogContent">The message of the log.</param>
         /// <param name="LoggingData">The log options.</param>
+        /// <param name="LogParameters">The additional log parameters.</param>
         /// <param name="LogSender">The sender of the this.</param>
         #endregion
-        public void Warning(string LogContent, LogData LoggingData, object LogSender = null) {
-            this.Write(LogContent, LogType.Warning, LoggingData, LogSender);
+        public void Warning(string LogContent, LogData LoggingData, List<LogParameter> LogParameters = null, Object LogSender = null) {
+            this.Write(LogContent, LogType.Warning, LoggingData, LogParameters, LogSender);
         }
 
         #region Error Function XML
@@ -198,10 +203,11 @@ namespace PowerLog
         /// </summary>
         /// <param name="LogContent">The message of the log.</param>
         /// <param name="LoggingData">The log options.</param>
+        /// <param name="LogParameters">The additional log parameters.</param>
         /// <param name="LogSender">The sender of the this.</param>
         #endregion
-        public void Error(string LogContent, LogData LoggingData, object LogSender = null) {
-            this.Write(LogContent, LogType.Error, LoggingData, LogSender);
+        public void Error(string LogContent, LogData LoggingData, List<LogParameter> LogParameters = null, Object LogSender = null) {
+            this.Write(LogContent, LogType.Error, LoggingData, LogParameters, LogSender);
         }
 
         #region Network Function XML
@@ -210,10 +216,11 @@ namespace PowerLog
         /// </summary>
         /// <param name="LogContent">The message of the log.</param>
         /// <param name="LoggingData">The log options.</param>
+        /// <param name="LogParameters">The additional log parameters.</param>
         /// <param name="LogSender">The sender of the this.</param>
         #endregion
-        public void Network(string LogContent, LogData LoggingData, object LogSender = null) {
-            this.Write(LogContent, LogType.Network, LoggingData, LogSender);
+        public void Network(string LogContent, LogData LoggingData, List<LogParameter> LogParameters = null, Object LogSender = null) {
+            this.Write(LogContent, LogType.Network, LoggingData, LogParameters, LogSender);
         }
 
         #region Fatal Function XML
@@ -222,10 +229,11 @@ namespace PowerLog
         /// </summary>
         /// <param name="LogContent">The message of the log.</param>
         /// <param name="LoggingData">The log options.</param>
+        /// <param name="LogParameters">The additional log parameters.</param>
         /// <param name="LogSender">The sender of the this.</param>
         #endregion
-        public void Fatal(string LogContent, LogData LoggingData, object LogSender = null) {
-            this.Write(LogContent, LogType.Fatal, LoggingData, LogSender);
+        public void Fatal(string LogContent, LogData LoggingData, List<LogParameter> LogParameters = null, Object LogSender = null) {
+            this.Write(LogContent, LogType.Fatal, LoggingData, LogParameters, LogSender);
         }
 
         #region NA Function XML
@@ -234,10 +242,11 @@ namespace PowerLog
         /// </summary>
         /// <param name="LogContent">The message of the log.</param>
         /// <param name="LoggingData">The log options.</param>
+        /// <param name="LogParameters">The additional log parameters.</param>
         /// <param name="LogSender">The sender of the this.</param>
         #endregion
-        public void NA(string LogContent, LogData LoggingData, object LogSender = null) {
-            this.Write(LogContent, LogType.NA, LoggingData, LogSender);
+        public void NA(string LogContent, LogData LoggingData, List<LogParameter> LogParameters = null, Object LogSender = null) {
+            this.Write(LogContent, LogType.NA, LoggingData, LogParameters, LogSender);
         }
         #endregion
 
@@ -247,11 +256,11 @@ namespace PowerLog
         /// Saves the log in a file.
         /// </summary>
         #endregion
-        public void Save(object Sender = null)
+        public void Save(Object Sender = null)
         {
             if (WriteInLogFile)
             {
-                string LogFilePath = LogPath.GetLogPath();
+                string LogFilePath = LogPath.Get();
 
                 if (!Directory.Exists(LogPath.LogPath))
                 {
@@ -264,7 +273,7 @@ namespace PowerLog
             }
 
             else {
-                this.Error("Log saving is currently disabled.", LogData.Default, this);
+                this.Error("Log saving is currently disabled.", LogData.Default, null, this);
             }
         }
 
@@ -273,16 +282,17 @@ namespace PowerLog
         /// Invokes the <c>OnClear</c> event.
         /// </summary>
         #endregion
-        public void Clear(object Sender = null) {
+        public void Clear(Object Sender = null) {
             OnClear?.Invoke();
         }
 
 
+
         #region SwapIO Method XML
         /// <summary>
-        /// Sets a new LogIO object as log path data.
+        /// Sets a new LogIO Object as log path data.
         /// </summary>
-        /// <param name="NewIO">The 'LogIO' object to swap to.</param>
+        /// <param name="NewIO">The 'LogIO' Object to swap to.</param>
         /// <param name="SwapMode">The 'LogIO' swap mode.</param>
         #endregion
         public void SwapIO(LogIO NewIO, IOSwapMode SwapMode)
@@ -295,16 +305,15 @@ namespace PowerLog
                     {
                         if (SwapMode.HasFlag(IOSwapMode.Migrate))
                         {
-                            if (File.Exists(NewIO.GetLogPath())) File.Delete(NewIO.GetLogPath());
+                            if (File.Exists(NewIO.Get())) File.Delete(NewIO.Get());
 
-                            if (File.Exists(LogPath.GetLogPath())) {
-                                File.Copy(LogPath.GetLogPath(), NewIO.GetLogPath());
+                            if (File.Exists(LogPath.Get())) {
+                                File.Copy(LogPath.Get(), NewIO.Get());
                             }
                         }
 
-                        else
-                        {
-                            if (File.Exists(NewIO.GetLogPath())) File.Delete(NewIO.GetLogPath());
+                        else {
+                            if (File.Exists(NewIO.Get())) File.Delete(NewIO.Get());
                         }
                     }
 
@@ -312,18 +321,18 @@ namespace PowerLog
                     {
                         if (SwapMode.HasFlag(IOSwapMode.Migrate))
                         {
-                            string OldLogContents = (File.Exists(LogPath.GetLogPath()) ? File.ReadAllText(LogPath.GetLogPath()) : String.Empty);
-                            File.AppendAllText(NewIO.GetLogPath(),
+                            string OldLogContents = (File.Exists(LogPath.Get()) ? File.ReadAllText(LogPath.Get()) : String.Empty);
+                            File.AppendAllText(NewIO.Get(),
                                 $"{OldLogContents}{((OldLogContents.EndsWith(Environment.NewLine)) ? String.Empty : Environment.NewLine)}");
                         }
                     }
                 }
 
-                if (!SwapMode.HasFlag(IOSwapMode.Keep) || SwapMode.HasFlag(IOSwapMode.None)) File.Delete(LogPath.GetLogPath());
+                if (!SwapMode.HasFlag(IOSwapMode.Keep) || SwapMode.HasFlag(IOSwapMode.None)) File.Delete(LogPath.Get());
             }
 
             else {
-                if (File.Exists(NewIO.GetLogPath()) && SwapMode.HasFlag(IOSwapMode.Override) && !SwapMode.HasFlag(IOSwapMode.None)) File.Delete(NewIO.GetLogPath());
+                if (File.Exists(NewIO.Get()) && SwapMode.HasFlag(IOSwapMode.Override) && !SwapMode.HasFlag(IOSwapMode.None)) File.Delete(NewIO.Get());
             }
 
             LogPath = NewIO;
@@ -338,6 +347,7 @@ namespace PowerLog
         public UInt64 CheckLogSize() {
             return (UInt64)(sizeof(char) * ((LogCache != null) ? LogCache.Length : 0f));
         }
+
 
         #region Log Constructor XML
         /// <summary>
@@ -378,12 +388,18 @@ namespace PowerLog
             this.Save(S);
         }
 
-        private void LogException(object Sender, UnhandledExceptionEventArgs ExceptionArgs)
+
+
+
+
+
+
+        private void LogException(Object Sender, UnhandledExceptionEventArgs ExceptionArgs)
         {
             if (true /*LogExceptions*/)
             {
-                this.NA(String.Empty, LogData.Default, this); // Add a new line in the log file.
-                this.Write($"Unhandled exception!{((ExceptionArgs.IsTerminating) ? " The application will now terminate." : String.Empty)}", ((ExceptionArgs.IsTerminating) ? LogType.Fatal : LogType.Error), LogData.Default, ExceptionArgs.ExceptionObject);
+                this.NA(String.Empty, LogData.Default, null, this); // Add a new line in the log file.
+                this.Write($"Unhandled exception!{((ExceptionArgs.IsTerminating) ? " The application will now terminate." : String.Empty)}", ((ExceptionArgs.IsTerminating) ? LogType.Fatal : LogType.Error), LogData.Default, null, ExceptionArgs.ExceptionObject);
                 this.NA($"{((Exception)ExceptionArgs.ExceptionObject).GetType()}: {((Exception)ExceptionArgs.ExceptionObject).Message}{Environment.NewLine}{((Exception)ExceptionArgs.ExceptionObject).StackTrace}", LogData.Default);
             }
         }
