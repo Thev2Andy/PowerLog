@@ -32,7 +32,7 @@ namespace PowerLog
         // Predefined profiles..
         #region Default LogData XML
         /// <summary>
-        /// The default <c>LogData</c> profile, with it's default templates.
+        /// The default <c>LogData</c> profile, with its default templates.
         /// </summary>
         #endregion
         public static LogData Default {
