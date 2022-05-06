@@ -53,13 +53,19 @@ namespace PowerLog
         #endregion
         public static LogArgs Preprocess(LogArgs Log)
         {
-            LogArgs PreprocessedLog = Log;
-            for (int i = 0; i < PreprocessedLog.LogParameters.Count; i++)
-            {
-                PreprocessedLog.LogContent = Log.LogContent.Replace($"~{PreprocessedLog.LogParameters[i].Identifier}~", PreprocessedLog.LogParameters[i].Value.ToString());
+            if (Log.LogParameters != null) {
+                LogArgs PreprocessedLog = Log;
+                for (int i = 0; i < PreprocessedLog.LogParameters.Count; i++)
+                {
+                    PreprocessedLog.LogContent = Log.LogContent.Replace($"~{PreprocessedLog.LogParameters[i].Identifier}~", PreprocessedLog.LogParameters[i].Value.ToString());
+                }
+
+                return PreprocessedLog;
             }
 
-            return PreprocessedLog;
+            else {
+                return Log;
+            }
         }
     }
 }

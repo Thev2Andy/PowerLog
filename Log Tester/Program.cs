@@ -14,14 +14,14 @@ namespace LogTester
             Log.OnLog += OnLog;
             Log.LogSizeThreshold = 128;
 
-            Log.Trace("Trace message..", LogData.Default, "Startup");
-            Log.Debug("Debug message..", LogData.Default, "Startup");
-            Log.Info("Info message..", LogData.Default, "Startup");
-            Log.Warning("Warning message..", LogData.Default, "Startup");
-            Log.Error("Error message..", LogData.Default, "Startup");
-            Log.Network("Network message..", LogData.Default, "Startup");
-            Log.Fatal("Fatal message..", LogData.Default, "Startup");
-            Log.NA("NA (No-Header) message..", LogData.Default, "Startup");
+            Log.Trace("Trace message..", LogData.Default, null, "Startup");
+            Log.Debug("Debug message..", LogData.Default, null, "Startup");
+            Log.Info("Info message..", LogData.Default, null, "Startup");
+            Log.Warning("Warning message..", LogData.Default, null, "Startup");
+            Log.Error("Error message..", LogData.Default, null, "Startup");
+            Log.Network("Network message..", LogData.Default, null, "Startup");
+            Log.Fatal("Fatal message..", LogData.Default, null, "Startup");
+            Log.NA("NA (No-Header) message..", LogData.Default, null, "Startup");
 
             int Tries = 0;
 
@@ -32,9 +32,11 @@ namespace LogTester
             Log.NA("", LogData.EmptyLine);
             // Log.NA(Environment.NewLine, LogData.Default);
 
+            Log.Info("Param test.. (~PARAM~)", LogData.Default, new System.Collections.Generic.List<LogParameter>() { new LogParameter("PARAM", "It works!") }, null);
+
             Log:
             Console.Write("Enter message: ");
-            Log.Write(Console.ReadLine(), (LogType)(LogValues.GetValue(RNG.Next(LogValues.Length))), LogData.Default, null);
+            Log.Write(Console.ReadLine(), (LogType)(LogValues.GetValue(RNG.Next(LogValues.Length))), LogData.Default);
 
             if (Tries == 4)
             {
