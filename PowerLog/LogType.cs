@@ -13,6 +13,13 @@ namespace PowerLog
     #endregion
     public enum LogType
     {
+        #region Verbose EnumEntry XML
+        /// <summary>
+        /// 'Verbose' log level.
+        /// </summary>
+        #endregion
+        Verbose,
+
         #region Trace EnumEntry XML
         /// <summary>
         /// 'Trace' log level.

@@ -145,6 +145,19 @@ namespace PowerLog
         }
 
         #region Log Overloads
+        #region Verbose Function XML
+        /// <summary>
+        /// Calls a verbose log, sent over to the <c>OnLog</c> event.
+        /// </summary>
+        /// <param name="LogContent">The message of the log.</param>
+        /// <param name="LoggingData">The log options.</param>
+        /// <param name="LogParameters">The additional log parameters.</param>
+        /// <param name="LogSender">The sender of the this.</param>
+        #endregion
+        public void Verbose(string LogContent, LogData LoggingData, List<LogParameter> LogParameters = null, Object LogSender = null) {
+            this.Write(LogContent, LogType.Verbose, LoggingData, LogParameters, LogSender);
+        }
+
         #region Trace Function XML
         /// <summary>
         /// Calls a trace log, sent over to the <c>OnLog</c> event.

@@ -14,6 +14,7 @@ namespace LogTester
             Log.OnLog += OnLog;
             Log.LogSizeThreshold = 128;
 
+            Log.Verbose("Verbose message..", LogData.Default, null, "Startup");
             Log.Trace("Trace message..", LogData.Default, null, "Startup");
             Log.Debug("Debug message..", LogData.Default, null, "Startup");
             Log.Info("Info message..", LogData.Default, null, "Startup");
