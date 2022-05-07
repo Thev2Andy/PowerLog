@@ -54,9 +54,20 @@ namespace PowerLog
         public static LogArgs Preprocess(LogArgs Log)
         {
             if (Log.LogParameters != null) {
-                LogArgs PreprocessedLog = Log;
-                for (int i = 0; i < PreprocessedLog.LogParameters.Count; i++)
-                {
+                LogArgs PreprocessedLog = new LogArgs() {
+                    LogContent = Log.LogContent,
+                    LogLevel = Log.LogLevel,
+                    LogTime = Log.LogTime,
+                    LoggingData = Log.LoggingData,
+                    LogSender = Log.LogSender,
+                    LogStacktrace = Log.LogStacktrace,
+                    LogParameters = Log.LogParameters,
+
+                    Logger = Log.Logger
+                };
+
+
+                for (int i = 0; i < PreprocessedLog.LogParameters.Count; i++) {
                     PreprocessedLog.LogContent = Log.LogContent.Replace($"~{PreprocessedLog.LogParameters[i].Identifier}~", PreprocessedLog.LogParameters[i].Value.ToString());
                 }
 
