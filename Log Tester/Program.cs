@@ -33,7 +33,7 @@ namespace LogTester
             Log.NA("", LogData.EmptyLine);
             // Log.NA(Environment.NewLine, LogData.Default);
 
-            Log.Info("Param test.. (~PARAM~)", LogData.Default, new System.Collections.Generic.List<LogParameter>() { new LogParameter("PARAM", "It works!") }, null);
+            Log.Info("Param test.. (~PARAM~ ~PARAM2~)", LogData.Default, new System.Collections.Generic.List<LogParameter>() { new LogParameter("PARAM", "It works!"), new LogParameter("PARAM2", "Hello.") }, null);
 
             Log:
             Console.Write("Enter message: ");

@@ -68,7 +68,7 @@ namespace PowerLog
 
 
                 for (int i = 0; i < PreprocessedLog.LogParameters.Count; i++) {
-                    PreprocessedLog.LogContent = Log.LogContent.Replace($"~{PreprocessedLog.LogParameters[i].Identifier}~", PreprocessedLog.LogParameters[i].Value.ToString());
+                    PreprocessedLog.LogContent = PreprocessedLog.LogContent.Replace($"~{PreprocessedLog.LogParameters[i].Identifier}~", PreprocessedLog.LogParameters[i].Value.ToString());
                 }
 
                 return PreprocessedLog;
