@@ -70,66 +70,6 @@ namespace PowerLog.Sinks.Terminal
 
 
                     if (Log.Severity == Severity.NA) TargetColor = BackupColor; // N/A.
-
-                    /*switch (Log.Severity)
-                    {
-                        case Severity.Verbose:
-                            TargetColor = ConsoleColor.DarkGray;
-                            break;
-
-                        case Severity.Trace:
-                            TargetColor = ConsoleColor.Gray;
-                            break;
-
-                        case Severity.Debug:
-                            TargetColor = ConsoleColor.Gray;
-                            break;
-
-                        case Severity.Info:
-                            TargetColor = ConsoleColor.White;
-                            break;
-
-                        case Severity.Network:
-                            TargetColor = ConsoleColor.Blue;
-                            break;
-
-                        case Severity.Notice:
-                            TargetColor = ConsoleColor.White;
-                            break;
-
-                        case Severity.Warning:
-                            TargetColor = ConsoleColor.Yellow;
-                            break;
-
-                        case Severity.Alert:
-                            TargetColor = ConsoleColor.DarkYellow;
-                            break;
-
-                        case Severity.Error:
-                            TargetColor = ConsoleColor.Red;
-                            break;
-
-                        case Severity.Critical:
-                            TargetColor = ConsoleColor.Red;
-                            break;
-
-                        case Severity.Emergency:
-                            TargetColor = ConsoleColor.DarkRed;
-                            break;
-
-                        case Severity.Fatal:
-                            TargetColor = ConsoleColor.DarkRed;
-                            break;
-
-                        case Severity.NA:
-                            TargetColor = BackupColor;
-                            break;
-
-
-                        default:
-                            TargetColor = BackupColor;
-                            break;
-                    }*/
                 }
 
                 Console.ForegroundColor = TargetColor;
