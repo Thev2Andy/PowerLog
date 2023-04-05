@@ -11,6 +11,7 @@ Logger.Information("Hello PowerLog!");
 * Has an `OnLog` Event, which can be used to display / monitor logs without a sink in your application.
 * Supports sinks, and comes with a few default ones (console, debugger, markdown file, simple file) as separate libraries. (You can write a custom one by implementing the `ISink` interface.)
 * Logger instances.
+* Blazingly fast.
 * Cross platform support.
 * ~~Simple, Documented API.~~ (the documentation is outdated, the best place to see how things work so far is the source code itself)
 
