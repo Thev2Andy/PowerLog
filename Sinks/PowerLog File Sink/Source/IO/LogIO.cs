@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PowerLog
+namespace PowerLog.Sinks.IO
 {
     #region LogIO Class XML
     /// <summary>
@@ -14,39 +14,40 @@ namespace PowerLog
     #endregion
     [Serializable] public class LogIO
     {
-        #region LogPath String XML
+        #region Path String XML
         /// <summary>
         /// The log file location.
         /// </summary>
         #endregion
-        public string LogPath { get; private set; }
+        public string Path { get; private set; }
 
-        #region LogFileName String XML
+        #region FileName String XML
         /// <summary>
         /// The log file name.
         /// </summary>
         #endregion
-        public string LogFileName { get; private set; }
+        public string FileName { get; private set; }
 
-        #region LogFileName String XML
+        #region FileExtension String XML
         /// <summary>
         /// The log file extension.
         /// </summary>
         #endregion
-        public string LogFileExtension { get; private set; }
+        public string FileExtension { get; private set; }
+
 
         #region LogIO Constructor XML
         /// <summary>
-        /// The default <c>LogIO</c> constructor.
+        /// The default <see cref="LogIO"/> constructor.
         /// </summary>
-        /// <param name="LogPath">The path of the log.</param>
-        /// <param name="LogFileName">The filename of the log.</param>
-        /// <param name="LogFileExtension">The file extension of the log.</param>
+        /// <param name="Path">The path of the log.</param>
+        /// <param name="FileName">The filename of the log.</param>
+        /// <param name="FileExtension">The file extension of the log.</param>
         #endregion
-        public LogIO(string LogPath, string LogFileName, string LogFileExtension) {
-            this.LogPath = LogPath;
-            this.LogFileName = LogFileName;
-            this.LogFileExtension = LogFileExtension;
+        public LogIO(string Path, string FileName, string FileExtension) {
+            this.FileExtension = FileExtension;
+            this.FileName = FileName;
+            this.Path = Path;
         }
 
         #region Get Method XML
@@ -56,7 +57,7 @@ namespace PowerLog
         /// <returns>The complete log path.</returns>
         #endregion
         public string Get() {
-            return Path.Combine(LogPath, $"{LogFileName}.{LogFileExtension}");
+            return System.IO.Path.Combine(Path, $"{FileName}.{FileExtension}");
         }
     }
 }

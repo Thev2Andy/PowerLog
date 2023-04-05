@@ -349,5 +349,5 @@ MigrationBackup/
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
 
-# PowerLog XML
-PowerLog/PowerLog/XML Docs
+# XML Docs
+XML Docs/

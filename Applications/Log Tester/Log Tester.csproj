@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net7.0</TargetFramework>
+    <RootNamespace>LogTester</RootNamespace>
+	  
+    <Authors>Thev2Andy</Authors>
+	  
+    <Nullable>disable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Library\PowerLog\PowerLog.csproj" />
+    <ProjectReference Include="..\..\Sinks\PowerLog Console Sink\PowerLog Console Sink.csproj" />
+    <ProjectReference Include="..\..\Sinks\PowerLog Debugger Sink\PowerLog Debugger Sink.csproj" />
+    <ProjectReference Include="..\..\Sinks\PowerLog File Sink\PowerLog File Sink.csproj" />
+    <ProjectReference Include="..\..\Sinks\PowerLog Markdown Sink\PowerLog Markdown Sink.csproj" />
+  </ItemGroup>
+
+</Project>

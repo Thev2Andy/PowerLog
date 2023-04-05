@@ -1,21 +1,20 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net7.0</TargetFramework>
     <RootNamespace>PowerLog</RootNamespace>
 	  
-    <AssemblyVersion>1.2.1.0</AssemblyVersion>
-    <FileVersion>1.2.1.0</FileVersion>
+    <AssemblyVersion>1.2.1</AssemblyVersion>
+    <FileVersion>1.2.1</FileVersion>
     <Authors>Thev2Andy</Authors>
-    <PackageProjectUrl>https://github.com/Thev2Andy/PowerLog</PackageProjectUrl>
+    <PackageProjectUrl>https://thev2andy.github.io/PowerLog/</PackageProjectUrl>
     <RepositoryUrl>https://github.com/Thev2Andy/PowerLog</RepositoryUrl>
-    <Description>PowerLog is a lightweight logging library made in C#, designed to make logging easy, with only one function call.</Description>
+    <Description>PowerLog is a modular, dependency-free, lightweight .NET 7 logging library made in C#, that is just built different.</Description>
     <PackageIcon>PowerLog Icon.png</PackageIcon>
     <PackageIconUrl />
     <Version>1.2.1</Version>
-    <SignAssembly>false</SignAssembly>
-	<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-	<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+	<GenerateAssemblyInfo>False</GenerateAssemblyInfo>
+	<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 	<PackageTags>Log, Logger, PowerLog, Power, Sharp, CSharp, C#, Modular, Library, Lib, Lightweight</PackageTags>
 	<PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
 	  

@@ -7,12 +7,12 @@ using System.Diagnostics;
 
 namespace PowerLog
 {
-    #region LogArgs Class XML
+    #region Arguments Class XML
     /// <summary>
-    /// Log arguments holder.
+    /// The recorded log arguments.
     /// </summary>
     #endregion
-    [Serializable] public class LogArgs : EventArgs
+    [Serializable] public class Arguments
     {
         #region FormattedLog String XML
         /// <summary>
@@ -21,59 +21,59 @@ namespace PowerLog
         #endregion
         public string FormattedLog {
             get {
-                return LogFormat.Postprocess(LogFormat.Preprocess(this), LoggingData.LogTemplate.LogFormat, LoggingData.LogTemplate.DateFormat);
+                return Format.Formulate(Format.Parse(this), Template);
             }
         }
 
 
-        #region LogContent String XML
+        #region Content String XML
         /// <summary>
         /// The content of the log.
         /// </summary>
         #endregion
-        public string LogContent;
+        public string Content;
 
-        #region LogLevel LogType XML
+        #region Severity Severity XML
         /// <summary>
-        /// The level of the log.
+        /// The severity of the log.
         /// </summary>
         #endregion
-        public LogType LogLevel;
+        public Severity Severity;
 
-        #region LogTime DateTime XML
+        #region Time DateTime XML
         /// <summary>
         /// The time of the log.
         /// </summary>
         #endregion
-        public DateTime LogTime;
+        public DateTime Time;
 
-        #region LoggingData LogData XML
+        #region Template Template XML
         /// <summary>
-        /// The logging data used for logging and formatting.
+        /// The logging template used for logging and formatting.
         /// </summary>
         #endregion
-        public LogData LoggingData;
+        public Template Template;
 
-        #region LogStacktrace StackTrace XML
+        #region Stacktrace StackTrace XML
         /// <summary>
         /// The stacktrace of the log.
         /// </summary>
         #endregion
-        public StackTrace LogStacktrace;
+        public StackTrace Stacktrace;
 
-        #region LogSender Object XML
+        #region Sender Object XML
         /// <summary>
         /// The sender of the log.
         /// </summary>
         #endregion
-        public Object LogSender;
+        public Object Sender;
 
-        #region LogParameters LogParameter List XML
+        #region Parameters Parameter List XML
         /// <summary>
         /// The additional log parameters.
         /// </summary>
         #endregion
-        public List<LogParameter> LogParameters;
+        public List<Parameter> Parameters;
 
 
         #region Logger Log XML

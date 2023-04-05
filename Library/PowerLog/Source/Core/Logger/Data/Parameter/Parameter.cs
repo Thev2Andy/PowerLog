@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 
 namespace PowerLog
 {
-    #region LogTemplate Class XML
+    #region Parameter Struct XML
     /// <summary>
     /// A custom log parameter, embedded in the raw log.
     /// </summary>
     #endregion
-    [Serializable] public class LogParameter
+    [Serializable] public struct Parameter
     {
         #region Identifier String XML
         /// <summary>
@@ -26,19 +26,6 @@ namespace PowerLog
         /// </summary>
         #endregion
         public Object Value { get; private set; }
-
-
-        #region LogParameter Constructor XML
-        /// <summary>
-        /// The default <c>LogParameter</c> constructor.
-        /// </summary>
-        /// <param name="Identifier">The identifier / name of this log parameter.</param>
-        /// <param name="Value">The value of this log parameter.</param>
-        #endregion
-        public LogParameter(string Identifier, Object Value) {
-            this.Identifier = Identifier;
-            this.Value = Value;
-        }
 
 
         #region Get Method XML
@@ -58,6 +45,19 @@ namespace PowerLog
         /// <param name="Value">The value to be assigned to this log parameter.</param>
         #endregion
         public void Set(Object Value) {
+            this.Value = Value;
+        }
+
+
+        #region Parameter Constructor XML
+        /// <summary>
+        /// The default <see cref="Parameter"/> constructor.
+        /// </summary>
+        /// <param name="Identifier">The identifier / name of this parameter.</param>
+        /// <param name="Value">The value of this parameter.</param>
+        #endregion
+        public Parameter(string Identifier, Object Value) {
+            this.Identifier = Identifier;
             this.Value = Value;
         }
     }
