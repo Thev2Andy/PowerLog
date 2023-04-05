@@ -58,7 +58,6 @@ namespace LogTester
 
             Log.Information($"Fancy overridden colored log in Spectre.Console? (Color: `~Color Override~`, Highlight: `~Highlight Override~`)", null, new System.Collections.Generic.List<Parameter>() { new Parameter("Color Override", "84, 0, 255"), new Parameter("Highlight Override", true) });
             Log.Information("F |C|");
-            Log.Fatal("OK.");
             Log.Information("MD Sink Test", new Template("| |T| | |I| | |S| | |C| | |O| |"));
 
             Log.Verbose("Log severity demo ended.");
