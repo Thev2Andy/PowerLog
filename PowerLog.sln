@@ -31,6 +31,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PowerLog Markdown Sink", "P
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PowerLog Markdown Sink", "Sinks\PowerLog Markdown Sink\PowerLog Markdown Sink.csproj", "{50E76FA4-8B24-4812-9E16-1979C92CE671}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PowerLog Spectre Console Sink", "PowerLog Spectre Console Sink", "{9F2CDE41-AF8E-49E1-9E37-12E4A04123B7}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PowerLog Spectre Console Sink", "Sinks\PowerLog Spectre Console Sink\PowerLog Spectre Console Sink.csproj", "{C667017C-9F30-4E20-9052-E8B32E062644}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -61,6 +65,10 @@ Global
 		{50E76FA4-8B24-4812-9E16-1979C92CE671}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{50E76FA4-8B24-4812-9E16-1979C92CE671}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{50E76FA4-8B24-4812-9E16-1979C92CE671}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C667017C-9F30-4E20-9052-E8B32E062644}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C667017C-9F30-4E20-9052-E8B32E062644}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C667017C-9F30-4E20-9052-E8B32E062644}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C667017C-9F30-4E20-9052-E8B32E062644}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -76,6 +84,8 @@ Global
 		{0EBA81DF-BCE9-4CC4-A139-B5D296028313} = {DFB634B9-7B42-4AE0-8198-C21D8419D81C}
 		{A38CD7AD-9570-4341-B49F-79CF2CE90DFA} = {3B3FAF8D-F4F2-47C0-BAFC-884EB79344D1}
 		{50E76FA4-8B24-4812-9E16-1979C92CE671} = {A38CD7AD-9570-4341-B49F-79CF2CE90DFA}
+		{9F2CDE41-AF8E-49E1-9E37-12E4A04123B7} = {3B3FAF8D-F4F2-47C0-BAFC-884EB79344D1}
+		{C667017C-9F30-4E20-9052-E8B32E062644} = {9F2CDE41-AF8E-49E1-9E37-12E4A04123B7}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {69DC3910-A53B-47D6-B4A2-8D95E586CE86}

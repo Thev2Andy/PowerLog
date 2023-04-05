@@ -108,7 +108,7 @@ namespace PowerLog.Sinks.Terminal
         /// </summary>
         /// <param name="Identifier">The sink identifier.</param>
         /// <param name="Logger">The logger to push the sink to.</param>
-        /// <param name="EnableColors">Should this sink print to console using colors?</param>
+        /// <param name="EnableColors">Should this sink print to the console using colors?</param>
         /// <param name="Verbosity">The sink verbosity.</param>
         #endregion
         public ConsoleSink(string Identifier, Log Logger, bool EnableColors = true, Severity Verbosity = Severity.Verbose) {
@@ -134,7 +134,7 @@ namespace PowerLog.Sinks.Terminal
         /// </summary>
         /// <param name="Logger">The logger to push the sink to.</param>
         /// <param name="Identifier">The sink identifier.</param>
-        /// <param name="EnableColors">Should this sink print to console using colors?</param>
+        /// <param name="EnableColors">Should this sink print to the console using colors?</param>
         /// <param name="Verbosity">The sink verbosity.</param>
         /// <returns>The current logger, to allow for builder patterns.</returns>
         #endregion

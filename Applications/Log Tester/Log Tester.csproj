@@ -16,6 +16,7 @@
     <ProjectReference Include="..\..\Sinks\PowerLog Debugger Sink\PowerLog Debugger Sink.csproj" />
     <ProjectReference Include="..\..\Sinks\PowerLog File Sink\PowerLog File Sink.csproj" />
     <ProjectReference Include="..\..\Sinks\PowerLog Markdown Sink\PowerLog Markdown Sink.csproj" />
+    <ProjectReference Include="..\..\Sinks\PowerLog Spectre Console Sink\PowerLog Spectre Console Sink.csproj" />
   </ItemGroup>
 
 </Project>
