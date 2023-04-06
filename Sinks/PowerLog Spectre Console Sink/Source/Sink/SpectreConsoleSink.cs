@@ -92,7 +92,7 @@ namespace PowerLog.Sinks.SpectreTerminal
                         ColorBlueChannel += TerminalColorLUT[SeverityLevels[I]].B;
                         SeverityFlagCount++;
 
-                        if (HighlightedSeverities.Contains(SeverityLevels[I])) {
+                        if (HighlightedSeverities.Contains(SeverityLevels[I]) && !InvertBackgroundColor) {
                             InvertBackgroundColor = true;
                         }
                     }
