@@ -5,8 +5,6 @@ VisualStudioVersion = 17.1.32328.378
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Applications", "Applications", "{FB9FFF98-ABEB-4CBF-9F80-F1F3BCAEA953}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Extensions", "Extensions", "{4ABB8327-D718-4CBB-82CD-9E6D3EA74871}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Sinks", "Sinks", "{3B3FAF8D-F4F2-47C0-BAFC-884EB79344D1}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Log Tester", "Applications\Log Tester\Log Tester.csproj", "{72A923EF-380F-42B9-ABF3-DF33F6D9E420}"
