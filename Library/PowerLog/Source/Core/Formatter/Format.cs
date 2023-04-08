@@ -38,7 +38,10 @@ namespace PowerLog
             foreach (KeyValuePair<char, string> Replacement in Replacements)
             {
                 Regex WildcardRegex = new Regex($@"\|([^|]*)([{Replacement.Key}])([^|]*)\|", RegexOptions.Multiline);
-                Result = WildcardRegex.Replace(Result, new MatchEvaluator((Match Match) => { return ($"{Match.Groups[1].Value}" + $"{Replacement.Value}" + $"{Match.Groups[3].Value}"); }));
+                Result = WildcardRegex.Replace(Result, new MatchEvaluator((Match Match) => {
+                    bool IsSkippingSeverityHeader = (Replacement.Key == 'S' && Log.Severity == Severity.NA);
+                    return ((!IsSkippingSeverityHeader) ? ($"{Match.Groups[1].Value}" + $"{Replacement.Value}" + $"{Match.Groups[3].Value}") : String.Empty);
+                }));
             }
 
             return Result;
