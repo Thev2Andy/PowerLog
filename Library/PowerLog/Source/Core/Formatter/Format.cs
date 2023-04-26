@@ -27,7 +27,7 @@ namespace PowerLog
             Dictionary<char, string> Replacements = new Dictionary<char, string>
             {
                 { 'T', Log.Time.ToString(Template.DateFormat) },
-                { 'I', Log.Logger?.Identifier ?? String.Empty },
+                { 'I', Log.Logger?.Identifier ?? "N/A"  },
                 { 'S', Log.Severity.ToString() },
                 { 'C', Log.Content },
                 { 'O', Log.Sender?.ToString() ?? "N/A" },
