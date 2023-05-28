@@ -58,7 +58,7 @@ namespace PowerLog.Sinks.Markdown
             // Very specific log formatting, but no markdown collisions.
             Arguments ProcessedLog = Log.Parse();
 
-            LogStream.Write($"| {ProcessedLog.Time.ToString(ProcessedLog.Template.DateFormat)} | {((ProcessedLog.Logger != null && !String.IsNullOrEmpty(ProcessedLog.Logger.Identifier)) ? $"{ProcessedLog.Logger.Identifier}" : String.Empty)} | {((ProcessedLog.Severity != Severity.NA) ? $"{ProcessedLog.Severity.ToString()}" : String.Empty)} | {ProcessedLog.Content} | {((ProcessedLog.Sender != null) ? ProcessedLog.Sender : "N/A")} |{Environment.NewLine}");
+            LogStream.Write($"| {ProcessedLog.Time.ToString(ProcessedLog.Template.DateFormat)} | {((ProcessedLog.Logger != null && !String.IsNullOrEmpty(ProcessedLog.Logger.Identifier)) ? $"{ProcessedLog.Logger.Identifier}" : String.Empty)} | {((ProcessedLog.Severity != Severity.Generic) ? $"{ProcessedLog.Severity.ToString()}" : String.Empty)} | {ProcessedLog.Content} | {((ProcessedLog.Sender != null) ? ProcessedLog.Sender : "N/A")} |{Environment.NewLine}");
         }
 
         #region Save Function XML

@@ -104,11 +104,11 @@ namespace PowerLog
         #endregion
         Fatal = 4096,
 
-        #region NA Enum Entry XML
+        #region Generic Enum Entry XML
         /// <summary>
-        /// 'NA' log level, will not have a header when formatted alone.
+        /// 'Generic' log level, will not have a header when formatted alone.
         /// </summary>
         #endregion
-        NA = 8192,
+        Generic = 8192,
     }
 }

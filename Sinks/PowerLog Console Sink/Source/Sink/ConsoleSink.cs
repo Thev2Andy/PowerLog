@@ -79,8 +79,8 @@ namespace PowerLog.Sinks.Terminal
                     if (Log.Severity >= Severity.Error && Log.Severity < Severity.Critical) TargetForegroundColor = ConsoleColor.Red; // Error.
                     if (Log.Severity >= Severity.Critical && Log.Severity < Severity.Emergency) TargetForegroundColor = ConsoleColor.Red; // Critical.
                     if (Log.Severity >= Severity.Emergency && Log.Severity < Severity.Fatal) TargetForegroundColor = ConsoleColor.DarkRed; // Emergency.
-                    if (Log.Severity >= Severity.Fatal && Log.Severity < Severity.NA) TargetForegroundColor = ConsoleColor.DarkRed; // Fatal.
-                    if (Log.Severity >= Severity.NA) TargetForegroundColor = OldForeground; // N/A.
+                    if (Log.Severity >= Severity.Fatal && Log.Severity < Severity.Generic) TargetForegroundColor = ConsoleColor.DarkRed; // Fatal.
+                    if (Log.Severity >= Severity.Generic) TargetForegroundColor = OldForeground; // N/A.
 
 
 

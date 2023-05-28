@@ -58,7 +58,7 @@ namespace PowerLog.Sinks.SpectreTerminal
             { Severity.Critical, new Color(255, 100, 100) },
             { Severity.Emergency, new Color(255, 85, 85) },
             { Severity.Fatal, new Color(192, 64, 64) },
-            { Severity.NA, new Color(255, 255, 255) },
+            { Severity.Generic, new Color(255, 255, 255) },
         };
 
         private readonly List<Severity> HighlightedSeverities = new List<Severity>() {

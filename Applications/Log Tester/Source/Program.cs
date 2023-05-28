@@ -43,15 +43,15 @@ namespace LogTester
             Log.Critical("Critical message..", Template.Default, null, "Startup");
             Log.Emergency("Emergency message..", Template.Default, null, "Startup");
             Log.Fatal("Fatal message..", Template.Default, null, "Startup");
-            Log.NA("NA (No-Header) message..", Template.Default, null, "Startup");
-            Log.Write("Flags message.." , (Severity.Fatal | Severity.Notice | Severity.NA));
+            Log.Generic("Generic (No-Header) message..", Template.Default, null, "Startup");
+            Log.Write("Flags message.." , (Severity.Fatal | Severity.Notice | Severity.Generic));
 
 
             Array LogValues = Enum.GetValues(typeof(Severity));
             Random RNG = new Random();
             Log.Write("Dynamic log message..", (Severity)(LogValues.GetValue(RNG.Next(LogValues.Length))));
 
-            Log.NA(String.Empty);
+            Log.Generic(String.Empty);
 
             Log.Information("Param test.. (~PARAM~, ~PARAM2~)", Template.Default, new System.Collections.Generic.List<Parameter>() { new Parameter("PARAM", "Hello"), new Parameter("PARAM2", "World!") }, null);
             Log.Information($"Application compiled at {File.GetLastWriteTime(Assembly.GetEntryAssembly().Location).ToString("HH-mm-ss tt, dd MMMM yyyy")}, in {typeof(Program).Assembly.GetCustomAttribute<AssemblyConfigurationAttribute>().Configuration} mode.", Template.Default, null, Process.GetCurrentProcess().ProcessName);
@@ -61,7 +61,7 @@ namespace LogTester
             Log.Information("MD Sink Test", new Template("| |T| | |I| | |S| | |C| | |O| |"));
 
             Log.Verbose("Log severity demo ended.");
-            Log.NA(String.Empty);
+            Log.Generic(String.Empty);
 
 
             while (true) {

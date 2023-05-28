@@ -39,7 +39,7 @@ namespace PowerLog
             {
                 Regex WildcardRegex = new Regex($@"\|([^|]*)([{Replacement.Key}])([^|]*)\|", RegexOptions.Multiline);
                 Result = WildcardRegex.Replace(Result, new MatchEvaluator((Match Match) => {
-                    bool IsSkippingSeverityHeader = (Replacement.Key == 'S' && Log.Severity == Severity.NA);
+                    bool IsSkippingSeverityHeader = (Replacement.Key == 'S' && Log.Severity == Severity.Generic);
                     return ((!IsSkippingSeverityHeader) ? ($"{Match.Groups[1].Value}" + $"{Replacement.Value}" + $"{Match.Groups[3].Value}") : String.Empty);
                 }));
             }

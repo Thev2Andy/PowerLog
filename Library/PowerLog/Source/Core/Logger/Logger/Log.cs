@@ -290,17 +290,17 @@ namespace PowerLog
             this.Write(Content, Severity.Fatal, Template, Parameters, Sender);
         }
 
-        #region NA Function XML
+        #region Generic Function XML
         /// <summary>
-        /// Calls a NA (no-header) log, sent over to the <see cref="Log.OnLog"/> event.
+        /// Calls a Generic (no-header) log, sent over to the <see cref="Log.OnLog"/> event.
         /// </summary>
         /// <param name="Content">The message of the log.</param>
         /// <param name="Template">The log templates.</param>
         /// <param name="Parameters">The additional log parameters.</param>
         /// <param name="Sender">The sender of the this.</param>
         #endregion
-        public void NA(string Content, Template? Template = null, List<Parameter> Parameters = null, Object Sender = null) {
-            this.Write(Content, Severity.NA, Template, Parameters, Sender);
+        public void Generic(string Content, Template? Template = null, List<Parameter> Parameters = null, Object Sender = null) {
+            this.Write(Content, Severity.Generic, Template, Parameters, Sender);
         }
         #endregion
 
