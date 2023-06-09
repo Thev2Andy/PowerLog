@@ -19,8 +19,8 @@ namespace LogTester
         {
             Log = new Log("Log", Severity.Verbose);
             Log.PushDebugger("Log DebuggerSink", Severity.Verbose, true).
-                // PushSpectreConsole("Log SpectreConsoleSink", true, Severity.Verbose).
-                PushConsole("Log ConsoleSink", true, Severity.Verbose).
+                PushSpectreConsole("Log SpectreConsoleSink", true, Severity.Verbose).
+                // PushConsole("Log ConsoleSink", true, Severity.Verbose).
                 PushFile("Log FileSink").
                 PushMarkdown("Log MarkdownSink");
 
