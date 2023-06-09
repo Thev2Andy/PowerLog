@@ -151,6 +151,7 @@ namespace PowerLog.Sinks.Terminal
         }
 
 
+
         #region ConsoleSink Constructor XML
         /// <summary>
         /// The default <see cref="ConsoleSink"/> constructor.

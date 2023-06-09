@@ -172,6 +172,7 @@ namespace PowerLog.Sinks.SpectreTerminal
         }
 
 
+
         #region SpectreConsoleSink Constructor XML
         /// <summary>
         /// The default <see cref="SpectreConsoleSink"/> constructor.
