@@ -106,7 +106,7 @@ namespace PowerLog
 
         #region Generic Enum Entry XML
         /// <summary>
-        /// 'Generic' log level, will not have a header when formatted alone.
+        /// 'Generic' log level, will not have a header when formatted either alone or together with other severity levels.
         /// </summary>
         #endregion
         Generic = 8192,
