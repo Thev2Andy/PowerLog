@@ -29,7 +29,7 @@ namespace PowerLog
         /// The verbosity level of the logger.
         /// </summary>
         #endregion
-        public Severity Verbosity { get; private set; }
+        public Severity Verbosity { get; set; }
 
         #region IsDisposed Boolean XML
         /// <summary>

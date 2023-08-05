@@ -24,6 +24,13 @@ namespace PowerLog
         #endregion
         public abstract Log Logger { get; }
 
+        #region Verbosity Severity XML
+        /// <summary>
+        /// The verbosity of the sink.
+        /// </summary>
+        #endregion
+        public abstract Severity Verbosity { get; set; }
+
 
 
         // Abstract methods..

@@ -110,9 +110,10 @@ public void Shutdown();
     * First of all, we want to get the basic stuff going (e.g. the constructor).
     For the constructor, we can just get the sink identifier and the logger instance, and this will cover the properties of the `ISink` interface.
     ```cs
-    public SimpleConsoleSink(string Identifier, Log Logger) {
+    public SimpleConsoleSink(string Identifier, Log Logger, Severity Verbosity = Severity.Verbose) {
         this.Identifier = Identifier;
         this.Logger = Logger;
+        this.Verbosity = Severity.Verbose;
     }
     ```
 
@@ -127,8 +128,11 @@ public void Shutdown();
     * There are endless ways to implement this depending on the sink you're making, but for this sink we'll do a very simple implementation and use the `Arguments.FormattedLog` property which will format our log based on it's template, but nothing is stopping you from accessing the fields of the `Arguments` instance.
     * One thing you might want to implement is verbosity, which can be implemented with a simple if statement, checking if `Log.Severity` is greater than the sink's verbosity. (it's called basic enum checking, checking them as integers)
     ```cs
-    public void Emit(Arguments Log) {
-        Console.WriteLine(Log.FormattedLog);
+    public void Emit(Arguments Log)
+    {
+        if (Log.Severity >= Verbosity) {
+            Console.WriteLine(Log.FormattedLog);
+        }
     }
     ```
 
@@ -143,16 +147,15 @@ public void Shutdown();
     * Notice the `this` keyword on the first parameter, this is a very crucial step of the extension method.
     * Also, notice the `Log` return type, this is what allows the builder pattern.
     ```cs
-    public static Log PushSimpleConsole(this Log Logger, string Identifier) { }
+    public static Log PushSimpleConsole(this Log Logger, string Identifier, Severity Verbosity = Severity.Verbose) { }
     ```
 
     * Let's implement this extension function, we essentially want to create an instance of the sink, set the parameters in the constructor and then push it onto the logger's sink stack.
     ```cs
-    public static Log PushSimpleConsole(this Log Logger, string Identifier) {
-        SimpleConsoleSink Sink = new SimpleConsoleSink(Identifier, Logger);
-        Logger.Push(Sink);
-
-        return Log;
+    public SimpleConsoleSink(string Identifier, Log Logger, Severity Verbosity = Severity.Verbose) {
+        this.Identifier = Identifier;
+        this.Logger = Logger;
+        this.Verbosity = Severity.Verbose;
     }
     ```
 
@@ -160,8 +163,8 @@ public void Shutdown();
     ```cs
     public static class SimpleConsoleSinkUtilities
     {
-        public static Log PushSimpleConsole(this Log Logger, string Identifier) {
-            SimpleConsoleSink Sink = new SimpleConsoleSink(Identifier, Logger);
+        public static Log PushSimpleConsole(this Log Logger, string Identifier, Severity Verbosity = Severity.Verbose) {
+            SimpleConsoleSink Sink = new SimpleConsoleSink(Identifier, Logger, Verbosity);
             Logger.Push(Sink);
 
             return Log;
@@ -175,9 +178,13 @@ public void Shutdown();
     {
         public string Identifier { get; }
         public Log Logger { get; }
+        public Severity Verbosity { get; set; }
 
-        public void Emit(Arguments Log) {
-            Console.WriteLine(Log.FormattedLog);
+        public void Emit(Arguments Log)
+        {
+            if (Log.Severity >= Verbosity) {
+                Console.WriteLine(Log.FormattedLog);
+            }
         }
 
         public void Initialize() { }
@@ -192,9 +199,10 @@ public void Shutdown();
 
 
 
-        public SimpleConsoleSink(string Identifier, Log Logger) {
+        public SimpleConsoleSink(string Identifier, Log Logger, Severity Verbosity = Severity.Verbose) {
             this.Identifier = Identifier;
             this.Logger = Logger;
+            this.Verbosity = Severity.Verbose;
         }
     }
 
@@ -202,8 +210,8 @@ public void Shutdown();
 
     public static class SimpleConsoleSinkUtilities
     {
-        public static Log PushSimpleConsole(this Log Logger, string Identifier) {
-            SimpleConsoleSink Sink = new SimpleConsoleSink(Identifier, Logger);
+        public static Log PushSimpleConsole(this Log Logger, string Identifier, Severity Verbosity = Severity.Verbose) {
+            SimpleConsoleSink Sink = new SimpleConsoleSink(Identifier, Logger, Verbosity);
             Logger.Push(Sink);
 
             return Log;

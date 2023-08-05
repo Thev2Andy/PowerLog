@@ -25,6 +25,13 @@ namespace PowerLog.Sinks.IO
         #endregion
         public Log Logger { get; }
 
+        #region Verbosity Severity XML
+        /// <summary>
+        /// The verbosity of the sink.
+        /// </summary>
+        #endregion
+        public Severity Verbosity { get; set; }
+
 
         #region LogPath LogIO XML
         /// <summary>
@@ -46,8 +53,11 @@ namespace PowerLog.Sinks.IO
         #region Emit Function XML
         /// <inheritdoc/>
         #endregion
-        public void Emit(Arguments Log) {
-            LogStream.Write($"{Log.FormattedLog}{Environment.NewLine}");
+        public void Emit(Arguments Log)
+        {
+            if (Log.Severity >= Verbosity) {
+                LogStream.Write($"{Log.FormattedLog}{Environment.NewLine}");
+            }
         }
 
         #region Save Function XML
@@ -92,11 +102,13 @@ namespace PowerLog.Sinks.IO
         /// </summary>
         /// <param name="Identifier">The sink identifier.</param>
         /// <param name="Logger">The logger to push the sink to.</param>
+        /// <param name="Verbosity">The sink verbosity.</param>
         /// <param name="LogPath">The log file path.</param>
         #endregion
-        public FileSink(string Identifier, Log Logger, LogIO LogPath = null) {
+        public FileSink(string Identifier, Log Logger, Severity Verbosity = Severity.Verbose, LogIO LogPath = null) {
             this.Identifier = Identifier;
             this.Logger = Logger;
+            this.Verbosity = Verbosity;
 
             AppDomain.CurrentDomain.ProcessExit += HandleExit;
 
@@ -120,12 +132,13 @@ namespace PowerLog.Sinks.IO
         /// </summary>
         /// <param name="Logger">The logger to push the sink to.</param>
         /// <param name="Identifier">The sink identifier.</param>
+        /// <param name="Verbosity">The sink verbosity.</param>
         /// <param name="LogPath">The log file path.</param>
         /// <returns>The current logger, to allow for builder patterns.</returns>
         #endregion
-        public static Log PushFile(this Log Logger, string Identifier, LogIO LogPath = null)
+        public static Log PushFile(this Log Logger, string Identifier, Severity Verbosity = Severity.Verbose, LogIO LogPath = null)
         {
-            FileSink Sink = new FileSink(Identifier, Logger, LogPath);
+            FileSink Sink = new FileSink(Identifier, Logger, Verbosity, LogPath);
             Logger.Push(Sink);
 
             return Logger;
