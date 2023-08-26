@@ -14,6 +14,14 @@ namespace PowerLog
     #endregion
     public static class Format
     {
+        // Wildcard Regular Expressions..
+        private static Regex TimeWildcardRegex = new Regex(@"\|([^|]*)([T])([^|]*)\|", (RegexOptions.Multiline | RegexOptions.Compiled));
+        private static Regex IdentifierWildcardRegex = new Regex(@"\|([^|]*)([I])([^|]*)\|", (RegexOptions.Multiline | RegexOptions.Compiled));
+        private static Regex SeverityWildcardRegex = new Regex(@"\|([^|]*)([S])([^|]*)\|", (RegexOptions.Multiline | RegexOptions.Compiled));
+        private static Regex ContentWildcardRegex = new Regex(@"\|([^|]*)([C])([^|]*)\|", (RegexOptions.Multiline | RegexOptions.Compiled));
+        private static Regex ObjectWildcardRegex = new Regex(@"\|([^|]*)([O])([^|]*)\|", (RegexOptions.Multiline | RegexOptions.Compiled));
+
+
         #region Formulate Function XML
         /// <summary>
         /// Formulates the log using the template by using regular expressions, then returns it as a string.
@@ -37,7 +45,34 @@ namespace PowerLog
             string Result = Template.LogFormat;
             foreach (KeyValuePair<char, string> Replacement in Replacements)
             {
-                Regex WildcardRegex = new Regex($@"\|([^|]*)([{Replacement.Key}])([^|]*)\|", RegexOptions.Multiline);
+                Regex WildcardRegex = null;
+                switch (Replacement.Key)
+                {
+                    case 'T':
+                        WildcardRegex = TimeWildcardRegex;
+                        break;
+
+                    case 'I':
+                        WildcardRegex = IdentifierWildcardRegex;
+                        break;
+
+                    case 'S':
+                        WildcardRegex = SeverityWildcardRegex;
+                        break;
+
+                    case 'C':
+                        WildcardRegex = ContentWildcardRegex;
+                        break;
+
+                    case 'O':
+                        WildcardRegex = ObjectWildcardRegex;
+                        break;
+
+
+                    default:
+                        throw new Exception($"Invalid wildcard key, couldn't find a replacement for `{Replacement.Key}`.");
+                }
+
                 Result = WildcardRegex.Replace(Result, new MatchEvaluator((Match Match) => {
                     bool IsSkippingSeverityHeader = (Replacement.Key == 'S' && Log.Severity.HasFlag(Severity.Generic));
                     return ((!IsSkippingSeverityHeader) ? ($"{Match.Groups[1].Value}" + $"{Replacement.Value}" + $"{Match.Groups[3].Value}") : String.Empty);
