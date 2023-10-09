@@ -1,11 +1,8 @@
 ﻿using System;
-using System.IO;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Diagnostics;
-using System.Reflection.Emit;
 
 namespace PowerLog
 {
@@ -403,9 +400,6 @@ namespace PowerLog
         public void Dispose()
         {
             if (!IsDisposed) {
-                AppDomain.CurrentDomain.UnhandledException -= this.EventSaveLog;
-                AppDomain.CurrentDomain.ProcessExit -= this.EventSaveLog;
-
                 OnDispose?.Invoke();
                 this.Save();
 
@@ -430,16 +424,9 @@ namespace PowerLog
         /// <param name="Verbosity">The logger verbosity.</param>
         #endregion
         public Log(string Identifier, Severity Verbosity = Severity.Verbose) {
-            AppDomain.CurrentDomain.UnhandledException += EventSaveLog;
-            AppDomain.CurrentDomain.ProcessExit += EventSaveLog;
-
             this.Identifier = Identifier;
             this.Sinks = new List<ISink>();
             this.Verbosity = Verbosity;
-        }
-
-        private void EventSaveLog(Object S, EventArgs E) {
-            this.Save();
         }
     }
 }
