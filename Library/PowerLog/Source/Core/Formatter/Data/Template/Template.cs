@@ -11,7 +11,7 @@ namespace PowerLog
     /// Holds data related to the formatting of the logs.
     /// </summary>
     #endregion
-    [Serializable] public struct Template
+    public struct Template
     {
         #region DateFormat String XML
         /// <summary>

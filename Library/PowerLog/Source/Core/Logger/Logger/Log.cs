@@ -11,7 +11,7 @@ namespace PowerLog
     /// The class used for writing logs.
     /// </summary>
     #endregion
-    [Serializable] public class Log
+    public class Log
     {
         // Public / Accessible variables.
         #region Identifier String XML

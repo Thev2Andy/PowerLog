@@ -12,7 +12,7 @@ namespace PowerLog.Sinks.IO
     /// Holds data related to log file paths.
     /// </summary>
     #endregion
-    [Serializable] public class LogIO
+    public class LogIO
     {
         #region Path String XML
         /// <summary>

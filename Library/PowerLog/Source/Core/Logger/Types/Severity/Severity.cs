@@ -11,7 +11,7 @@ namespace PowerLog
     /// Log severity enumeration.
     /// </summary>
     #endregion
-    [Serializable] [Flags] public enum Severity
+    [Flags] public enum Severity
     {
         #region Verbose Enum Entry XML
         /// <summary>
