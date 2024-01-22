@@ -69,9 +69,9 @@ namespace PowerLog.Sinks.Terminal
                     // Before you ask, I don't think you can do this with a 'switch' statement.
                     if (Log.Severity >= Severity.Verbose && Log.Severity < Severity.Trace) TargetForegroundColor = ConsoleColor.DarkGray; // Verbose.
                     if (Log.Severity >= Severity.Trace && Log.Severity < Severity.Debug) TargetForegroundColor = ConsoleColor.Gray; // Trace.
-                    if (Log.Severity >= Severity.Debug && Log.Severity < Severity.Information) TargetForegroundColor = ConsoleColor.Gray; // Debug.
-                    if (Log.Severity >= Severity.Information && Log.Severity < Severity.Network) TargetForegroundColor = ConsoleColor.White; // Info.
-                    if (Log.Severity >= Severity.Network && Log.Severity < Severity.Notice) TargetForegroundColor = ConsoleColor.Blue; // Network.
+                    if (Log.Severity >= Severity.Debug && Log.Severity < Severity.Network) TargetForegroundColor = ConsoleColor.Gray; // Debug.
+                    if (Log.Severity >= Severity.Network && Log.Severity < Severity.Information) TargetForegroundColor = ConsoleColor.Blue; // Network.
+                    if (Log.Severity >= Severity.Information && Log.Severity < Severity.Notice) TargetForegroundColor = ConsoleColor.White; // Information.
                     if (Log.Severity >= Severity.Notice && Log.Severity < Severity.Caution) TargetForegroundColor = ConsoleColor.White; // Notice.
                     if (Log.Severity >= Severity.Caution && Log.Severity < Severity.Warning) TargetForegroundColor = ConsoleColor.Yellow; // Caution.
                     if (Log.Severity >= Severity.Warning && Log.Severity < Severity.Alert) TargetForegroundColor = ConsoleColor.Yellow; // Warning.
@@ -80,7 +80,7 @@ namespace PowerLog.Sinks.Terminal
                     if (Log.Severity >= Severity.Critical && Log.Severity < Severity.Emergency) TargetForegroundColor = ConsoleColor.Red; // Critical.
                     if (Log.Severity >= Severity.Emergency && Log.Severity < Severity.Fatal) TargetForegroundColor = ConsoleColor.DarkRed; // Emergency.
                     if (Log.Severity >= Severity.Fatal && Log.Severity < Severity.Generic) TargetForegroundColor = ConsoleColor.DarkRed; // Fatal.
-                    if (Log.Severity >= Severity.Generic) TargetForegroundColor = OldForeground; // N/A.
+                    if (Log.Severity >= Severity.Generic) TargetForegroundColor = OldForeground; // Generic.
 
 
 
