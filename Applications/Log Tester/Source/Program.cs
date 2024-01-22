@@ -33,8 +33,8 @@ namespace LogTester
             Log.Verbose("Verbose message..", Template.Default, null, "Startup");
             Log.Trace("Trace message..", Template.Default, null, "Startup");
             Log.Debug("Debug message..", Template.Default, null, "Startup");
-            Log.Information("Information message..", Template.Default, null, "Startup");
             Log.Network("Network message..", Template.Default, null, "Startup");
+            Log.Information("Information message..", Template.Default, null, "Startup");
             Log.Notice("Notice message..", Template.Default, null, "Startup");
             Log.Caution("Caution message", Template.Default, null, "Startup");
             Log.Warning("Warning message..", Template.Default, null, "Startup");

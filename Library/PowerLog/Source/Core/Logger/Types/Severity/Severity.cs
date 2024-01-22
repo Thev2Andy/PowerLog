@@ -34,19 +34,19 @@ namespace PowerLog
         #endregion
         Debug = 4,
 
-        #region Information Enum Entry XML
-        /// <summary>
-        /// 'Information' log level.
-        /// </summary>
-        #endregion
-        Information = 8,
-
         #region Network Enum Entry XML
         /// <summary>
         /// 'Network' log level.
         /// </summary>
         #endregion
-        Network = 16,
+        Network = 8,
+
+        #region Information Enum Entry XML
+        /// <summary>
+        /// 'Information' log level.
+        /// </summary>
+        #endregion
+        Information = 16,
 
         #region Notice Enum Entry XML
         /// <summary>

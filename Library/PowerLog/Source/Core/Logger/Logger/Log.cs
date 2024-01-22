@@ -157,19 +157,6 @@ namespace PowerLog
             this.Write(Content, Severity.Debug, Template, Parameters, Sender);
         }
 
-        #region Information Function XML
-        /// <summary>
-        /// Calls an information log, sent over to the <see cref="Log.OnLog"/> event.
-        /// </summary>
-        /// <param name="Content">The message of the log.</param>
-        /// <param name="Template">The log templates.</param>
-        /// <param name="Parameters">The additional log parameters.</param>
-        /// <param name="Sender">The sender of the this.</param>
-        #endregion
-        public void Information(string Content, Template? Template = null, List<Parameter> Parameters = null, Object Sender = null) {
-            this.Write(Content, Severity.Information, Template, Parameters, Sender);
-        }
-
         #region Network Function XML
         /// <summary>
         /// Calls a network log, sent over to the <see cref="Log.OnLog"/> event.
@@ -181,6 +168,19 @@ namespace PowerLog
         #endregion
         public void Network(string Content, Template? Template = null, List<Parameter> Parameters = null, Object Sender = null) {
             this.Write(Content, Severity.Network, Template, Parameters, Sender);
+        }
+
+        #region Information Function XML
+        /// <summary>
+        /// Calls an information log, sent over to the <see cref="Log.OnLog"/> event.
+        /// </summary>
+        /// <param name="Content">The message of the log.</param>
+        /// <param name="Template">The log templates.</param>
+        /// <param name="Parameters">The additional log parameters.</param>
+        /// <param name="Sender">The sender of the this.</param>
+        #endregion
+        public void Information(string Content, Template? Template = null, List<Parameter> Parameters = null, Object Sender = null) {
+            this.Write(Content, Severity.Information, Template, Parameters, Sender);
         }
 
         #region Notice Function XML
