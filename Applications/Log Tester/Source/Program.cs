@@ -66,9 +66,11 @@ namespace LogTester
             Log.Generic(String.Empty);
 
 
-            while (true) {
+            while (true)
+            {
                 Console.Write("Enter message: ");
                 Log.Write(Console.ReadLine(), ((Severity)(LogValues.GetValue(RNG.Next(LogValues.Length)))));
+                Console.WriteLine();
             }
         }
     }

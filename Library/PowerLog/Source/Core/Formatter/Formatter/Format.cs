@@ -91,7 +91,8 @@ namespace PowerLog
         #endregion
         public static Arguments Parse(this Arguments Log)
         {
-            if (Log.Parameters != null) {
+            if (Log.Parameters != null)
+            {
                 Arguments PreprocessedLog = new Arguments() {
                     Content = Log.Content,
                     Severity = Log.Severity,
