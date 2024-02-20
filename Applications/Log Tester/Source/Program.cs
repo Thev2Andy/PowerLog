@@ -22,7 +22,7 @@ namespace LogTester
             Log = new Log("Log", Verbosity.All);
             Log.PushDebugger("Log DebuggerSink", Verbosity.All, true).
                 PushSpectreConsole("Log SpectreConsoleSink", true, Verbosity.All).
-                // PushConsole("Log ConsoleSink", true, VerbosityMask.All).
+                // PushConsole("Log ConsoleSink", true, Verbosity.All).
                 PushFile("Log FileSink").
                 PushMarkdown("Log MarkdownSink");
 
