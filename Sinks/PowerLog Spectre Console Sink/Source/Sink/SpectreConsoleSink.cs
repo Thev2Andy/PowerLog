@@ -44,6 +44,8 @@ namespace PowerLog.Sinks.SpectreTerminal
 
 
         // Private / Hidden variables..
+        private readonly Regex ColorOverrideRegex = new Regex(@"^\s*(\d{1,3})\s*([ ,\-])?\s*(\d{1,3})\s*([ ,\-])?\s*(\d{1,3})\s*$", RegexOptions.Compiled);
+
         private readonly Dictionary<Severity, Color> TerminalColorLUT = new Dictionary<Severity, Color>() {
             { Severity.Verbose, new Color(64, 64, 64) },
             { Severity.Trace, new Color(128, 128, 128) },
@@ -73,7 +75,7 @@ namespace PowerLog.Sinks.SpectreTerminal
         #endregion
         public void Emit(Arguments Log)
         {
-            if (Log.Severity >= Verbosity)
+            if (Log.Severity.Passes(Verbosity))
             {
                 Severity[] SeverityLevels = Enum.GetValues(typeof(Severity)) as Severity[];
 
@@ -101,16 +103,15 @@ namespace PowerLog.Sinks.SpectreTerminal
                 Color FinalColor = new Color(((Byte)(ColorRedChannel / SeverityFlagCount)), ((Byte)(ColorGreenChannel / SeverityFlagCount)), ((Byte)(ColorBlueChannel / SeverityFlagCount)));
                 bool MatchedOverride = false;
                 bool MatchedHighlight = false;
-                for (int I = 0; I < Log.Parameters.Count; I++)
+                foreach (KeyValuePair<string, Object> Parameter in Log.Parameters)
                 {
-                    if (Log.Parameters[I].Identifier == "Color Override" && !MatchedOverride)
+                    if (Parameter.Key == "Color Override" && !MatchedOverride)
                     {
-                        Regex ColorOverrideRegex = new Regex(@"^\s*(\d{1,3})\s*([ ,\-])?\s*(\d{1,3})\s*([ ,\-])?\s*(\d{1,3})\s*$");
-                        if (ColorOverrideRegex.IsMatch(Log.Parameters[I].Value.ToString()))
+                        if (ColorOverrideRegex.IsMatch(Parameter.Value.ToString()))
                         {
                             try
                             {
-                                string[] OverrideChannels = Log.Parameters[I].Value.ToString().Split(new Char[] { ',', ' ', '-' }, StringSplitOptions.RemoveEmptyEntries);
+                                string[] OverrideChannels = Parameter.Value.ToString().Split(new Char[] { ',', ' ', '-' }, StringSplitOptions.RemoveEmptyEntries);
                                 Byte OverrideRedChannel = Convert.ToByte(OverrideChannels[0]);
                                 Byte OverrideGreenChannel = Convert.ToByte(OverrideChannels[1]);
                                 Byte OverrideBlueChannel = Convert.ToByte(OverrideChannels[2]);
@@ -126,10 +127,10 @@ namespace PowerLog.Sinks.SpectreTerminal
                         MatchedOverride = true;
                     }
 
-                    if (Log.Parameters[I].Identifier == "Highlight Override" && !MatchedHighlight)
+                    if (Parameter.Key == "Highlight Override" && !MatchedHighlight)
                     {
                         try {
-                            InvertBackgroundColor = Convert.ToBoolean(Log.Parameters[I].Value);
+                            InvertBackgroundColor = Convert.ToBoolean(Parameter.Value);
                         }
 
                         catch (Exception) {
@@ -182,7 +183,7 @@ namespace PowerLog.Sinks.SpectreTerminal
         /// <param name="EnableColors">Should this sink print to the spectre console using colors?</param>
         /// <param name="Verbosity">The sink verbosity.</param>
         #endregion
-        public SpectreConsoleSink(string Identifier, Log Logger, bool EnableColors = true, Severity Verbosity = Severity.Verbose) {
+        public SpectreConsoleSink(string Identifier, Log Logger, bool EnableColors = true, Severity Verbosity = PowerLog.Verbosity.All) {
             this.Identifier = Identifier;
             this.Logger = Logger;
             this.Verbosity = Verbosity;
@@ -209,7 +210,7 @@ namespace PowerLog.Sinks.SpectreTerminal
         /// <param name="Verbosity">The sink verbosity.</param>
         /// <returns>The current logger, to allow for builder patterns.</returns>
         #endregion
-        public static Log PushSpectreConsole(this Log Logger, string Identifier, bool EnableColors = true, Severity Verbosity = Severity.Verbose)
+        public static Log PushSpectreConsole(this Log Logger, string Identifier, bool EnableColors = true, Severity Verbosity = Verbosity.All)
         {
             SpectreConsoleSink Sink = new SpectreConsoleSink(Identifier, Logger, EnableColors, Verbosity);
             Logger.Push(Sink);

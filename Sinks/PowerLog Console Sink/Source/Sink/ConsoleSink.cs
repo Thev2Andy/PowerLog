@@ -55,7 +55,7 @@ namespace PowerLog.Sinks.Terminal
         #endregion
         public void Emit(Arguments Log)
         {
-            if (Log.Severity >= Verbosity)
+            if (Log.Severity.Passes(Verbosity))
             {
                 ConsoleColor OldForeground = Console.ForegroundColor;
                 ConsoleColor OldBackground = Console.BackgroundColor;
@@ -95,12 +95,12 @@ namespace PowerLog.Sinks.Terminal
                         }
                     }
 
-                    for (int I = 0; I < Log.Parameters.Count; I++)
+                    foreach (KeyValuePair<string, Object> Parameter in Log.Parameters)
                     {
-                        if (Log.Parameters[I].Identifier == "Highlight Override")
+                        if (Parameter.Key == "Highlight Override")
                         {
                             try {
-                                InvertBackgroundColor = Convert.ToBoolean(Log.Parameters[I].Value);
+                                InvertBackgroundColor = Convert.ToBoolean(Parameter.Value);
                             }
 
                             catch (Exception) {
@@ -161,7 +161,7 @@ namespace PowerLog.Sinks.Terminal
         /// <param name="EnableColors">Should this sink print to the console using colors?</param>
         /// <param name="Verbosity">The sink verbosity.</param>
         #endregion
-        public ConsoleSink(string Identifier, Log Logger, bool EnableColors = true, Severity Verbosity = Severity.Verbose) {
+        public ConsoleSink(string Identifier, Log Logger, bool EnableColors = true, Severity Verbosity = PowerLog.Verbosity.All) {
             this.Identifier = Identifier;
             this.Logger = Logger;
             this.Verbosity = Verbosity;
@@ -188,7 +188,7 @@ namespace PowerLog.Sinks.Terminal
         /// <param name="Verbosity">The sink verbosity.</param>
         /// <returns>The current logger, to allow for builder patterns.</returns>
         #endregion
-        public static Log PushConsole(this Log Logger, string Identifier, bool EnableColors = true, Severity Verbosity = Severity.Verbose)
+        public static Log PushConsole(this Log Logger, string Identifier, bool EnableColors = true, Severity Verbosity = Verbosity.All)
         {
             ConsoleSink Sink = new ConsoleSink(Identifier, Logger, EnableColors, Verbosity);
             Logger.Push(Sink);

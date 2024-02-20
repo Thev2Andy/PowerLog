@@ -68,12 +68,12 @@ namespace PowerLog
         #endregion
         public Object Sender;
 
-        #region Parameters Parameter List XML
+        #region Parameters Dictionary XML
         /// <summary>
-        /// The additional log parameters.
+        /// Additional logging data.
         /// </summary>
         #endregion
-        public List<Parameter> Parameters;
+        public Dictionary<string, Object> Parameters;
 
 
         #region Logger Log XML

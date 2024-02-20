@@ -48,7 +48,7 @@ namespace PowerLog
         // Public / Accessible Events.
         #region OnLog Event XML
         /// <summary>
-        /// Invoked in the <see cref="Log.Write(string, Severity, Template?, List{Parameter}, object)"/> function.
+        /// Invoked in the <see cref="Log.Write(string, Severity, Template?, Dictionary{string, Object}, Object)"/> function.
         /// </summary>
         #endregion
         public event Action<Arguments> OnLog;
@@ -78,19 +78,19 @@ namespace PowerLog
 
         #region Write Function XML
         /// <summary>
-        /// Calls a fully-customizable log, sent over to the <see cref="Log.OnLog"/> event.
+        /// Calls a dynamic <see cref="Severity"/> log, sent over to the current active sinks and the <see cref="Log.OnLog"/> event.
         /// </summary>
-        /// <param name="Content">The content of the this.</param>
-        /// <param name="Severity">The type / level of the this.</param>
-        /// <param name="Template">The log templates.</param>
-        /// <param name="Parameters">The additional log parameters.</param>
-        /// <param name="Sender">The sender of the this.</param>
+        /// <param name="Content">The actual content of the log.</param>
+        /// <param name="Severity">The type / level / severity of the log.</param>
+        /// <param name="Template">Format template used by most sinks to compose the log. (Some sinks may use a custom formatting solution and ignore the <see cref="Arguments.FormattedLog"/> property.)</param>
+        /// <param name="Parameters">Additional logging data.</param>
+        /// <param name="Sender">The log sender.</param>
         #endregion
-        public void Write(string Content, Severity Severity, Template? Template = null, List<Parameter> Parameters = null, Object Sender = null)
+        public void Write(string Content, Severity Severity, Template? Template = null, Dictionary<string, Object> Parameters = null, Object Sender = null)
         {
             if (!IsDisposed)
             {
-                if (Severity >= Verbosity)
+                if (Severity.Passes(Verbosity))
                 {
                     Arguments ProducedLog = new Arguments();
                     ProducedLog.Content = Content;
@@ -99,7 +99,7 @@ namespace PowerLog
                     ProducedLog.Template = ((Template)((Template == null) ? ((!String.IsNullOrEmpty(Content)) ? PowerLog.Template.Default : PowerLog.Template.Empty) : Template));
                     ProducedLog.Sender = Sender;
                     ProducedLog.Stacktrace = new StackTrace();
-                    ProducedLog.Parameters = ((Parameters != null) ? Parameters : new List<Parameter>());
+                    ProducedLog.Parameters = ((Parameters != null) ? Parameters : new Dictionary<string, Object>());
 
                     ProducedLog.Logger = this;
 
@@ -120,183 +120,183 @@ namespace PowerLog
         #region Log Overloads
         #region Verbose Function XML
         /// <summary>
-        /// Calls a verbose log, sent over to the <see cref="Log.OnLog"/> event.
+        /// Calls a <see cref="Severity.Verbose"/> log, sent over to the current active sinks and the <see cref="Log.OnLog"/> event.
         /// </summary>
-        /// <param name="Content">The message of the log.</param>
-        /// <param name="Template">The log templates.</param>
-        /// <param name="Parameters">The additional log parameters.</param>
-        /// <param name="Sender">The sender of the this.</param>
+        /// <param name="Content">The actual content of the log.</param>
+        /// <param name="Template">Format template used by most sinks to compose the log. (Some sinks may use a custom formatting solution and ignore the <see cref="Arguments.FormattedLog"/> property.)</param>
+        /// <param name="Parameters">Additional logging data.</param>
+        /// <param name="Sender">The log sender.</param>
         #endregion
-        public void Verbose(string Content, Template? Template = null, List<Parameter> Parameters = null, Object Sender = null) {
+        public void Verbose(string Content, Template? Template = null, Dictionary<string, Object> Parameters = null, Object Sender = null) {
             this.Write(Content, Severity.Verbose, Template, Parameters, Sender);
         }
 
         #region Trace Function XML
         /// <summary>
-        /// Calls a trace log, sent over to the <see cref="Log.OnLog"/> event.
+        /// Calls a <see cref="Severity.Trace"/> log, sent over to the current active sinks and the <see cref="Log.OnLog"/> event.
         /// </summary>
-        /// <param name="Content">The message of the log.</param>
-        /// <param name="Template">The log templates.</param>
-        /// <param name="Parameters">The additional log parameters.</param>
-        /// <param name="Sender">The sender of the this.</param>
+        /// <param name="Content">The actual content of the log.</param>
+        /// <param name="Template">Format template used by most sinks to compose the log. (Some sinks may use a custom formatting solution and ignore the <see cref="Arguments.FormattedLog"/> property.)</param>
+        /// <param name="Parameters">Additional logging data.</param>
+        /// <param name="Sender">The log sender.</param>
         #endregion
-        public void Trace(string Content, Template? Template = null, List<Parameter> Parameters = null, Object Sender = null) {
+        public void Trace(string Content, Template? Template = null, Dictionary<string, Object> Parameters = null, Object Sender = null) {
             this.Write(Content, Severity.Trace, Template, Parameters, Sender);
         }
 
         #region Debug Function XML
         /// <summary>
-        /// Calls a debug log, sent over to the <see cref="Log.OnLog"/> event.
+        /// Calls a <see cref="Severity.Debug"/> log, sent over to the current active sinks and the <see cref="Log.OnLog"/> event.
         /// </summary>
-        /// <param name="Content">The message of the log.</param>
-        /// <param name="Template">The log templates.</param>
-        /// <param name="Parameters">The additional log parameters.</param>
-        /// <param name="Sender">The sender of the this.</param>
+        /// <param name="Content">The actual content of the log.</param>
+        /// <param name="Template">Format template used by most sinks to compose the log. (Some sinks may use a custom formatting solution and ignore the <see cref="Arguments.FormattedLog"/> property.)</param>
+        /// <param name="Parameters">Additional logging data.</param>
+        /// <param name="Sender">The log sender.</param>
         #endregion
-        public void Debug(string Content, Template? Template = null, List<Parameter> Parameters = null, Object Sender = null) {
+        public void Debug(string Content, Template? Template = null, Dictionary<string, Object> Parameters = null, Object Sender = null) {
             this.Write(Content, Severity.Debug, Template, Parameters, Sender);
         }
 
         #region Network Function XML
         /// <summary>
-        /// Calls a network log, sent over to the <see cref="Log.OnLog"/> event.
+        /// Calls a <see cref="Severity.Network"/> log, sent over to the current active sinks and the <see cref="Log.OnLog"/> event.
         /// </summary>
-        /// <param name="Content">The message of the log.</param>
-        /// <param name="Template">The log templates.</param>
-        /// <param name="Parameters">The additional log parameters.</param>
-        /// <param name="Sender">The sender of the this.</param>
+        /// <param name="Content">The actual content of the log.</param>
+        /// <param name="Template">Format template used by most sinks to compose the log. (Some sinks may use a custom formatting solution and ignore the <see cref="Arguments.FormattedLog"/> property.)</param>
+        /// <param name="Parameters">Additional logging data.</param>
+        /// <param name="Sender">The log sender.</param>
         #endregion
-        public void Network(string Content, Template? Template = null, List<Parameter> Parameters = null, Object Sender = null) {
+        public void Network(string Content, Template? Template = null, Dictionary<string, Object> Parameters = null, Object Sender = null) {
             this.Write(Content, Severity.Network, Template, Parameters, Sender);
         }
 
         #region Information Function XML
         /// <summary>
-        /// Calls an information log, sent over to the <see cref="Log.OnLog"/> event.
+        /// Calls an <see cref="Severity.Information"/> log, sent over to the current active sinks and the <see cref="Log.OnLog"/> event.
         /// </summary>
-        /// <param name="Content">The message of the log.</param>
-        /// <param name="Template">The log templates.</param>
-        /// <param name="Parameters">The additional log parameters.</param>
-        /// <param name="Sender">The sender of the this.</param>
+        /// <param name="Content">The actual content of the log.</param>
+        /// <param name="Template">Format template used by most sinks to compose the log. (Some sinks may use a custom formatting solution and ignore the <see cref="Arguments.FormattedLog"/> property.)</param>
+        /// <param name="Parameters">Additional logging data.</param>
+        /// <param name="Sender">The log sender.</param>
         #endregion
-        public void Information(string Content, Template? Template = null, List<Parameter> Parameters = null, Object Sender = null) {
+        public void Information(string Content, Template? Template = null, Dictionary<string, Object> Parameters = null, Object Sender = null) {
             this.Write(Content, Severity.Information, Template, Parameters, Sender);
         }
 
         #region Notice Function XML
         /// <summary>
-        /// Calls a notice log, sent over to the <see cref="Log.OnLog"/> event.
+        /// Calls a <see cref="Severity.Notice"/> log, sent over to the current active sinks and the <see cref="Log.OnLog"/> event.
         /// </summary>
-        /// <param name="Content">The message of the log.</param>
-        /// <param name="Template">The log templates.</param>
-        /// <param name="Parameters">The additional log parameters.</param>
-        /// <param name="Sender">The sender of the this.</param>
+        /// <param name="Content">The actual content of the log.</param>
+        /// <param name="Template">Format template used by most sinks to compose the log. (Some sinks may use a custom formatting solution and ignore the <see cref="Arguments.FormattedLog"/> property.)</param>
+        /// <param name="Parameters">Additional logging data.</param>
+        /// <param name="Sender">The log sender.</param>
         #endregion
-        public void Notice(string Content, Template? Template = null, List<Parameter> Parameters = null, Object Sender = null) {
+        public void Notice(string Content, Template? Template = null, Dictionary<string, Object> Parameters = null, Object Sender = null) {
             this.Write(Content, Severity.Notice, Template, Parameters, Sender);
         }
 
         #region Caution Function XML
         /// <summary>
-        /// Calls a caution log, sent over to the <see cref="Log.OnLog"/> event.
+        /// Calls a <see cref="Severity.Caution"/> log, sent over to the current active sinks and the <see cref="Log.OnLog"/> event.
         /// </summary>
-        /// <param name="Content">The message of the log.</param>
-        /// <param name="Template">The log templates.</param>
-        /// <param name="Parameters">The additional log parameters.</param>
-        /// <param name="Sender">The sender of the this.</param>
+        /// <param name="Content">The actual content of the log.</param>
+        /// <param name="Template">Format template used by most sinks to compose the log. (Some sinks may use a custom formatting solution and ignore the <see cref="Arguments.FormattedLog"/> property.)</param>
+        /// <param name="Parameters">Additional logging data.</param>
+        /// <param name="Sender">The log sender.</param>
         #endregion
-        public void Caution(string Content, Template? Template = null, List<Parameter> Parameters = null, Object Sender = null) {
+        public void Caution(string Content, Template? Template = null, Dictionary<string, Object> Parameters = null, Object Sender = null) {
             this.Write(Content, Severity.Caution, Template, Parameters, Sender);
         }
 
         #region Warning Function XML
         /// <summary>
-        /// Calls a warning log, sent over to the <see cref="Log.OnLog"/> event.
+        /// Calls a <see cref="Severity.Warning"/> log, sent over to the current active sinks and the <see cref="Log.OnLog"/> event.
         /// </summary>
-        /// <param name="Content">The message of the log.</param>
-        /// <param name="Template">The log templates.</param>
-        /// <param name="Parameters">The additional log parameters.</param>
-        /// <param name="Sender">The sender of the this.</param>
+        /// <param name="Content">The actual content of the log.</param>
+        /// <param name="Template">Format template used by most sinks to compose the log. (Some sinks may use a custom formatting solution and ignore the <see cref="Arguments.FormattedLog"/> property.)</param>
+        /// <param name="Parameters">Additional logging data.</param>
+        /// <param name="Sender">The log sender.</param>
         #endregion
-        public void Warning(string Content, Template? Template = null, List<Parameter> Parameters = null, Object Sender = null) {
+        public void Warning(string Content, Template? Template = null, Dictionary<string, Object> Parameters = null, Object Sender = null) {
             this.Write(Content, Severity.Warning, Template, Parameters, Sender);
         }
 
         #region Alert Function XML
         /// <summary>
-        /// Calls an alert log, sent over to the <see cref="Log.OnLog"/> event.
+        /// Calls an <see cref="Severity.Alert"/> log, sent over to the current active sinks and the <see cref="Log.OnLog"/> event.
         /// </summary>
-        /// <param name="Content">The message of the log.</param>
-        /// <param name="Template">The log templates.</param>
-        /// <param name="Parameters">The additional log parameters.</param>
-        /// <param name="Sender">The sender of the this.</param>
+        /// <param name="Content">The actual content of the log.</param>
+        /// <param name="Template">Format template used by most sinks to compose the log. (Some sinks may use a custom formatting solution and ignore the <see cref="Arguments.FormattedLog"/> property.)</param>
+        /// <param name="Parameters">Additional logging data.</param>
+        /// <param name="Sender">The log sender.</param>
         #endregion
-        public void Alert(string Content, Template? Template = null, List<Parameter> Parameters = null, Object Sender = null) {
+        public void Alert(string Content, Template? Template = null, Dictionary<string, Object> Parameters = null, Object Sender = null) {
             this.Write(Content, Severity.Alert, Template, Parameters, Sender);
         }
 
         #region Error Function XML
         /// <summary>
-        /// Calls an error log, sent over to the <see cref="Log.OnLog"/> event.
+        /// Calls an <see cref="Severity.Error"/> log, sent over to the current active sinks and the <see cref="Log.OnLog"/> event.
         /// </summary>
-        /// <param name="Content">The message of the log.</param>
-        /// <param name="Template">The log templates.</param>
-        /// <param name="Parameters">The additional log parameters.</param>
-        /// <param name="Sender">The sender of the this.</param>
+        /// <param name="Content">The actual content of the log.</param>
+        /// <param name="Template">Format template used by most sinks to compose the log. (Some sinks may use a custom formatting solution and ignore the <see cref="Arguments.FormattedLog"/> property.)</param>
+        /// <param name="Parameters">Additional logging data.</param>
+        /// <param name="Sender">The log sender.</param>
         #endregion
-        public void Error(string Content, Template? Template = null, List<Parameter> Parameters = null, Object Sender = null) {
+        public void Error(string Content, Template? Template = null, Dictionary<string, Object> Parameters = null, Object Sender = null) {
             this.Write(Content, Severity.Error, Template, Parameters, Sender);
         }
 
         #region Critical Function XML
         /// <summary>
-        /// Calls a critical log, sent over to the <see cref="Log.OnLog"/> event.
+        /// Calls a <see cref="Severity.Critical"/> log, sent over to the current active sinks and the <see cref="Log.OnLog"/> event.
         /// </summary>
-        /// <param name="Content">The message of the log.</param>
-        /// <param name="Template">The log templates.</param>
-        /// <param name="Parameters">The additional log parameters.</param>
-        /// <param name="Sender">The sender of the this.</param>
+        /// <param name="Content">The actual content of the log.</param>
+        /// <param name="Template">Format template used by most sinks to compose the log. (Some sinks may use a custom formatting solution and ignore the <see cref="Arguments.FormattedLog"/> property.)</param>
+        /// <param name="Parameters">Additional logging data.</param>
+        /// <param name="Sender">The log sender.</param>
         #endregion
-        public void Critical(string Content, Template? Template = null, List<Parameter> Parameters = null, Object Sender = null) {
+        public void Critical(string Content, Template? Template = null, Dictionary<string, Object> Parameters = null, Object Sender = null) {
             this.Write(Content, Severity.Critical, Template, Parameters, Sender);
         }
 
         #region Emergency Function XML
         /// <summary>
-        /// Calls an emergency log, sent over to the <see cref="Log.OnLog"/> event.
+        /// Calls an <see cref="Severity.Emergency"/> log, sent over to the current active sinks and the <see cref="Log.OnLog"/> event.
         /// </summary>
-        /// <param name="Content">The message of the log.</param>
-        /// <param name="Template">The log templates.</param>
-        /// <param name="Parameters">The additional log parameters.</param>
-        /// <param name="Sender">The sender of the this.</param>
+        /// <param name="Content">The actual content of the log.</param>
+        /// <param name="Template">Format template used by most sinks to compose the log. (Some sinks may use a custom formatting solution and ignore the <see cref="Arguments.FormattedLog"/> property.)</param>
+        /// <param name="Parameters">Additional logging data.</param>
+        /// <param name="Sender">The log sender.</param>
         #endregion
-        public void Emergency(string Content, Template? Template = null, List<Parameter> Parameters = null, Object Sender = null) {
+        public void Emergency(string Content, Template? Template = null, Dictionary<string, Object> Parameters = null, Object Sender = null) {
             this.Write(Content, Severity.Emergency, Template, Parameters, Sender);
         }
 
         #region Fatal Function XML
         /// <summary>
-        /// Calls a fatal log, sent over to the <see cref="Log.OnLog"/> event.
+        /// Calls a <see cref="Severity.Fatal"/> log, sent over to the current active sinks and the <see cref="Log.OnLog"/> event.
         /// </summary>
-        /// <param name="Content">The message of the log.</param>
-        /// <param name="Template">The log templates.</param>
-        /// <param name="Parameters">The additional log parameters.</param>
-        /// <param name="Sender">The sender of the this.</param>
+        /// <param name="Content">The actual content of the log.</param>
+        /// <param name="Template">Format template used by most sinks to compose the log. (Some sinks may use a custom formatting solution and ignore the <see cref="Arguments.FormattedLog"/> property.)</param>
+        /// <param name="Parameters">Additional logging data.</param>
+        /// <param name="Sender">The log sender.</param>
         #endregion
-        public void Fatal(string Content, Template? Template = null, List<Parameter> Parameters = null, Object Sender = null) {
+        public void Fatal(string Content, Template? Template = null, Dictionary<string, Object> Parameters = null, Object Sender = null) {
             this.Write(Content, Severity.Fatal, Template, Parameters, Sender);
         }
 
         #region Generic Function XML
         /// <summary>
-        /// Calls a Generic (no-header) log, sent over to the <see cref="Log.OnLog"/> event.
+        /// Calls a <see cref="Severity.Generic"/> log, sent over to the current active sinks and the <see cref="Log.OnLog"/> event.
         /// </summary>
-        /// <param name="Content">The message of the log.</param>
-        /// <param name="Template">The log templates.</param>
-        /// <param name="Parameters">The additional log parameters.</param>
-        /// <param name="Sender">The sender of the this.</param>
+        /// <param name="Content">The actual content of the log.</param>
+        /// <param name="Template">Format template used by most sinks to compose the log. (Some sinks may use a custom formatting solution and ignore the <see cref="Arguments.FormattedLog"/> property.)</param>
+        /// <param name="Parameters">Additional logging data.</param>
+        /// <param name="Sender">The log sender.</param>
         #endregion
-        public void Generic(string Content, Template? Template = null, List<Parameter> Parameters = null, Object Sender = null) {
+        public void Generic(string Content, Template? Template = null, Dictionary<string, Object> Parameters = null, Object Sender = null) {
             this.Write(Content, Severity.Generic, Template, Parameters, Sender);
         }
         #endregion
@@ -307,8 +307,10 @@ namespace PowerLog
         /// Sends a signal to listening sinks to "save" the log.
         /// </summary>
         #endregion
-        public void Save() {
-            if (!IsDisposed) {
+        public void Save()
+        {
+            if (!IsDisposed)
+            {
                 foreach (ISink Sink in Sinks) {
                     Sink.Save();
                 }
@@ -326,8 +328,10 @@ namespace PowerLog
         /// Sends a signal to listening sinks to "clear" the log.
         /// </summary>
         #endregion
-        public void Clear() {
-            if (!IsDisposed) {
+        public void Clear()
+        {
+            if (!IsDisposed)
+            {
                 foreach (ISink Sink in Sinks) {
                     Sink.Clear();
                 }
@@ -370,12 +374,12 @@ namespace PowerLog
         {
             if (Sink.Logger == this)
             {
-                Sink.Initialize();
                 Sinks.Add(Sink);
+                Sink.Initialize();
             }
 
             else {
-                throw new InvalidOperationException($"Invalid logger instance `{Sink.Logger.Identifier}` in sink `{Sink.Identifier}`, should be `{this.Identifier}`.");
+                throw new ArgumentException($"Invalid logger instance `{Sink.Logger.Identifier}` in sink `{Sink.Identifier}`, should be `{this.Identifier}`.");
             }
         }
 
@@ -423,7 +427,7 @@ namespace PowerLog
         /// <param name="Identifier">The identifier / name of this logger.</param>
         /// <param name="Verbosity">The logger verbosity.</param>
         #endregion
-        public Log(string Identifier, Severity Verbosity = Severity.Verbose) {
+        public Log(string Identifier, Severity Verbosity = PowerLog.Verbosity.All) {
             this.Identifier = Identifier;
             this.Sinks = new List<ISink>();
             this.Verbosity = Verbosity;

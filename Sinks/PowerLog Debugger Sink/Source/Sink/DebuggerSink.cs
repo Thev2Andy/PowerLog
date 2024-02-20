@@ -45,7 +45,7 @@ namespace PowerLog.Sinks.Debugger
         #endregion
         public void Emit(Arguments Log)
         {
-            if (Log.Severity >= Verbosity)
+            if (Log.Severity.Passes(Verbosity))
             {
                 if (WriteInReleaseMode) {
                     Trace.WriteLine(Log.FormattedLog);
@@ -81,7 +81,7 @@ namespace PowerLog.Sinks.Debugger
         #region DebuggerSink Constructor XML
         /// <inheritdoc/>
         #endregion
-        public DebuggerSink(string Identifier, Log Logger, Severity Verbosity = Severity.Verbose, bool WriteInReleaseMode = true)
+        public DebuggerSink(string Identifier, Log Logger, Severity Verbosity = PowerLog.Verbosity.All, bool WriteInReleaseMode = true)
         {
             this.Identifier = Identifier;
             this.Logger = Logger;
@@ -109,7 +109,7 @@ namespace PowerLog.Sinks.Debugger
         /// <param name="WriteInReleaseMode">Determines what class will the sink use. (<see cref="Trace"/> / <see cref="Debug"/>)</param>
         /// <returns>The current logger, to allow for builder patterns.</returns>
         #endregion
-        public static Log PushDebugger(this Log Logger, string Identifier, Severity Verbosity = Severity.Verbose, bool WriteInReleaseMode = true)
+        public static Log PushDebugger(this Log Logger, string Identifier, Severity Verbosity = Verbosity.All, bool WriteInReleaseMode = true)
         {
             DebuggerSink Sink = new DebuggerSink(Identifier, Logger, Verbosity, WriteInReleaseMode);
             Logger.Push(Sink);

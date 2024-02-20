@@ -15,11 +15,11 @@ namespace PowerLog
     public static class Format
     {
         // Wildcard Regular Expressions..
-        private static Regex TimeWildcardRegex = new Regex(@"\|([^|]*)([T])([^|]*)\|", (RegexOptions.Multiline | RegexOptions.Compiled));
-        private static Regex IdentifierWildcardRegex = new Regex(@"\|([^|]*)([I])([^|]*)\|", (RegexOptions.Multiline | RegexOptions.Compiled));
-        private static Regex SeverityWildcardRegex = new Regex(@"\|([^|]*)([S])([^|]*)\|", (RegexOptions.Multiline | RegexOptions.Compiled));
-        private static Regex ContentWildcardRegex = new Regex(@"\|([^|]*)([C])([^|]*)\|", (RegexOptions.Multiline | RegexOptions.Compiled));
-        private static Regex ObjectWildcardRegex = new Regex(@"\|([^|]*)([O])([^|]*)\|", (RegexOptions.Multiline | RegexOptions.Compiled));
+        private static readonly Regex TimeWildcardRegex = new Regex(@"\|([^|]*)([T])([^|]*)\|", (RegexOptions.Multiline | RegexOptions.Compiled));
+        private static readonly Regex IdentifierWildcardRegex = new Regex(@"\|([^|]*)([I])([^|]*)\|", (RegexOptions.Multiline | RegexOptions.Compiled));
+        private static readonly Regex SeverityWildcardRegex = new Regex(@"\|([^|]*)([S])([^|]*)\|", (RegexOptions.Multiline | RegexOptions.Compiled));
+        private static readonly Regex ContentWildcardRegex = new Regex(@"\|([^|]*)([C])([^|]*)\|", (RegexOptions.Multiline | RegexOptions.Compiled));
+        private static readonly Regex ObjectWildcardRegex = new Regex(@"\|([^|]*)([O])([^|]*)\|", (RegexOptions.Multiline | RegexOptions.Compiled));
 
 
         #region Formulate Function XML
@@ -105,8 +105,8 @@ namespace PowerLog
                 };
 
 
-                for (int I = 0; I < PreprocessedLog.Parameters.Count; I++) {
-                    PreprocessedLog.Content = PreprocessedLog.Content.Replace($"~{PreprocessedLog.Parameters[I].Identifier}~", PreprocessedLog.Parameters[I].Value.ToString());
+                foreach (KeyValuePair<string, Object> Parameter in PreprocessedLog.Parameters) {
+                    PreprocessedLog.Content = PreprocessedLog.Content.Replace($"~{Parameter.Key}~", Parameter.Value.ToString());
                 }
 
                 return PreprocessedLog;

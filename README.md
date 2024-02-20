@@ -14,6 +14,7 @@ Logger.Information("Hello PowerLog!");
 * Supports sinks, and comes with a few default ones (console, debugger, markdown file, simple file, as well as a spectre.console sink) as separate libraries. (You can write a custom one by implementing the `ISink` interface, check the examples section for a detailed tutorial on it.)
 * Logger instances.
 * Enables the combination of log levels, such as `Information` and `Network`, or `Verbose` and `Error`, for more granular logging control.
+* Allows full control over logging level exclusion and inclusion via verbosity masks, built using `VerbosityMask` and `Severity` extension methods.
 * Blazingly fast. (Around ~0.4875 ms per log average worst-case scenario.)
 * Completely dependency-free and self-sustained.
 * Cross platform support.
@@ -34,7 +35,7 @@ A logging library provides a simple API for developers to log events happening i
 1. Logger instances allow developers to set up multiple loggers with different sink sets for different purposes, and is the only way to use PowerLog. (since logger instances are more versatile and are overall superior for general purpose logging and most logging situations.)
 2. To set up a logger instance, you need to provide the constructor with the logger's identifier (used for different purposes, such as the formatting of logs and sorting the log files in the file sink by the sink's identifier.), and optionally the logger's verbosity, defaulting to `Severity.Verbose`. (meaning that it will emit all logs.)
 ```cs
-Log Logger = new Log("Readme Logger", Severity.Information);
+Log Logger = new Log("Readme Logger", Verbosity.Minimum(Severity.Information));
 ```
 
 ___
@@ -55,17 +56,16 @@ Logger.PushConsoleSink("Console Sink Identifier")
 3. Setting up a sink from an instance.
 ```cs
 ISink Instance = /* Your sink instance. */;
-Instance.Logger = Logger; // Make sure the logger is assigned to the sink. (Otherwise it will throw an exception of type `InvalidOperationException`.)
+Instance.Logger = Logger; // Make sure the logger is assigned to the sink. (Otherwise it will throw an exception of type `ArgumentException`.)
 Logger.Push(Instance);
 ```
 
 ___
 
 ## Logging using multiple combined levels.
-1. Requires the usage of the `Write` method istead of the overloads.
+1. Requires the usage of the `Write` method instead of the overloads.
 2. Will arrange the logs when formatting in the order of verbosity, from lowest to highest.
-3. Will take the highest severity when calculating verbosity, so it will require the verbosity of the sink / logger to be above the level with the highest verbosity.
-4. Having the `Generic` severity will make the log impossible to hide by verbosity and will hide the severity header. (Both properties inherited from the `Generic` severity level.)
+3. Will check against any matching flag when calculating verbosity, so it will require the verbosity of the sink / logger to contain at least one of the flags.
 ```cs
 Logger.Write("Log Content", (Severity.Information | Severity.Network | Severity.Verbose));
 ```
@@ -92,7 +92,7 @@ Template Template = new Template("|[T]| ||I |S: ||C|| (O)|", "HH:mm:ss");
 ___
 
 ## Writing a custom sink.
-1. This section is a bit bigger, beware, but in this section we'll be implementing an extremely basic console sink. (with no colors and no verbosity)
+1. This section is a bit bigger, beware, but in this section we'll be implementing an extremely basic console sink. (with no colors)
 2. In order to make a sink, you first have to implement the `ISink` interface.
 3. Here's the 3 most important parts of the `ISink` interface:
 ```cs
@@ -126,11 +126,11 @@ public void Shutdown();
 
     * It's time to implement the most important function of a sink, the `Emit` function.
     * There are endless ways to implement this depending on the sink you're making, but for this sink we'll do a very simple implementation and use the `Arguments.FormattedLog` property which will format our log based on it's template, but nothing is stopping you from accessing the fields of the `Arguments` instance.
-    * One thing you might want to implement is verbosity, which can be implemented with a simple if statement, checking if `Log.Severity` is greater than the sink's verbosity. (it's called basic enum checking, checking them as integers)
+    * One thing you might want to implement is verbosity, which can be implemented with a simple function call implemented in the library's `Verbosity` class, or as an extension method over `Severity`. (Beware of collisions between the `Verbosity` property and said class.)
     ```cs
     public void Emit(Arguments Log)
     {
-        if (Log.Severity >= Verbosity) {
+        if (Log.Severity.Passes(Verbosity)) {
             Console.WriteLine(Log.FormattedLog);
         }
     }
@@ -152,10 +152,10 @@ public void Shutdown();
 
     * Let's implement this extension function, we essentially want to create an instance of the sink, set the parameters in the constructor and then push it onto the logger's sink stack.
     ```cs
-    public SimpleConsoleSink(string Identifier, Log Logger, Severity Verbosity = Severity.Verbose) {
+    public SimpleConsoleSink(string Identifier, Log Logger, Severity Verbosity = PowerLog.Verbosity.All) {
         this.Identifier = Identifier;
         this.Logger = Logger;
-        this.Verbosity = Severity.Verbose;
+        this.Verbosity = Verbosity;
     }
     ```
 
@@ -163,7 +163,7 @@ public void Shutdown();
     ```cs
     public static class SimpleConsoleSinkUtilities
     {
-        public static Log PushSimpleConsole(this Log Logger, string Identifier, Severity Verbosity = Severity.Verbose) {
+        public static Log PushSimpleConsole(this Log Logger, string Identifier, Severity Verbosity = Verbosity.All) {
             SimpleConsoleSink Sink = new SimpleConsoleSink(Identifier, Logger, Verbosity);
             Logger.Push(Sink);
 
@@ -199,10 +199,10 @@ public void Shutdown();
 
 
 
-        public SimpleConsoleSink(string Identifier, Log Logger, Severity Verbosity = Severity.Verbose) {
+        public SimpleConsoleSink(string Identifier, Log Logger, Severity Verbosity = PowerLog.Verbosity.All) {
             this.Identifier = Identifier;
             this.Logger = Logger;
-            this.Verbosity = Severity.Verbose;
+            this.Verbosity = Verbosity;
         }
     }
 
@@ -210,7 +210,7 @@ public void Shutdown();
 
     public static class SimpleConsoleSinkUtilities
     {
-        public static Log PushSimpleConsole(this Log Logger, string Identifier, Severity Verbosity = Severity.Verbose) {
+        public static Log PushSimpleConsole(this Log Logger, string Identifier, Severity Verbosity = Verbosity.All) {
             SimpleConsoleSink Sink = new SimpleConsoleSink(Identifier, Logger, Verbosity);
             Logger.Push(Sink);
 

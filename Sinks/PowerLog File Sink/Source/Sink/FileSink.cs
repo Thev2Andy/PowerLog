@@ -55,7 +55,7 @@ namespace PowerLog.Sinks.IO
         #endregion
         public void Emit(Arguments Log)
         {
-            if (Log.Severity >= Verbosity) {
+            if (Log.Severity.Passes(Verbosity)) {
                 LogStream.Write($"{Log.FormattedLog}{Environment.NewLine}");
             }
         }
@@ -105,7 +105,7 @@ namespace PowerLog.Sinks.IO
         /// <param name="Verbosity">The sink verbosity.</param>
         /// <param name="LogPath">The log file path.</param>
         #endregion
-        public FileSink(string Identifier, Log Logger, Severity Verbosity = Severity.Verbose, LogIO LogPath = null) {
+        public FileSink(string Identifier, Log Logger, Severity Verbosity = PowerLog.Verbosity.All, LogIO LogPath = null) {
             this.Identifier = Identifier;
             this.Logger = Logger;
             this.Verbosity = Verbosity;
@@ -136,7 +136,7 @@ namespace PowerLog.Sinks.IO
         /// <param name="LogPath">The log file path.</param>
         /// <returns>The current logger, to allow for builder patterns.</returns>
         #endregion
-        public static Log PushFile(this Log Logger, string Identifier, Severity Verbosity = Severity.Verbose, LogIO LogPath = null)
+        public static Log PushFile(this Log Logger, string Identifier, Severity Verbosity = Verbosity.All, LogIO LogPath = null)
         {
             FileSink Sink = new FileSink(Identifier, Logger, Verbosity, LogPath);
             Logger.Push(Sink);

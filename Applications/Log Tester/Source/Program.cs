@@ -1,13 +1,15 @@
 ﻿using System;
-using System.Reflection;
 using System.IO;
+using System.Collections;
+using System.Collections.Generic;
+using System.Reflection;
 using System.Diagnostics;
-using PowerLog;
 using PowerLog.Sinks.Debugger;
 using PowerLog.Sinks.SpectreTerminal;
 using PowerLog.Sinks.Terminal;
 using PowerLog.Sinks.Markdown;
 using PowerLog.Sinks.IO;
+using PowerLog;
 
 namespace LogTester
 {
@@ -17,10 +19,10 @@ namespace LogTester
 
         static void Main(string[] Args)
         {
-            Log = new Log("Log", Severity.Verbose);
-            Log.PushDebugger("Log DebuggerSink", Severity.Verbose, true).
-                PushSpectreConsole("Log SpectreConsoleSink", true, Severity.Verbose).
-                // PushConsole("Log ConsoleSink", true, Severity.Verbose).
+            Log = new Log("Log", Verbosity.All);
+            Log.PushDebugger("Log DebuggerSink", Verbosity.All, true).
+                PushSpectreConsole("Log SpectreConsoleSink", true, Verbosity.All).
+                // PushConsole("Log ConsoleSink", true, VerbosityMask.All).
                 PushFile("Log FileSink").
                 PushMarkdown("Log MarkdownSink");
 
@@ -53,10 +55,10 @@ namespace LogTester
 
             Log.Generic(String.Empty);
 
-            Log.Information("Param test.. (~PARAM~, ~PARAM2~)", Template.Default, new System.Collections.Generic.List<Parameter>() { new Parameter("PARAM", "Hello"), new Parameter("PARAM2", "World!") }, null);
+            Log.Information("Param test.. (~PARAM~, ~PARAM2~)", Template.Default, new Dictionary<string, Object> { { "PARAM", "Hello" }, { "PARAM2", "World!" } }, null);
             Log.Information($"Application compiled at {File.GetLastWriteTime(Assembly.GetEntryAssembly().Location).ToString("HH-mm-ss tt, dd MMMM yyyy")}, in {typeof(Program).Assembly.GetCustomAttribute<AssemblyConfigurationAttribute>().Configuration} mode.", Template.Default, null, Process.GetCurrentProcess().ProcessName);
 
-            Log.Information($"Here's a fancy overridden colored log in Spectre.Console, however the normal console will use the default color. (Color: `~Color Override~`, Highlight: `~Highlight Override~`)", null, new System.Collections.Generic.List<Parameter>() { new Parameter("Color Override", "84, 0, 255"), new Parameter("Highlight Override", true) });
+            Log.Information($"Here's a fancy overridden colored log in Spectre.Console, however the normal console will use the default color. (Color: `~Color Override~`, Highlight: `~Highlight Override~`)", null, new Dictionary<string, Object> { { "Color Override", "84, 0, 255" }, { "Highlight Override", true } });
             Log.Information("F |C|");
             Log.Information("MD Sink Test", new Template("| |T| | |I| | |S| | |C| | |O| |"));
 
