@@ -1,12 +1,14 @@
-﻿using System.IO;
-using System;
+﻿using System;
+using System.IO;
+using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using PowerLog;
 
 namespace PowerLog.Sinks.Markdown
 {
     #region MarkdownSink Class XML
     /// <summary>
-    /// Writes logs to a markdown file.
+    /// Writes logs to a colored markdown file.
     /// </summary>
     #endregion
     public class MarkdownSink : ISink
@@ -56,12 +58,32 @@ namespace PowerLog.Sinks.Markdown
 
 
         // Private / Hidden variables..
-        #region LogStream StreamWriter XML
-        /// <summary>
-        /// The log stream.
-        /// </summary>
-        #endregion
+        private readonly Regex ColorOverrideRegex = new Regex(@"^\s*(\d{1,3})\s*([ ,\-])?\s*(\d{1,3})\s*([ ,\-])?\s*(\d{1,3})\s*$", RegexOptions.Compiled);
+        private Severity[] SeverityLevels;
         private StreamWriter LogStream;
+
+        private readonly Dictionary<Severity, Color> TerminalColorLUT = new Dictionary<Severity, Color>() {
+            { Severity.Verbose, new Color(64, 64, 64) },
+            { Severity.Trace, new Color(128, 128, 128) },
+            { Severity.Debug, new Color(192, 192, 192) },
+            { Severity.Information, new Color(255, 255, 255) },
+            { Severity.Network, new Color(65, 135, 255) },
+            { Severity.Notice, new Color(255, 240, 195) },
+            { Severity.Caution, new Color(255, 230, 165) },
+            { Severity.Warning, new Color(255, 215, 128) },
+            { Severity.Alert, new Color(255, 170, 128) },
+            { Severity.Error, new Color(255, 128, 128) },
+            { Severity.Critical, new Color(255, 100, 100) },
+            { Severity.Emergency, new Color(255, 85, 85) },
+            { Severity.Fatal, new Color(192, 64, 64) },
+            { Severity.Generic, new Color(255, 255, 255) },
+        };
+
+        private readonly List<Severity> HighlightedSeverities = new List<Severity>() {
+            Severity.Critical,
+            Severity.Emergency,
+            Severity.Fatal,
+        };
 
 
         #region Emit Function XML
@@ -72,8 +94,77 @@ namespace PowerLog.Sinks.Markdown
             // Very specific log formatting, but no markdown collisions.
             Arguments ProcessedLog = Log.Parse();
 
-            if (Log.Severity.Passes(AllowedSeverities, StrictFiltering)) {
-                LogStream.Write($"| {ProcessedLog.Time.ToString(ProcessedLog.Template.DateFormat)} | {((ProcessedLog.Logger != null && !String.IsNullOrEmpty(ProcessedLog.Logger.Identifier)) ? $"{ProcessedLog.Logger.Identifier}" : String.Empty)} | {((ProcessedLog.Severity != Severity.Generic) ? $"{ProcessedLog.Severity.ToString()}" : String.Empty)} | {ProcessedLog.Content} | {((ProcessedLog.Sender != null) ? ProcessedLog.Sender : "N/A")} |{Environment.NewLine}");
+            if (Log.Severity.Passes(AllowedSeverities, StrictFiltering))
+            {
+                bool InvertBackgroundColor = false;
+                int SeverityFlagCount = 0;
+                int ColorRedChannel = 0;
+                int ColorGreenChannel = 0;
+                int ColorBlueChannel = 0;
+
+                for (int I = 0; I < SeverityLevels.Length; I++)
+                {
+                    if (Log.Severity.HasFlag(SeverityLevels[I]))
+                    {
+                        ColorRedChannel += TerminalColorLUT[SeverityLevels[I]].R;
+                        ColorGreenChannel += TerminalColorLUT[SeverityLevels[I]].G;
+                        ColorBlueChannel += TerminalColorLUT[SeverityLevels[I]].B;
+                        SeverityFlagCount++;
+
+                        if (HighlightedSeverities.Contains(SeverityLevels[I]) && !InvertBackgroundColor) {
+                            InvertBackgroundColor = true;
+                        }
+                    }
+                }
+
+                Color FinalColor = new Color(((Byte)(ColorRedChannel / SeverityFlagCount)), ((Byte)(ColorGreenChannel / SeverityFlagCount)), ((Byte)(ColorBlueChannel / SeverityFlagCount)));
+                bool MatchedOverride = false;
+                bool MatchedHighlight = false;
+                foreach (KeyValuePair<string, Object> Parameter in Log.Parameters)
+                {
+                    if (Parameter.Key == "Color Override" && !MatchedOverride)
+                    {
+                        if (ColorOverrideRegex.IsMatch(Parameter.Value.ToString()))
+                        {
+                            try
+                            {
+                                string[] OverrideChannels = Parameter.Value.ToString().Split(new Char[] { ',', ' ', '-' }, StringSplitOptions.RemoveEmptyEntries);
+                                Byte OverrideRedChannel = Convert.ToByte(OverrideChannels[0]);
+                                Byte OverrideGreenChannel = Convert.ToByte(OverrideChannels[1]);
+                                Byte OverrideBlueChannel = Convert.ToByte(OverrideChannels[2]);
+
+                                FinalColor = new Color(OverrideRedChannel, OverrideGreenChannel, OverrideBlueChannel);
+                            }
+
+                            catch (Exception) {
+                                Logger.Error("An error occured while trying to override the color of the log.", null, null, this.Identifier);
+                            }
+                        }
+
+                        MatchedOverride = true;
+                    }
+
+                    if (Parameter.Key == "Highlight Override" && !MatchedHighlight)
+                    {
+                        try {
+                            InvertBackgroundColor = Convert.ToBoolean(Parameter.Value);
+                        }
+
+                        catch (Exception) {
+                            Logger.Error("An error occured while trying to invert the color of the log.", null, null, this.Identifier);
+                        }
+
+                        MatchedHighlight = true;
+                    }
+
+
+                    if (MatchedOverride && MatchedHighlight) {
+                        break;
+                    }
+                }
+
+                string SeverityField = this.ComposeSeverity(ProcessedLog.Severity, FinalColor, InvertBackgroundColor);
+                LogStream.Write($"| {ProcessedLog.Time.ToString(ProcessedLog.Template.DateFormat)} | {((ProcessedLog.Logger != null && !String.IsNullOrEmpty(ProcessedLog.Logger.Identifier)) ? $"{ProcessedLog.Logger.Identifier}" : String.Empty)} | {SeverityField} | {ProcessedLog.Content} | {((ProcessedLog.Sender != null) ? ProcessedLog.Sender : "N/A")} |{Environment.NewLine}");
             }
         }
 
@@ -91,11 +182,11 @@ namespace PowerLog.Sinks.Markdown
             LogStream = new StreamWriter(LogPath.Get(), true);
             LogStream.AutoFlush = true;
 
-            LogStream.Write($"# {Logger.Identifier} Output{Environment.NewLine}### Logger '{Logger.Identifier}' started at {InitializationDate.ToString("HH-mm-ss tt, dd MMMM yyyy")}.{Environment.NewLine}<br/>{Environment.NewLine}{Environment.NewLine}{Environment.NewLine}## Log Table{Environment.NewLine}{Environment.NewLine}| Timestamp | Logger Identifier | Severity | Content | Sender |{Environment.NewLine}|---|---|---|---|---|{Environment.NewLine}");
+            LogStream.Write($"# {Logger.Identifier} Output{Environment.NewLine}* Sink started at {InitializationDate.ToString("HH:mm:ss, dddd, dd MMMM yyyy")}.{Environment.NewLine}{Environment.NewLine}# Output History{Environment.NewLine}| Timestamp | Logger | Severity | Content | Sender |{Environment.NewLine}| --------- | ------ | -------- | ------- | ------ |{Environment.NewLine}");
         }
 
         #region Shutdown Function XML
-        /// Closes the log stream and handles sink shutdown.
+        /// <inheritdoc/>
         #endregion
         public void Shutdown() {
             LogStream.Close();
@@ -107,6 +198,10 @@ namespace PowerLog.Sinks.Markdown
         #endregion
         public void Clear() { }
 
+
+        private string ComposeSeverity(Severity Severity, Color Color, bool Highlight) {
+            return $"<span style=\"{((Highlight) ? "background-" : String.Empty)}color: rgb({Color.R}, {Color.G}, {Color.B})\">{Severity}</span>";
+        }
 
         private void HandleExit(Object S, EventArgs A) {
             Shutdown();
@@ -131,11 +226,28 @@ namespace PowerLog.Sinks.Markdown
             this.StrictFiltering = true;
 
             this.InitializationDate = DateTime.Now;
+            SeverityLevels = Enum.GetValues<Severity>();
 
             AppDomain.CurrentDomain.ProcessExit += HandleExit;
 
             this.LogPath = ((LogPath != null) ? LogPath : new LogIO(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $"Markdown Logs", $"{((Logger.Identifier.IndexOfAny(Path.GetInvalidPathChars()) == -1) ? Logger.Identifier : "Miscellaneous")}"),
                  $"{((Logger.Identifier.IndexOfAny(Path.GetInvalidFileNameChars()) == -1) ? Logger.Identifier : "Log")} Markdown - ({DateTime.Now.ToString("HH-mm-ss tt, dd MMMM yyyy")})", "md"));
+        }
+
+
+
+        private struct Color
+        {
+            public Byte R;
+            public Byte G;
+            public Byte B;
+
+            public Color(Byte R, Byte G, Byte B)
+            {
+                this.R = R;
+                this.G = G;
+                this.B = B;
+            }
         }
     }
 

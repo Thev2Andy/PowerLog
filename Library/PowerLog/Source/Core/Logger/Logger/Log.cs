@@ -11,7 +11,7 @@ namespace PowerLog
     /// The class used for writing logs.
     /// </summary>
     #endregion
-    public class Log
+    public class Log : IDisposable
     {
         // Public / Accessible variables.
         #region Identifier String XML
@@ -361,14 +361,21 @@ namespace PowerLog
         #endregion
         public ISink Find(string Identifier)
         {
-            foreach (ISink ProbedSink in Sinks)
+            if (!IsDisposed)
             {
-                if (ProbedSink.Identifier == Identifier) {
-                    return ProbedSink;
+                foreach (ISink ProbedSink in Sinks)
+                {
+                    if (ProbedSink.Identifier == Identifier) {
+                        return ProbedSink;
+                    }
                 }
+
+                return null;
             }
 
-            return null;
+            else {
+                throw new ObjectDisposedException(Identifier);
+            }
         }
 
         #region Push Function XML
@@ -379,14 +386,21 @@ namespace PowerLog
         #endregion
         public void Push(ISink Sink)
         {
-            if (Sink.Logger == this)
+            if (!IsDisposed)
             {
-                Sinks.Add(Sink);
-                Sink.Initialize();
+                if (Sink.Logger == this)
+                {
+                    Sinks.Add(Sink);
+                    Sink.Initialize();
+                }
+
+                else {
+                    throw new ArgumentException($"Invalid logger instance `{Sink.Logger.Identifier}` in sink `{Sink.Identifier}`, should be `{this.Identifier}`.");
+                }
             }
 
             else {
-                throw new ArgumentException($"Invalid logger instance `{Sink.Logger.Identifier}` in sink `{Sink.Identifier}`, should be `{this.Identifier}`.");
+                throw new ObjectDisposedException(Identifier);
             }
         }
 
@@ -396,9 +410,17 @@ namespace PowerLog
         /// </summary>
         /// <param name="Sink">The sink to remove.</param>
         #endregion
-        public void Pop(ISink Sink) {
-            Sink.Shutdown();
-            Sinks.Remove(Sink);
+        public void Pop(ISink Sink)
+        {
+            if (!IsDisposed)
+            {
+                Sink.Shutdown();
+                Sinks.Remove(Sink);
+            }
+
+            else {
+                throw new ObjectDisposedException(Identifier);
+            }
         }
 
 

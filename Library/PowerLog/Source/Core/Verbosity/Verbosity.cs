@@ -18,9 +18,9 @@ namespace PowerLog
         /// Convenience constant for enabling every logging level.
         /// </summary>
         #endregion
-        public const Severity All = ((Severity)(~0));
+        public const Severity All = ((Severity)(~(-1 << 14)));
 
-        #region All Constant Severity XML
+        #region None Constant Severity XML
         /// <summary>
         /// Convenience constant for disabling every logging level.
         /// </summary>
@@ -96,6 +96,24 @@ namespace PowerLog
         #endregion
         public static bool Passes(this Severity Severity, Severity Verbosity, bool StrictFiltering = true) {
             return ((StrictFiltering) ? ((Verbosity & Severity) == Severity) : ((Verbosity & Severity) != 0));
+        }
+
+
+
+        #region Verbosity Static Constructor XML
+        /// <summary>
+        /// Ensures that <see cref="All"/> is valid and includes all of the severities, when adding / removing a severity. <br/>
+        /// In the case that <see cref="All"/> is invalid, update the bitshift amount with the new amount of severities.
+        /// </summary>
+        /// <exception cref="ApplicationException"><see cref="All"/> is invalid.</exception>
+        #endregion
+        static Verbosity()
+        {
+            Severity ValidationAll = (Severity)(~(-1 << Enum.GetValues<Severity>().Length));
+            if (All != ValidationAll) {
+                throw new ApplicationException($"The verbosity preset `{nameof(Verbosity)}.{nameof(All)}` is invalid!");
+                // please don't ever fire thank you <3
+            }
         }
     }
 }

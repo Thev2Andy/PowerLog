@@ -49,11 +49,6 @@ namespace PowerLog.Sinks.IO
 
 
         // Private / Hidden variables..
-        #region LogStream StreamWriter XML
-        /// <summary>
-        /// The log stream.
-        /// </summary>
-        #endregion
         private StreamWriter LogStream;
 
 

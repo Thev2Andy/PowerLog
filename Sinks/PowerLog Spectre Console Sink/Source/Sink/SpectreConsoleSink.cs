@@ -84,7 +84,7 @@ namespace PowerLog.Sinks.SpectreTerminal
         {
             if (Log.Severity.Passes(AllowedSeverities, StrictFiltering))
             {
-                Severity[] SeverityLevels = Enum.GetValues(typeof(Severity)) as Severity[];
+                Severity[] SeverityLevels = Enum.GetValues<Severity>();
 
                 bool InvertBackgroundColor = false;
                 int SeverityFlagCount = 0;
@@ -153,7 +153,7 @@ namespace PowerLog.Sinks.SpectreTerminal
                     }
                 }
 
-                AnsiConsole.Write(new Text((Log.FormattedLog + Environment.NewLine), new Style(((EnableColors) ? FinalColor : null), AnsiConsole.Background, ((InvertBackgroundColor) ? Decoration.Invert : Decoration.None))));
+                AnsiConsole.Write(new Text((Log.FormattedLog + Environment.NewLine), new Style(((EnableColors) ? FinalColor : AnsiConsole.Foreground), AnsiConsole.Background, ((InvertBackgroundColor) ? Decoration.Invert : Decoration.None))));
             }
         }
 
