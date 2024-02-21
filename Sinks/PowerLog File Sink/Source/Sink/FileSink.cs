@@ -25,12 +25,19 @@ namespace PowerLog.Sinks.IO
         #endregion
         public Log Logger { get; }
 
-        #region Verbosity Severity XML
+        #region AllowedSeverities Severity XML
         /// <summary>
-        /// The verbosity of the sink.
+        /// The sink's allowed severity levels.
         /// </summary>
         #endregion
-        public Severity Verbosity { get; set; }
+        public Severity AllowedSeverities { get; set; }
+
+        #region StrictFiltering Boolean XML
+        /// <summary>
+        /// Verbosity test behaviour, determines if a given log needs to fully or partially match the allowed severities.
+        /// </summary>
+        #endregion
+        public bool StrictFiltering { get; set; }
 
 
         #region LogPath LogIO XML
@@ -55,7 +62,7 @@ namespace PowerLog.Sinks.IO
         #endregion
         public void Emit(Arguments Log)
         {
-            if (Log.Severity.Passes(Verbosity)) {
+            if (Log.Severity.Passes(AllowedSeverities, StrictFiltering)) {
                 LogStream.Write($"{Log.FormattedLog}{Environment.NewLine}");
             }
         }
@@ -102,13 +109,15 @@ namespace PowerLog.Sinks.IO
         /// </summary>
         /// <param name="Identifier">The sink identifier.</param>
         /// <param name="Logger">The logger to push the sink to.</param>
-        /// <param name="Verbosity">The sink verbosity.</param>
+        /// <param name="AllowedSeverities">The sink's allowed severity levels.</param>
         /// <param name="LogPath">The log file path.</param>
         #endregion
-        public FileSink(string Identifier, Log Logger, Severity Verbosity = PowerLog.Verbosity.All, LogIO LogPath = null) {
+        public FileSink(string Identifier, Log Logger, Severity AllowedSeverities = Verbosity.All, LogIO LogPath = null)
+        {
             this.Identifier = Identifier;
             this.Logger = Logger;
-            this.Verbosity = Verbosity;
+            this.AllowedSeverities = AllowedSeverities;
+            this.StrictFiltering = true;
 
             AppDomain.CurrentDomain.ProcessExit += HandleExit;
 
@@ -132,13 +141,13 @@ namespace PowerLog.Sinks.IO
         /// </summary>
         /// <param name="Logger">The logger to push the sink to.</param>
         /// <param name="Identifier">The sink identifier.</param>
-        /// <param name="Verbosity">The sink verbosity.</param>
+        /// <param name="AllowedSeverities">The sink's allowed severity levels.</param>
         /// <param name="LogPath">The log file path.</param>
         /// <returns>The current logger, to allow for builder patterns.</returns>
         #endregion
-        public static Log PushFile(this Log Logger, string Identifier, Severity Verbosity = Verbosity.All, LogIO LogPath = null)
+        public static Log PushFile(this Log Logger, string Identifier, Severity AllowedSeverities = Verbosity.All, LogIO LogPath = null)
         {
-            FileSink Sink = new FileSink(Identifier, Logger, Verbosity, LogPath);
+            FileSink Sink = new FileSink(Identifier, Logger, AllowedSeverities, LogPath);
             Logger.Push(Sink);
 
             return Logger;

@@ -33,19 +33,26 @@ namespace PowerLog.Sinks.Debugger
         #endregion
         public bool WriteInReleaseMode { get; private set; }
 
-        #region Verbosity Severity XML
+        #region AllowedSeverities Severity XML
         /// <summary>
-        /// The verbosity of the sink.
+        /// The sink's allowed severity levels.
         /// </summary>
         #endregion
-        public Severity Verbosity { get; set; }
+        public Severity AllowedSeverities { get; set; }
+
+        #region StrictFiltering Boolean XML
+        /// <summary>
+        /// Verbosity test behaviour, determines if a given log needs to fully or partially match the allowed severities.
+        /// </summary>
+        #endregion
+        public bool StrictFiltering { get; set; }
 
         #region Emit Function XML
         /// <inheritdoc/>
         #endregion
         public void Emit(Arguments Log)
         {
-            if (Log.Severity.Passes(Verbosity))
+            if (Log.Severity.Passes(AllowedSeverities, StrictFiltering))
             {
                 if (WriteInReleaseMode) {
                     Trace.WriteLine(Log.FormattedLog);
@@ -79,14 +86,21 @@ namespace PowerLog.Sinks.Debugger
 
 
         #region DebuggerSink Constructor XML
-        /// <inheritdoc/>
+        /// <summary>
+        /// The default <see cref="DebuggerSink"/> constructor.
+        /// </summary>
+        /// <param name="Identifier">The sink identifier.</param>
+        /// <param name="Logger">The logger to push the sink to.</param>
+        /// <param name="AllowedSeverities">The sink's allowed severity levels.</param>
+        /// <param name="WriteInReleaseMode">Determines what class will the sink use. (<see cref="Trace"/> / <see cref="Debug"/>)</param>
         #endregion
-        public DebuggerSink(string Identifier, Log Logger, Severity Verbosity = PowerLog.Verbosity.All, bool WriteInReleaseMode = true)
+        public DebuggerSink(string Identifier, Log Logger, Severity AllowedSeverities = Verbosity.All, bool WriteInReleaseMode = true)
         {
             this.Identifier = Identifier;
             this.Logger = Logger;
             this.WriteInReleaseMode = WriteInReleaseMode;
-            this.Verbosity = Verbosity;
+            this.AllowedSeverities = AllowedSeverities;
+            this.StrictFiltering = true;
         }
     }
 
@@ -105,13 +119,13 @@ namespace PowerLog.Sinks.Debugger
         /// </summary>
         /// <param name="Logger">The logger to push the sink to.</param>
         /// <param name="Identifier">The sink identifier.</param>
-        /// <param name="Verbosity">The sink verbosity.</param>
+        /// <param name="AllowedSeverities">The sink's allowed severity levels.</param>
         /// <param name="WriteInReleaseMode">Determines what class will the sink use. (<see cref="Trace"/> / <see cref="Debug"/>)</param>
         /// <returns>The current logger, to allow for builder patterns.</returns>
         #endregion
-        public static Log PushDebugger(this Log Logger, string Identifier, Severity Verbosity = Verbosity.All, bool WriteInReleaseMode = true)
+        public static Log PushDebugger(this Log Logger, string Identifier, Severity AllowedSeverities = Verbosity.All, bool WriteInReleaseMode = true)
         {
-            DebuggerSink Sink = new DebuggerSink(Identifier, Logger, Verbosity, WriteInReleaseMode);
+            DebuggerSink Sink = new DebuggerSink(Identifier, Logger, AllowedSeverities, WriteInReleaseMode);
             Logger.Push(Sink);
 
             return Logger;

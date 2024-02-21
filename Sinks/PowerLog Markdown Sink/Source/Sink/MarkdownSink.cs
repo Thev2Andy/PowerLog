@@ -25,12 +25,19 @@ namespace PowerLog.Sinks.Markdown
         #endregion
         public Log Logger { get; }
 
-        #region Verbosity Severity XML
+        #region AllowedSeverities Severity XML
         /// <summary>
-        /// The verbosity of the sink.
+        /// The sink's allowed severity levels.
         /// </summary>
         #endregion
-        public Severity Verbosity { get; set; }
+        public Severity AllowedSeverities { get; set; }
+
+        #region StrictFiltering Boolean XML
+        /// <summary>
+        /// Verbosity test behaviour, determines if a given log needs to fully or partially match the allowed severities.
+        /// </summary>
+        #endregion
+        public bool StrictFiltering { get; set; }
 
 
         #region LogPath LogIO XML
@@ -65,7 +72,7 @@ namespace PowerLog.Sinks.Markdown
             // Very specific log formatting, but no markdown collisions.
             Arguments ProcessedLog = Log.Parse();
 
-            if (Log.Severity.Passes(Verbosity)) {
+            if (Log.Severity.Passes(AllowedSeverities, StrictFiltering)) {
                 LogStream.Write($"| {ProcessedLog.Time.ToString(ProcessedLog.Template.DateFormat)} | {((ProcessedLog.Logger != null && !String.IsNullOrEmpty(ProcessedLog.Logger.Identifier)) ? $"{ProcessedLog.Logger.Identifier}" : String.Empty)} | {((ProcessedLog.Severity != Severity.Generic) ? $"{ProcessedLog.Severity.ToString()}" : String.Empty)} | {ProcessedLog.Content} | {((ProcessedLog.Sender != null) ? ProcessedLog.Sender : "N/A")} |{Environment.NewLine}");
             }
         }
@@ -113,13 +120,15 @@ namespace PowerLog.Sinks.Markdown
         /// </summary>
         /// <param name="Identifier">The sink identifier.</param>
         /// <param name="Logger">The logger to push the sink to.</param>
-        /// <param name="Verbosity">The sink verbosity.</param>
+        /// <param name="AllowedSeverities">The sink's allowed severity levels.</param>
         /// <param name="LogPath">The log file path.</param>
         #endregion
-        public MarkdownSink(string Identifier, Log Logger, Severity Verbosity = PowerLog.Verbosity.All, LogIO LogPath = null) {
+        public MarkdownSink(string Identifier, Log Logger, Severity AllowedSeverities = Verbosity.All, LogIO LogPath = null)
+        {
             this.Identifier = Identifier;
             this.Logger = Logger;
-            this.Verbosity = Verbosity;
+            this.AllowedSeverities = AllowedSeverities;
+            this.StrictFiltering = true;
 
             this.InitializationDate = DateTime.Now;
 
@@ -145,13 +154,13 @@ namespace PowerLog.Sinks.Markdown
         /// </summary>
         /// <param name="Logger">The logger to push the sink to.</param>
         /// <param name="Identifier">The sink identifier.</param>
-        /// <param name="Verbosity">The sink verbosity.</param>
+        /// <param name="AllowedSeverities">The sink's allowed severity levels.</param>
         /// <param name="LogPath">The log file path.</param>
         /// <returns>The current logger, to allow for builder patterns.</returns>
         #endregion
-        public static Log PushMarkdown(this Log Logger, string Identifier, Severity Verbosity = Verbosity.All, LogIO LogPath = null)
+        public static Log PushMarkdown(this Log Logger, string Identifier, Severity AllowedSeverities = Verbosity.All, LogIO LogPath = null)
         {
-            MarkdownSink Sink = new MarkdownSink(Identifier, Logger, Verbosity, LogPath);
+            MarkdownSink Sink = new MarkdownSink(Identifier, Logger, AllowedSeverities, LogPath);
             Logger.Push(Sink);
 
             return Logger;

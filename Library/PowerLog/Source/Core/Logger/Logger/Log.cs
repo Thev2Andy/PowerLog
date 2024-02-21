@@ -21,12 +21,19 @@ namespace PowerLog
         #endregion
         public string Identifier { get; private set; }
 
-        #region Verbosity Severity XML
+        #region AllowedSeverities Severity XML
         /// <summary>
-        /// The verbosity level of the logger.
+        /// The logger's allowed severity levels.
         /// </summary>
         #endregion
-        public Severity Verbosity { get; set; }
+        public Severity AllowedSeverities { get; set; }
+
+        #region StrictFiltering Boolean XML
+        /// <summary>
+        /// Verbosity test behaviour, determines if a given log needs to fully or partially match the allowed severities.
+        /// </summary>
+        #endregion
+        public bool StrictFiltering { get; set; }
 
         #region IsDisposed Boolean XML
         /// <summary>
@@ -90,7 +97,7 @@ namespace PowerLog
         {
             if (!IsDisposed)
             {
-                if (Severity.Passes(Verbosity))
+                if (Severity.Passes(AllowedSeverities, StrictFiltering))
                 {
                     Arguments ProducedLog = new Arguments();
                     ProducedLog.Content = Content;
@@ -425,12 +432,14 @@ namespace PowerLog
         /// The default <see cref="Log"/> constructor.
         /// </summary>
         /// <param name="Identifier">The identifier / name of this logger.</param>
-        /// <param name="Verbosity">The logger verbosity.</param>
+        /// <param name="AllowedSeverities">The logger's allowed severity levels.</param>
         #endregion
-        public Log(string Identifier, Severity Verbosity = PowerLog.Verbosity.All) {
+        public Log(string Identifier, Severity AllowedSeverities = Verbosity.All)
+        {
             this.Identifier = Identifier;
             this.Sinks = new List<ISink>();
-            this.Verbosity = Verbosity;
+            this.AllowedSeverities = AllowedSeverities;
+            this.StrictFiltering = true;
         }
     }
 }

@@ -24,12 +24,19 @@ namespace PowerLog
         #endregion
         public abstract Log Logger { get; }
 
-        #region Verbosity Severity XML
+        #region AllowedSeverities Severity XML
         /// <summary>
-        /// The verbosity of the sink.
+        /// The sink's allowed severity levels.
         /// </summary>
         #endregion
-        public abstract Severity Verbosity { get; set; }
+        public abstract Severity AllowedSeverities { get; set; }
+
+        #region StrictFiltering Boolean XML
+        /// <summary>
+        /// Verbosity test behaviour, determines if a given log needs to fully or partially match the allowed severities.
+        /// </summary>
+        #endregion
+        public abstract bool StrictFiltering { get; set; }
 
 
 

@@ -14,7 +14,7 @@ Logger.Information("Hello PowerLog!");
 * Supports sinks, and comes with a few default ones (console, debugger, markdown file, simple file, as well as a spectre.console sink) as separate libraries. (You can write a custom one by implementing the `ISink` interface, check the examples section for a detailed tutorial on it.)
 * Logger instances.
 * Enables the combination of log levels, such as `Information` and `Network`, or `Verbose` and `Error`, for more granular logging control.
-* Allows full control over logging level exclusion and inclusion via verbosity masks, built using `VerbosityMask` and `Severity` extension methods.
+* Allows full control over logging level exclusion and inclusion via verbosity masks / allowed severities, built using `Verbosity` presets and methods, and `Severity` extension methods.
 * Blazingly fast. (Around ~0.4875 ms per log average worst-case scenario.)
 * Completely dependency-free and self-sustained.
 * Cross platform support.
@@ -65,9 +65,9 @@ ___
 ## Logging using multiple combined levels.
 1. Requires the usage of the `Write` method instead of the overloads.
 2. Will arrange the logs when formatting in the order of verbosity, from lowest to highest.
-3. Will check against any matching flag when calculating verbosity, so it will require the verbosity of the sink / logger to contain at least one of the flags.
+3. Will check against any or all matching flags when calculating verbosity depending on the `StrictFiltering` flag on the logger and sinks.
 ```cs
-Logger.Write("Log Content", (Severity.Information | Severity.Network | Severity.Verbose));
+Logger.Write("Log Content", (Severity.Information | Severity.Network));
 ```
 
 ___
@@ -92,7 +92,7 @@ Template Template = new Template("|[T]| ||I |S: ||C|| (O)|", "HH:mm:ss");
 ___
 
 ## Writing a custom sink.
-1. This section is a bit bigger, beware, but in this section we'll be implementing an extremely basic console sink. (with no colors)
+1. This section is a bit bigger, beware, but in this section we'll be implementing an extremely basic console sink, without any colors.
 2. In order to make a sink, you first have to implement the `ISink` interface.
 3. Here's the 3 most important parts of the `ISink` interface:
 ```cs
@@ -105,15 +105,17 @@ public void Shutdown();
     * `Initialize` is called when the sink is added to a logger's sink stack, allowing for lazy initialization of the sink. It is called after the sink's constructor or initialization method.
     * `Shutdown` is called when the sink is removed from the logger's sink stack and can be used for cleanup operations.
 5. Additionally, there are two control functions, `Save` and `Clear`, which can be called from the logger using `Log.Save` and `Log.Clear` for each attached sink.
-6. It is crucial to ensure that the sink is associated with the correct logger instance to prevent the logger from throwing an `InvalidOperationException` when attempting to push the sink.
+6. It is crucial to ensure that the sink is associated with the correct logger instance to prevent the logger from throwing an `ArgumentException` when attempting to push the sink.
 7. After getting that out of the way, let's implement the console sink:
     * First of all, we want to get the basic stuff going (e.g. the constructor).
     For the constructor, we can just get the sink identifier and the logger instance, and this will cover the properties of the `ISink` interface.
     ```cs
-    public SimpleConsoleSink(string Identifier, Log Logger, Severity Verbosity = Severity.Verbose) {
+    public SimpleConsoleSink(string Identifier, Log Logger, Severity AllowedSeverities = Verbosity.All)
+    {
         this.Identifier = Identifier;
         this.Logger = Logger;
-        this.Verbosity = Severity.Verbose;
+        this.AllowedSeverities = AllowedSeverities;
+        this.StrictFiltering = true;
     }
     ```
 
@@ -126,11 +128,11 @@ public void Shutdown();
 
     * It's time to implement the most important function of a sink, the `Emit` function.
     * There are endless ways to implement this depending on the sink you're making, but for this sink we'll do a very simple implementation and use the `Arguments.FormattedLog` property which will format our log based on it's template, but nothing is stopping you from accessing the fields of the `Arguments` instance.
-    * One thing you might want to implement is verbosity, which can be implemented with a simple function call implemented in the library's `Verbosity` class, or as an extension method over `Severity`. (Beware of collisions between the `Verbosity` property and said class.)
+    * One thing you might want to implement is verbosity, which can be implemented with a simple function call implemented in the library's `Verbosity` class, or as an extension method over `Severity`.
     ```cs
     public void Emit(Arguments Log)
     {
-        if (Log.Severity.Passes(Verbosity)) {
+        if (Log.Severity.Passes(AllowedSeverities, StrictFiltering)) {
             Console.WriteLine(Log.FormattedLog);
         }
     }
@@ -152,10 +154,12 @@ public void Shutdown();
 
     * Let's implement this extension function, we essentially want to create an instance of the sink, set the parameters in the constructor and then push it onto the logger's sink stack.
     ```cs
-    public SimpleConsoleSink(string Identifier, Log Logger, Severity Verbosity = PowerLog.Verbosity.All) {
+    public SimpleConsoleSink(string Identifier, Log Logger, Severity AllowedSeverities = Verbosity.All)
+    {
         this.Identifier = Identifier;
         this.Logger = Logger;
-        this.Verbosity = Verbosity;
+        this.AllowedSeverities = AllowedSeverities;
+        this.StrictFiltering = true;
     }
     ```
 
@@ -163,8 +167,8 @@ public void Shutdown();
     ```cs
     public static class SimpleConsoleSinkUtilities
     {
-        public static Log PushSimpleConsole(this Log Logger, string Identifier, Severity Verbosity = Verbosity.All) {
-            SimpleConsoleSink Sink = new SimpleConsoleSink(Identifier, Logger, Verbosity);
+        public static Log PushSimpleConsole(this Log Logger, string Identifier, Severity AllowedSeverities = Verbosity.All) {
+            SimpleConsoleSink Sink = new SimpleConsoleSink(Identifier, Logger, AllowedSeverities);
             Logger.Push(Sink);
 
             return Log;
@@ -178,11 +182,11 @@ public void Shutdown();
     {
         public string Identifier { get; }
         public Log Logger { get; }
-        public Severity Verbosity { get; set; }
+        public Severity AllowedSeverities { get; set; }
 
         public void Emit(Arguments Log)
         {
-            if (Log.Severity >= Verbosity) {
+            if (Log.Severity.Passes(AllowedSeverities, StrictFiltering)) {
                 Console.WriteLine(Log.FormattedLog);
             }
         }
@@ -199,10 +203,11 @@ public void Shutdown();
 
 
 
-        public SimpleConsoleSink(string Identifier, Log Logger, Severity Verbosity = PowerLog.Verbosity.All) {
+        public SimpleConsoleSink(string Identifier, Log Logger, Severity AllowedSeverities = Verbosity.All) {
             this.Identifier = Identifier;
             this.Logger = Logger;
-            this.Verbosity = Verbosity;
+            this.AllowedSeverities = AllowedSeverities;
+            this.StrictFiltering = true;
         }
     }
 
@@ -210,8 +215,8 @@ public void Shutdown();
 
     public static class SimpleConsoleSinkUtilities
     {
-        public static Log PushSimpleConsole(this Log Logger, string Identifier, Severity Verbosity = Verbosity.All) {
-            SimpleConsoleSink Sink = new SimpleConsoleSink(Identifier, Logger, Verbosity);
+        public static Log PushSimpleConsole(this Log Logger, string Identifier, Severity AllowedSeverities = Verbosity.All) {
+            SimpleConsoleSink Sink = new SimpleConsoleSink(Identifier, Logger, AllowedSeverities);
             Logger.Push(Sink);
 
             return Log;

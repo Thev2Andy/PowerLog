@@ -91,10 +91,11 @@ namespace PowerLog
         /// </summary>
         /// <param name="Severity">The value to test.</param>
         /// <param name="Verbosity">The mask to test against.</param>
+        /// <param name="StrictFiltering">Verbosity test behaviour, determines if the severity needs to fully or partially match the verbosity mask.</param>
         /// <returns>A boolean indicating <see langword="true"/> if the severity value passed the test.</returns>
         #endregion
-        public static bool Passes(this Severity Severity, Severity Verbosity) {
-            return ((Verbosity & Severity) != 0);
+        public static bool Passes(this Severity Severity, Severity Verbosity, bool StrictFiltering = true) {
+            return ((StrictFiltering) ? ((Verbosity & Severity) == Severity) : ((Verbosity & Severity) != 0));
         }
     }
 }

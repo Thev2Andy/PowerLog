@@ -27,12 +27,19 @@ namespace PowerLog.Sinks.Terminal
         #endregion
         public Log Logger { get; }
 
-        #region Verbosity Severity XML
+        #region AllowedSeverities Severity XML
         /// <summary>
-        /// The verbosity of the sink.
+        /// The sink's allowed severity levels.
         /// </summary>
         #endregion
-        public Severity Verbosity { get; set; }
+        public Severity AllowedSeverities { get; set; }
+
+        #region StrictFiltering Boolean XML
+        /// <summary>
+        /// Verbosity test behaviour, determines if a given log needs to fully or partially match the allowed severities.
+        /// </summary>
+        #endregion
+        public bool StrictFiltering { get; set; }
 
         #region EnableColors Boolean XML
         /// <summary>
@@ -55,7 +62,7 @@ namespace PowerLog.Sinks.Terminal
         #endregion
         public void Emit(Arguments Log)
         {
-            if (Log.Severity.Passes(Verbosity))
+            if (Log.Severity.Passes(AllowedSeverities, StrictFiltering))
             {
                 ConsoleColor OldForeground = Console.ForegroundColor;
                 ConsoleColor OldBackground = Console.BackgroundColor;
@@ -159,13 +166,15 @@ namespace PowerLog.Sinks.Terminal
         /// <param name="Identifier">The sink identifier.</param>
         /// <param name="Logger">The logger to push the sink to.</param>
         /// <param name="EnableColors">Should this sink print to the console using colors?</param>
-        /// <param name="Verbosity">The sink verbosity.</param>
+        /// <param name="AllowedSeverities">The sink's allowed severity levels.</param>
         #endregion
-        public ConsoleSink(string Identifier, Log Logger, bool EnableColors = true, Severity Verbosity = PowerLog.Verbosity.All) {
+        public ConsoleSink(string Identifier, Log Logger, bool EnableColors = true, Severity AllowedSeverities = Verbosity.All)
+        {
             this.Identifier = Identifier;
             this.Logger = Logger;
-            this.Verbosity = Verbosity;
+            this.AllowedSeverities = AllowedSeverities;
             this.EnableColors = EnableColors;
+            this.StrictFiltering = true;
         }
     }
 
@@ -185,12 +194,12 @@ namespace PowerLog.Sinks.Terminal
         /// <param name="Logger">The logger to push the sink to.</param>
         /// <param name="Identifier">The sink identifier.</param>
         /// <param name="EnableColors">Should this sink print to the console using colors?</param>
-        /// <param name="Verbosity">The sink verbosity.</param>
+        /// <param name="AllowedSeverities">The sink's allowed severity levels.</param>
         /// <returns>The current logger, to allow for builder patterns.</returns>
         #endregion
-        public static Log PushConsole(this Log Logger, string Identifier, bool EnableColors = true, Severity Verbosity = Verbosity.All)
+        public static Log PushConsole(this Log Logger, string Identifier, bool EnableColors = true, Severity AllowedSeverities = Verbosity.All)
         {
-            ConsoleSink Sink = new ConsoleSink(Identifier, Logger, EnableColors, Verbosity);
+            ConsoleSink Sink = new ConsoleSink(Identifier, Logger, EnableColors, AllowedSeverities);
             Logger.Push(Sink);
 
             return Logger;
