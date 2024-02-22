@@ -14,14 +14,14 @@ namespace PowerLog
     #endregion
     [Serializable] public class Arguments
     {
-        #region FormattedLog String XML
+        #region ComposedLog String XML
         /// <summary>
-        /// The formatted log, using the saved log templates.
+        /// The composed log, using the saved log templates.
         /// </summary>
         #endregion
-        public string FormattedLog {
+        public string ComposedLog {
             get {
-                return Format.Formulate(Format.Parse(this), Template);
+                return this.Compose(Template, true);
             }
         }
 

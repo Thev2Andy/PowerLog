@@ -55,11 +55,11 @@ namespace PowerLog.Sinks.Debugger
             if (Log.Severity.Passes(AllowedSeverities, StrictFiltering))
             {
                 if (WriteInReleaseMode) {
-                    Trace.WriteLine(Log.FormattedLog);
+                    Trace.WriteLine(Log.ComposedLog);
                 }
 
                 else {
-                    Debug.WriteLine(Log.FormattedLog);
+                    Debug.WriteLine(Log.ComposedLog);
                 }
             }
         }

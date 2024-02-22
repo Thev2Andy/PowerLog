@@ -58,7 +58,7 @@ namespace PowerLog.Sinks.IO
         public void Emit(Arguments Log)
         {
             if (Log.Severity.Passes(AllowedSeverities, StrictFiltering)) {
-                LogStream.Write($"{Log.FormattedLog}{Environment.NewLine}");
+                LogStream.Write($"{Log.ComposedLog}{Environment.NewLine}");
             }
         }
 

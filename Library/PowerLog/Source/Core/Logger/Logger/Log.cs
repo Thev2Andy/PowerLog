@@ -89,7 +89,7 @@ namespace PowerLog
         /// </summary>
         /// <param name="Content">The actual content of the log.</param>
         /// <param name="Severity">The type / level / severity of the log.</param>
-        /// <param name="Template">Format template used by most sinks to compose the log. (Some sinks may use a custom formatting solution and ignore the <see cref="Arguments.FormattedLog"/> property.)</param>
+        /// <param name="Template">Format template used by most sinks to compose the log. (Some sinks may use a custom formatting solution and ignore the <see cref="Arguments.ComposedLog"/> property.)</param>
         /// <param name="Parameters">Additional logging data.</param>
         /// <param name="Sender">The log sender.</param>
         #endregion
@@ -130,7 +130,7 @@ namespace PowerLog
         /// Calls a <see cref="Severity.Verbose"/> log, sent over to the current active sinks and the <see cref="Log.OnLog"/> event.
         /// </summary>
         /// <param name="Content">The actual content of the log.</param>
-        /// <param name="Template">Format template used by most sinks to compose the log. (Some sinks may use a custom formatting solution and ignore the <see cref="Arguments.FormattedLog"/> property.)</param>
+        /// <param name="Template">Format template used by most sinks to compose the log. (Some sinks may use a custom formatting solution and ignore the <see cref="Arguments.ComposedLog"/> property.)</param>
         /// <param name="Parameters">Additional logging data.</param>
         /// <param name="Sender">The log sender.</param>
         #endregion
@@ -143,7 +143,7 @@ namespace PowerLog
         /// Calls a <see cref="Severity.Trace"/> log, sent over to the current active sinks and the <see cref="Log.OnLog"/> event.
         /// </summary>
         /// <param name="Content">The actual content of the log.</param>
-        /// <param name="Template">Format template used by most sinks to compose the log. (Some sinks may use a custom formatting solution and ignore the <see cref="Arguments.FormattedLog"/> property.)</param>
+        /// <param name="Template">Format template used by most sinks to compose the log. (Some sinks may use a custom formatting solution and ignore the <see cref="Arguments.ComposedLog"/> property.)</param>
         /// <param name="Parameters">Additional logging data.</param>
         /// <param name="Sender">The log sender.</param>
         #endregion
@@ -156,7 +156,7 @@ namespace PowerLog
         /// Calls a <see cref="Severity.Debug"/> log, sent over to the current active sinks and the <see cref="Log.OnLog"/> event.
         /// </summary>
         /// <param name="Content">The actual content of the log.</param>
-        /// <param name="Template">Format template used by most sinks to compose the log. (Some sinks may use a custom formatting solution and ignore the <see cref="Arguments.FormattedLog"/> property.)</param>
+        /// <param name="Template">Format template used by most sinks to compose the log. (Some sinks may use a custom formatting solution and ignore the <see cref="Arguments.ComposedLog"/> property.)</param>
         /// <param name="Parameters">Additional logging data.</param>
         /// <param name="Sender">The log sender.</param>
         #endregion
@@ -169,7 +169,7 @@ namespace PowerLog
         /// Calls a <see cref="Severity.Network"/> log, sent over to the current active sinks and the <see cref="Log.OnLog"/> event.
         /// </summary>
         /// <param name="Content">The actual content of the log.</param>
-        /// <param name="Template">Format template used by most sinks to compose the log. (Some sinks may use a custom formatting solution and ignore the <see cref="Arguments.FormattedLog"/> property.)</param>
+        /// <param name="Template">Format template used by most sinks to compose the log. (Some sinks may use a custom formatting solution and ignore the <see cref="Arguments.ComposedLog"/> property.)</param>
         /// <param name="Parameters">Additional logging data.</param>
         /// <param name="Sender">The log sender.</param>
         #endregion
@@ -182,7 +182,7 @@ namespace PowerLog
         /// Calls an <see cref="Severity.Information"/> log, sent over to the current active sinks and the <see cref="Log.OnLog"/> event.
         /// </summary>
         /// <param name="Content">The actual content of the log.</param>
-        /// <param name="Template">Format template used by most sinks to compose the log. (Some sinks may use a custom formatting solution and ignore the <see cref="Arguments.FormattedLog"/> property.)</param>
+        /// <param name="Template">Format template used by most sinks to compose the log. (Some sinks may use a custom formatting solution and ignore the <see cref="Arguments.ComposedLog"/> property.)</param>
         /// <param name="Parameters">Additional logging data.</param>
         /// <param name="Sender">The log sender.</param>
         #endregion
@@ -195,7 +195,7 @@ namespace PowerLog
         /// Calls a <see cref="Severity.Notice"/> log, sent over to the current active sinks and the <see cref="Log.OnLog"/> event.
         /// </summary>
         /// <param name="Content">The actual content of the log.</param>
-        /// <param name="Template">Format template used by most sinks to compose the log. (Some sinks may use a custom formatting solution and ignore the <see cref="Arguments.FormattedLog"/> property.)</param>
+        /// <param name="Template">Format template used by most sinks to compose the log. (Some sinks may use a custom formatting solution and ignore the <see cref="Arguments.ComposedLog"/> property.)</param>
         /// <param name="Parameters">Additional logging data.</param>
         /// <param name="Sender">The log sender.</param>
         #endregion
@@ -208,7 +208,7 @@ namespace PowerLog
         /// Calls a <see cref="Severity.Caution"/> log, sent over to the current active sinks and the <see cref="Log.OnLog"/> event.
         /// </summary>
         /// <param name="Content">The actual content of the log.</param>
-        /// <param name="Template">Format template used by most sinks to compose the log. (Some sinks may use a custom formatting solution and ignore the <see cref="Arguments.FormattedLog"/> property.)</param>
+        /// <param name="Template">Format template used by most sinks to compose the log. (Some sinks may use a custom formatting solution and ignore the <see cref="Arguments.ComposedLog"/> property.)</param>
         /// <param name="Parameters">Additional logging data.</param>
         /// <param name="Sender">The log sender.</param>
         #endregion
@@ -221,7 +221,7 @@ namespace PowerLog
         /// Calls a <see cref="Severity.Warning"/> log, sent over to the current active sinks and the <see cref="Log.OnLog"/> event.
         /// </summary>
         /// <param name="Content">The actual content of the log.</param>
-        /// <param name="Template">Format template used by most sinks to compose the log. (Some sinks may use a custom formatting solution and ignore the <see cref="Arguments.FormattedLog"/> property.)</param>
+        /// <param name="Template">Format template used by most sinks to compose the log. (Some sinks may use a custom formatting solution and ignore the <see cref="Arguments.ComposedLog"/> property.)</param>
         /// <param name="Parameters">Additional logging data.</param>
         /// <param name="Sender">The log sender.</param>
         #endregion
@@ -234,7 +234,7 @@ namespace PowerLog
         /// Calls an <see cref="Severity.Alert"/> log, sent over to the current active sinks and the <see cref="Log.OnLog"/> event.
         /// </summary>
         /// <param name="Content">The actual content of the log.</param>
-        /// <param name="Template">Format template used by most sinks to compose the log. (Some sinks may use a custom formatting solution and ignore the <see cref="Arguments.FormattedLog"/> property.)</param>
+        /// <param name="Template">Format template used by most sinks to compose the log. (Some sinks may use a custom formatting solution and ignore the <see cref="Arguments.ComposedLog"/> property.)</param>
         /// <param name="Parameters">Additional logging data.</param>
         /// <param name="Sender">The log sender.</param>
         #endregion
@@ -247,7 +247,7 @@ namespace PowerLog
         /// Calls an <see cref="Severity.Error"/> log, sent over to the current active sinks and the <see cref="Log.OnLog"/> event.
         /// </summary>
         /// <param name="Content">The actual content of the log.</param>
-        /// <param name="Template">Format template used by most sinks to compose the log. (Some sinks may use a custom formatting solution and ignore the <see cref="Arguments.FormattedLog"/> property.)</param>
+        /// <param name="Template">Format template used by most sinks to compose the log. (Some sinks may use a custom formatting solution and ignore the <see cref="Arguments.ComposedLog"/> property.)</param>
         /// <param name="Parameters">Additional logging data.</param>
         /// <param name="Sender">The log sender.</param>
         #endregion
@@ -260,7 +260,7 @@ namespace PowerLog
         /// Calls a <see cref="Severity.Critical"/> log, sent over to the current active sinks and the <see cref="Log.OnLog"/> event.
         /// </summary>
         /// <param name="Content">The actual content of the log.</param>
-        /// <param name="Template">Format template used by most sinks to compose the log. (Some sinks may use a custom formatting solution and ignore the <see cref="Arguments.FormattedLog"/> property.)</param>
+        /// <param name="Template">Format template used by most sinks to compose the log. (Some sinks may use a custom formatting solution and ignore the <see cref="Arguments.ComposedLog"/> property.)</param>
         /// <param name="Parameters">Additional logging data.</param>
         /// <param name="Sender">The log sender.</param>
         #endregion
@@ -273,7 +273,7 @@ namespace PowerLog
         /// Calls an <see cref="Severity.Emergency"/> log, sent over to the current active sinks and the <see cref="Log.OnLog"/> event.
         /// </summary>
         /// <param name="Content">The actual content of the log.</param>
-        /// <param name="Template">Format template used by most sinks to compose the log. (Some sinks may use a custom formatting solution and ignore the <see cref="Arguments.FormattedLog"/> property.)</param>
+        /// <param name="Template">Format template used by most sinks to compose the log. (Some sinks may use a custom formatting solution and ignore the <see cref="Arguments.ComposedLog"/> property.)</param>
         /// <param name="Parameters">Additional logging data.</param>
         /// <param name="Sender">The log sender.</param>
         #endregion
@@ -286,7 +286,7 @@ namespace PowerLog
         /// Calls a <see cref="Severity.Fatal"/> log, sent over to the current active sinks and the <see cref="Log.OnLog"/> event.
         /// </summary>
         /// <param name="Content">The actual content of the log.</param>
-        /// <param name="Template">Format template used by most sinks to compose the log. (Some sinks may use a custom formatting solution and ignore the <see cref="Arguments.FormattedLog"/> property.)</param>
+        /// <param name="Template">Format template used by most sinks to compose the log. (Some sinks may use a custom formatting solution and ignore the <see cref="Arguments.ComposedLog"/> property.)</param>
         /// <param name="Parameters">Additional logging data.</param>
         /// <param name="Sender">The log sender.</param>
         #endregion
@@ -299,7 +299,7 @@ namespace PowerLog
         /// Calls a <see cref="Severity.Generic"/> log, sent over to the current active sinks and the <see cref="Log.OnLog"/> event.
         /// </summary>
         /// <param name="Content">The actual content of the log.</param>
-        /// <param name="Template">Format template used by most sinks to compose the log. (Some sinks may use a custom formatting solution and ignore the <see cref="Arguments.FormattedLog"/> property.)</param>
+        /// <param name="Template">Format template used by most sinks to compose the log. (Some sinks may use a custom formatting solution and ignore the <see cref="Arguments.ComposedLog"/> property.)</param>
         /// <param name="Parameters">Additional logging data.</param>
         /// <param name="Sender">The log sender.</param>
         #endregion

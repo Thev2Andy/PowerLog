@@ -22,16 +22,21 @@ namespace PowerLog
         private static readonly Regex ObjectWildcardRegex = new Regex(@"\|([^|]*)([O])([^|]*)\|", (RegexOptions.Multiline | RegexOptions.Compiled));
 
 
-        #region Formulate Function XML
+        #region Compose Function XML
         /// <summary>
-        /// Formulates the log using the template by using regular expressions, then returns it as a string.
+        /// Parses and composes a log using the template by using regular expressions, then returns it as a string.
         /// </summary>
-        /// <returns>The formulated log string.</returns>
-        /// <param name="Log">The log to formulate.</param>
-        /// <param name="Template">The log template.</param>
+        /// <returns>The composed log string.</returns>
+        /// <param name="Log">The log to parse and compose.</param>
+        /// <param name="Template">Formatting template used in composing the log.</param>
+        /// <param name="Evaluate">Whether or not parameters are evaluated, parsed and replaced.</param>
         #endregion
-        public static string Formulate(this Arguments Log, Template Template)
+        public static string Compose(this Arguments Log, Template Template, bool Evaluate)
         {
+            if (Evaluate) {
+                Log = Log.Parse();
+            }
+
             Dictionary<char, string> Replacements = new Dictionary<char, string>
             {
                 { 'T', Log.Time.ToString(Template.DateFormat) },

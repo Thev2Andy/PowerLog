@@ -153,7 +153,7 @@ namespace PowerLog.Sinks.SpectreTerminal
                     }
                 }
 
-                AnsiConsole.Write(new Text((Log.FormattedLog + Environment.NewLine), new Style(((EnableColors) ? FinalColor : AnsiConsole.Foreground), AnsiConsole.Background, ((InvertBackgroundColor) ? Decoration.Invert : Decoration.None))));
+                AnsiConsole.Write(new Text((Log.ComposedLog + Environment.NewLine), new Style(((EnableColors) ? FinalColor : AnsiConsole.Foreground), AnsiConsole.Background, ((InvertBackgroundColor) ? Decoration.Invert : Decoration.None))));
             }
         }
 

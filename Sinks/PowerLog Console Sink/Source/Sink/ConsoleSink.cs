@@ -128,7 +128,7 @@ namespace PowerLog.Sinks.Terminal
                 Console.ForegroundColor = TargetForegroundColor;
                 Console.BackgroundColor = TargetBackgroundColor;
 
-                Console.WriteLine(Log.FormattedLog);
+                Console.WriteLine(Log.ComposedLog);
 
                 Console.ForegroundColor = OldForeground;
                 Console.BackgroundColor = OldBackground;
