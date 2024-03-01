@@ -16,7 +16,7 @@ namespace PowerLog
     {
         #region ComposedLog String XML
         /// <summary>
-        /// The composed log, using the saved log templates.
+        /// The composed log, composed using the saved log templates.
         /// </summary>
         #endregion
         public string ComposedLog {
@@ -49,14 +49,14 @@ namespace PowerLog
 
         #region Template Template XML
         /// <summary>
-        /// The logging template used for logging and formatting.
+        /// The saved logging template used for logging and formatting.
         /// </summary>
         #endregion
         public Template Template;
 
         #region Stacktrace StackTrace XML
         /// <summary>
-        /// The stacktrace of the log.
+        /// Represents the stack trace up to the point of the log production in the <see cref="Log.Write">Log.Write</see> method.
         /// </summary>
         #endregion
         public StackTrace Stacktrace;

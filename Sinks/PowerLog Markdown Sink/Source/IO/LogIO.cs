@@ -36,6 +36,18 @@ namespace PowerLog.Sinks.Markdown
         public string FileExtension { get; private set; }
 
 
+        #region Get Method XML
+        /// <summary>
+        /// Gets the complete log path.
+        /// </summary>
+        /// <returns>The complete log path.</returns>
+        #endregion
+        public string Get() {
+            return System.IO.Path.Combine(Path, $"{FileName}.{FileExtension}");
+        }
+
+        
+
         #region LogIO Constructor XML
         /// <summary>
         /// The default <see cref="LogIO"/> constructor.
@@ -48,16 +60,6 @@ namespace PowerLog.Sinks.Markdown
             this.FileExtension = FileExtension;
             this.FileName = FileName;
             this.Path = Path;
-        }
-
-        #region Get Method XML
-        /// <summary>
-        /// Gets the complete log path.
-        /// </summary>
-        /// <returns>The complete log path.</returns>
-        #endregion
-        public string Get() {
-            return System.IO.Path.Combine(Path, $"{FileName}.{FileExtension}");
         }
     }
 }

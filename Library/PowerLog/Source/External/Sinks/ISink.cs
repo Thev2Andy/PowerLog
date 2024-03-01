@@ -33,7 +33,7 @@ namespace PowerLog
 
         #region StrictFiltering Boolean XML
         /// <summary>
-        /// Verbosity test behaviour, determines if a given log needs to fully or partially match the allowed severities.
+        /// Determines whether a log needs to fully or partially match the allowed severities.
         /// </summary>
         #endregion
         public abstract bool StrictFiltering { get; set; }

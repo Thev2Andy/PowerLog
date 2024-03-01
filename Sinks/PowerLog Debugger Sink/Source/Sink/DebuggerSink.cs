@@ -28,7 +28,7 @@ namespace PowerLog.Sinks.Debugger
 
         #region WriteInReleaseMode Boolean XML
         /// <summary>
-        /// Determines what class will the sink use. (<see cref="Trace"/> / <see cref="Debug"/>)
+        /// Enables / disables writing in release mode.
         /// </summary>
         #endregion
         public bool WriteInReleaseMode { get; private set; }
@@ -42,7 +42,7 @@ namespace PowerLog.Sinks.Debugger
 
         #region StrictFiltering Boolean XML
         /// <summary>
-        /// Verbosity test behaviour, determines if a given log needs to fully or partially match the allowed severities.
+        /// Determines whether a log needs to fully or partially match the allowed severities.
         /// </summary>
         #endregion
         public bool StrictFiltering { get; set; }
@@ -92,7 +92,7 @@ namespace PowerLog.Sinks.Debugger
         /// <param name="Identifier">The sink identifier.</param>
         /// <param name="Logger">The logger to push the sink to.</param>
         /// <param name="AllowedSeverities">The sink's allowed severity levels.</param>
-        /// <param name="WriteInReleaseMode">Determines what class will the sink use. (<see cref="Trace"/> / <see cref="Debug"/>)</param>
+        /// <param name="WriteInReleaseMode">Enables / disables writing in release mode.</param>
         #endregion
         public DebuggerSink(string Identifier, Log Logger, Severity AllowedSeverities = Verbosity.All, bool WriteInReleaseMode = true)
         {
@@ -120,7 +120,7 @@ namespace PowerLog.Sinks.Debugger
         /// <param name="Logger">The logger to push the sink to.</param>
         /// <param name="Identifier">The sink identifier.</param>
         /// <param name="AllowedSeverities">The sink's allowed severity levels.</param>
-        /// <param name="WriteInReleaseMode">Determines what class will the sink use. (<see cref="Trace"/> / <see cref="Debug"/>)</param>
+        /// <param name="WriteInReleaseMode">Enables / disables writing in release mode.</param>
         /// <returns>The current logger, to allow for builder patterns.</returns>
         #endregion
         public static Log PushDebugger(this Log Logger, string Identifier, Severity AllowedSeverities = Verbosity.All, bool WriteInReleaseMode = true)

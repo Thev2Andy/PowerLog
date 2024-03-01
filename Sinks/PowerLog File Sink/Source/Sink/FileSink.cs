@@ -34,7 +34,7 @@ namespace PowerLog.Sinks.IO
 
         #region StrictFiltering Boolean XML
         /// <summary>
-        /// Verbosity test behaviour, determines if a given log needs to fully or partially match the allowed severities.
+        /// Determines whether a log needs to fully or partially match the allowed severities.
         /// </summary>
         #endregion
         public bool StrictFiltering { get; set; }
@@ -67,7 +67,9 @@ namespace PowerLog.Sinks.IO
         /// <inheritdoc/>
         /// </summary>
         #endregion
-        public void Save() { }
+        public void Save() {
+            LogStream.Flush();
+        }
 
         #region Initialize Function XML
         /// <inheritdoc/>
@@ -82,7 +84,9 @@ namespace PowerLog.Sinks.IO
         #region Shutdown Function XML
         /// <inheritdoc/>
         #endregion
-        public void Shutdown() {
+        public void Shutdown()
+        {
+            LogStream.Flush();
             LogStream.Close();
             LogStream.Dispose();
         }

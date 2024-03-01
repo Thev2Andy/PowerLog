@@ -54,7 +54,7 @@ namespace PowerLog
 
         #region Minimum Function XML
         /// <summary>
-        /// Generated a verbosity mask with every level above or equal to the minimum.
+        /// Generates a verbosity mask with every level above or equal to the minimum.
         /// </summary>
         /// <param name="Minimum">The reference minimum value.</param>
         /// <returns>The generated mask.</returns>
@@ -75,7 +75,7 @@ namespace PowerLog
 
         #region Maximum Function XML
         /// <summary>
-        /// Generated a verbosity mask with every level less or equal to the maximum.
+        /// Generates a verbosity mask with every level less or equal to the maximum.
         /// </summary>
         /// <param name="Maximum">The reference maximum value.</param>
         /// <returns>The generated mask.</returns>
@@ -102,7 +102,7 @@ namespace PowerLog
 
         #region Verbosity Static Constructor XML
         /// <summary>
-        /// Ensures that <see cref="All"/> is valid and includes all of the severities, when adding / removing a severity. <br/>
+        /// Ensures that <see cref="All"/> is valid and includes all of the severities, when adding / removing a severity.<br/>
         /// In the case that <see cref="All"/> is invalid, update the bitshift amount with the new amount of severities.
         /// </summary>
         /// <exception cref="ApplicationException"><see cref="All"/> is invalid.</exception>

@@ -36,7 +36,7 @@ namespace PowerLog.Sinks.Markdown
 
         #region StrictFiltering Boolean XML
         /// <summary>
-        /// Verbosity test behaviour, determines if a given log needs to fully or partially match the allowed severities.
+        /// Determines whether a log needs to fully or partially match the allowed severities.
         /// </summary>
         #endregion
         public bool StrictFiltering { get; set; }
@@ -91,7 +91,7 @@ namespace PowerLog.Sinks.Markdown
         #endregion
         public void Emit(Arguments Log)
         {
-            // Very specific log formatting, but no markdown collisions.
+            // Manual formatting into a mardown table row.
             Arguments ProcessedLog = Log.Parse();
 
             if (Log.Severity.Passes(AllowedSeverities, StrictFiltering))
@@ -137,7 +137,7 @@ namespace PowerLog.Sinks.Markdown
                             }
 
                             catch (Exception) {
-                                Logger.Error("An error occured while trying to override the color of the log.", null, null, this.Identifier);
+                                // don't care didn't ask
                             }
                         }
 
@@ -151,7 +151,7 @@ namespace PowerLog.Sinks.Markdown
                         }
 
                         catch (Exception) {
-                            Logger.Error("An error occured while trying to invert the color of the log.", null, null, this.Identifier);
+                            // don't care didn't ask
                         }
 
                         MatchedHighlight = true;
@@ -171,7 +171,9 @@ namespace PowerLog.Sinks.Markdown
         #region Save Function XML
         /// <inheritdoc/>
         #endregion
-        public void Save() { }
+        public void Save() {
+            LogStream.Flush();
+        }
 
         #region Initialize Function XML
         /// <inheritdoc/>
@@ -188,7 +190,9 @@ namespace PowerLog.Sinks.Markdown
         #region Shutdown Function XML
         /// <inheritdoc/>
         #endregion
-        public void Shutdown() {
+        public void Shutdown()
+        {
+            LogStream.Flush();
             LogStream.Close();
             LogStream.Dispose();
         }

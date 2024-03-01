@@ -36,14 +36,14 @@ namespace PowerLog.Sinks.Terminal
 
         #region StrictFiltering Boolean XML
         /// <summary>
-        /// Verbosity test behaviour, determines if a given log needs to fully or partially match the allowed severities.
+        /// Determines whether a log needs to fully or partially match the allowed severities.
         /// </summary>
         #endregion
         public bool StrictFiltering { get; set; }
 
         #region EnableColors Boolean XML
         /// <summary>
-        /// If true, the console logs will be colored.
+        /// Determines if console logs will be colored.
         /// </summary>
         #endregion
         public bool EnableColors { get; set; }
@@ -165,7 +165,7 @@ namespace PowerLog.Sinks.Terminal
         /// </summary>
         /// <param name="Identifier">The sink identifier.</param>
         /// <param name="Logger">The logger to push the sink to.</param>
-        /// <param name="EnableColors">Should this sink print to the console using colors?</param>
+        /// <param name="EnableColors">Determines if console logs will be colored.</param>
         /// <param name="AllowedSeverities">The sink's allowed severity levels.</param>
         #endregion
         public ConsoleSink(string Identifier, Log Logger, bool EnableColors = true, Severity AllowedSeverities = Verbosity.All)
@@ -193,7 +193,7 @@ namespace PowerLog.Sinks.Terminal
         /// </summary>
         /// <param name="Logger">The logger to push the sink to.</param>
         /// <param name="Identifier">The sink identifier.</param>
-        /// <param name="EnableColors">Should this sink print to the console using colors?</param>
+        /// <param name="EnableColors">Determines if console logs will be colored.</param>
         /// <param name="AllowedSeverities">The sink's allowed severity levels.</param>
         /// <returns>The current logger, to allow for builder patterns.</returns>
         #endregion
