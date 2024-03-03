@@ -369,7 +369,7 @@ namespace PowerLog
         }
 
 
-        #region Find Function XML
+        #region Find<Sink> Function XML
         /// <summary>
         /// Finds and returns matching sinks based on their type and identifier.
         /// </summary>
@@ -399,7 +399,7 @@ namespace PowerLog
             }
 
             else {
-                throw new ObjectDisposedException(Identifier);
+                throw new ObjectDisposedException(this.Identifier);
             }
         }
 
