@@ -192,6 +192,10 @@ namespace PowerLog
         {
             if (!IsDisposed)
             {
+                if (!Log.Severity.Validate()) {
+                    throw new ArgumentException($"Invalid `{nameof(Severity)}` value!");
+                }
+
                 if (Log.Severity.Passes(AllowedSeverities, StrictFiltering))
                 {
                     bool PassesFilters = true;
