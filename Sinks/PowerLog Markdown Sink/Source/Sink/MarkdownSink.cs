@@ -41,6 +41,13 @@ namespace PowerLog.Sinks.Markdown
         #endregion
         public bool StrictFiltering { get; set; }
 
+        #region IsEnabled Boolean XML
+        /// <summary>
+        /// Determines if the sink is enabled.
+        /// </summary>
+        #endregion
+        public bool IsEnabled { get; set; }
+
 
         #region LogPath LogIO XML
         /// <summary>
@@ -94,41 +101,41 @@ namespace PowerLog.Sinks.Markdown
             // Manual formatting into a mardown table row.
             Arguments ProcessedLog = Log.Parse();
 
-            if (Log.Severity.Passes(AllowedSeverities, StrictFiltering))
+            bool InvertBackgroundColor = false;
+            int SeverityFlagCount = 0;
+            int ColorRedChannel = 0;
+            int ColorGreenChannel = 0;
+            int ColorBlueChannel = 0;
+
+            for (int I = 0; I < SeverityLevels.Length; I++)
             {
-                bool InvertBackgroundColor = false;
-                int SeverityFlagCount = 0;
-                int ColorRedChannel = 0;
-                int ColorGreenChannel = 0;
-                int ColorBlueChannel = 0;
-
-                for (int I = 0; I < SeverityLevels.Length; I++)
+                if (Log.Severity.HasFlag(SeverityLevels[I]))
                 {
-                    if (Log.Severity.HasFlag(SeverityLevels[I]))
-                    {
-                        ColorRedChannel += TerminalColorLUT[SeverityLevels[I]].R;
-                        ColorGreenChannel += TerminalColorLUT[SeverityLevels[I]].G;
-                        ColorBlueChannel += TerminalColorLUT[SeverityLevels[I]].B;
-                        SeverityFlagCount++;
+                    ColorRedChannel += TerminalColorLUT[SeverityLevels[I]].R;
+                    ColorGreenChannel += TerminalColorLUT[SeverityLevels[I]].G;
+                    ColorBlueChannel += TerminalColorLUT[SeverityLevels[I]].B;
+                    SeverityFlagCount++;
 
-                        if (HighlightedSeverities.Contains(SeverityLevels[I]) && !InvertBackgroundColor) {
-                            InvertBackgroundColor = true;
-                        }
+                    if (HighlightedSeverities.Contains(SeverityLevels[I]) && !InvertBackgroundColor) {
+                        InvertBackgroundColor = true;
                     }
                 }
+            }
 
-                Color FinalColor = new Color(((Byte)(ColorRedChannel / SeverityFlagCount)), ((Byte)(ColorGreenChannel / SeverityFlagCount)), ((Byte)(ColorBlueChannel / SeverityFlagCount)));
-                bool MatchedOverride = false;
-                bool MatchedHighlight = false;
-                foreach (KeyValuePair<string, Object> Parameter in Log.Parameters)
+            Color FinalColor = new Color(((Byte)(ColorRedChannel / SeverityFlagCount)), ((Byte)(ColorGreenChannel / SeverityFlagCount)), ((Byte)(ColorBlueChannel / SeverityFlagCount)));
+            bool MatchedOverride = false;
+            bool MatchedHighlight = false;
+            if (Log.Context != null)
+            {
+                foreach (KeyValuePair<string, Object> ContextualProperty in Log.Context)
                 {
-                    if (Parameter.Key == "Color Override" && !MatchedOverride)
+                    if (ContextualProperty.Key == "Color Override" && !MatchedOverride)
                     {
-                        if (ColorOverrideRegex.IsMatch(Parameter.Value.ToString()))
+                        if (ColorOverrideRegex.IsMatch(ContextualProperty.Value.ToString()))
                         {
                             try
                             {
-                                string[] OverrideChannels = Parameter.Value.ToString().Split(new Char[] { ',', ' ', '-' }, StringSplitOptions.RemoveEmptyEntries);
+                                string[] OverrideChannels = ContextualProperty.Value.ToString().Split(new Char[] { ',', ' ', '-' }, StringSplitOptions.RemoveEmptyEntries);
                                 Byte OverrideRedChannel = Convert.ToByte(OverrideChannels[0]);
                                 Byte OverrideGreenChannel = Convert.ToByte(OverrideChannels[1]);
                                 Byte OverrideBlueChannel = Convert.ToByte(OverrideChannels[2]);
@@ -144,10 +151,10 @@ namespace PowerLog.Sinks.Markdown
                         MatchedOverride = true;
                     }
 
-                    if (Parameter.Key == "Highlight Override" && !MatchedHighlight)
+                    if (ContextualProperty.Key == "Highlight Override" && !MatchedHighlight)
                     {
                         try {
-                            InvertBackgroundColor = Convert.ToBoolean(Parameter.Value);
+                            InvertBackgroundColor = Convert.ToBoolean(ContextualProperty.Value);
                         }
 
                         catch (Exception) {
@@ -162,10 +169,10 @@ namespace PowerLog.Sinks.Markdown
                         break;
                     }
                 }
-
-                string SeverityField = this.ComposeSeverity(ProcessedLog.Severity, FinalColor, InvertBackgroundColor);
-                LogStream.Write($"| {ProcessedLog.Time.ToString(ProcessedLog.Template.DateFormat)} | {((ProcessedLog.Logger != null && !String.IsNullOrEmpty(ProcessedLog.Logger.Identifier)) ? $"{ProcessedLog.Logger.Identifier}" : String.Empty)} | {SeverityField} | {ProcessedLog.Content} | {((ProcessedLog.Sender != null) ? ProcessedLog.Sender : "N/A")} |{Environment.NewLine}");
             }
+
+            string SeverityField = this.ComposeSeverity(ProcessedLog.Severity, FinalColor, InvertBackgroundColor);
+            LogStream.Write($"| {ProcessedLog.Time.ToString(ProcessedLog.Template.Date)} | {((ProcessedLog.Logger != null && !String.IsNullOrEmpty(ProcessedLog.Logger.Identifier)) ? $"{ProcessedLog.Logger.Identifier}" : "N/A")} | {SeverityField} | {ProcessedLog.Content} | {((ProcessedLog.Sender != null) ? ProcessedLog.Sender : "N/A")} |{Environment.NewLine}");
         }
 
         #region Save Function XML
@@ -228,6 +235,7 @@ namespace PowerLog.Sinks.Markdown
             this.Logger = Logger;
             this.AllowedSeverities = AllowedSeverities;
             this.StrictFiltering = true;
+            this.IsEnabled = true;
 
             this.InitializationDate = DateTime.Now;
             SeverityLevels = Enum.GetValues<Severity>();
@@ -272,7 +280,7 @@ namespace PowerLog.Sinks.Markdown
         /// <param name="Identifier">The sink identifier.</param>
         /// <param name="AllowedSeverities">The sink's allowed severity levels.</param>
         /// <param name="LogPath">The log file path.</param>
-        /// <returns>The current logger, to allow for builder patterns.</returns>
+        /// <returns>The current logger, to allow for method chaining.</returns>
         #endregion
         public static Log PushMarkdown(this Log Logger, string Identifier, Severity AllowedSeverities = Verbosity.All, LogIO LogPath = null)
         {

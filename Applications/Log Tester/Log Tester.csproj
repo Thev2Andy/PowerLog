@@ -10,11 +10,21 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Library\PowerLog\PowerLog.csproj" />
+	  
     <ProjectReference Include="..\..\Sinks\PowerLog Console Sink\PowerLog Console Sink.csproj" />
     <ProjectReference Include="..\..\Sinks\PowerLog Debugger Sink\PowerLog Debugger Sink.csproj" />
     <ProjectReference Include="..\..\Sinks\PowerLog File Sink\PowerLog File Sink.csproj" />
     <ProjectReference Include="..\..\Sinks\PowerLog Markdown Sink\PowerLog Markdown Sink.csproj" />
     <ProjectReference Include="..\..\Sinks\PowerLog Spectre Console Sink\PowerLog Spectre Console Sink.csproj" />
+    <ProjectReference Include="..\..\Sinks\PowerLog Asynchronous Sink\PowerLog Asynchronous Sink.csproj" />
+    <ProjectReference Include="..\..\Sinks\PowerLog Logger Sink\PowerLog Logger Sink.csproj" />
+	  
+    <ProjectReference Include="..\..\Enrichers\PowerLog Stacktrace Enricher\PowerLog Stacktrace Enricher.csproj" />
+    <ProjectReference Include="..\..\Enrichers\PowerLog Environment Enricher\PowerLog Environment Enricher.csproj" />
+    <ProjectReference Include="..\..\Enrichers\PowerLog Process Enricher\PowerLog Process Enricher.csproj" />
+    <ProjectReference Include="..\..\Enrichers\PowerLog Thread Enricher\PowerLog Thread Enricher.csproj" />
+	  
+    <ProjectReference Include="..\..\Filters\PowerLog Predicate Filter\PowerLog Predicate Filter.csproj" />
   </ItemGroup>
 
 </Project>

@@ -7,7 +7,7 @@ namespace PowerLog
     /// An interface with the required functions and variables to create a destination for all log events.
     /// </summary>
     #endregion
-    public interface ISink
+    public interface ISink : IComponent
     {
         // Public / Accessible variables..
         #region Identifier String XML
@@ -15,14 +15,14 @@ namespace PowerLog
         /// The sink identifier / name.
         /// </summary>
         #endregion
-        public abstract string Identifier { get; }
+        public abstract new string Identifier { get; }
 
         #region Logger Log XML
         /// <summary>
         /// The sink logger.
         /// </summary>
         #endregion
-        public abstract Log Logger { get; }
+        public abstract new Log Logger { get; }
 
         #region AllowedSeverities Severity XML
         /// <summary>
@@ -33,10 +33,17 @@ namespace PowerLog
 
         #region StrictFiltering Boolean XML
         /// <summary>
-        /// Determines whether a log needs to fully or partially match the allowed severities.
+        /// Determines whether a log needs to fully or partially match filtering tests.
         /// </summary>
         #endregion
         public abstract bool StrictFiltering { get; set; }
+
+        #region IsEnabled Boolean XML
+        /// <summary>
+        /// Determines if the sink is enabled.
+        /// </summary>
+        #endregion
+        public abstract new bool IsEnabled { get; set; }
 
 
 
@@ -45,6 +52,7 @@ namespace PowerLog
         /// <summary>
         /// The main function of the sink, called on every log.
         /// </summary>
+        /// <param name="Log">The emitted log.</param>
         #endregion
         public void Emit(Arguments Log);
 

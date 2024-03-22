@@ -1,9 +1,8 @@
-﻿using System.IO;
-using System;
+﻿using System;
+using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using Spectre.Console;
 using PowerLog;
-using System.Text.RegularExpressions;
 
 namespace PowerLog.Sinks.SpectreTerminal
 {
@@ -42,6 +41,13 @@ namespace PowerLog.Sinks.SpectreTerminal
         #endregion
         public bool StrictFiltering { get; set; }
 
+        #region IsEnabled Boolean XML
+        /// <summary>
+        /// Determines if the sink is enabled.
+        /// </summary>
+        #endregion
+        public bool IsEnabled { get; set; }
+
         #region EnableColors Boolean XML
         /// <summary>
         /// Determines if console logs will be colored.
@@ -52,7 +58,7 @@ namespace PowerLog.Sinks.SpectreTerminal
 
         // Private / Hidden variables..
         private readonly Regex ColorOverrideRegex = new Regex(@"^\s*(\d{1,3})\s*([ ,\-])?\s*(\d{1,3})\s*([ ,\-])?\s*(\d{1,3})\s*$", RegexOptions.Compiled);
-
+        private Severity[] SeverityLevels;
         private readonly Dictionary<Severity, Color> TerminalColorLUT = new Dictionary<Severity, Color>() {
             { Severity.Verbose, new Color(64, 64, 64) },
             { Severity.Trace, new Color(128, 128, 128) },
@@ -82,43 +88,41 @@ namespace PowerLog.Sinks.SpectreTerminal
         #endregion
         public void Emit(Arguments Log)
         {
-            if (Log.Severity.Passes(AllowedSeverities, StrictFiltering))
+            bool InvertBackgroundColor = false;
+            int SeverityFlagCount = 0;
+            int ColorRedChannel = 0;
+            int ColorGreenChannel = 0;
+            int ColorBlueChannel = 0;
+
+            for (int I = 0; I < SeverityLevels.Length; I++)
             {
-                Severity[] SeverityLevels = Enum.GetValues<Severity>();
-
-                bool InvertBackgroundColor = false;
-                int SeverityFlagCount = 0;
-                int ColorRedChannel = 0;
-                int ColorGreenChannel = 0;
-                int ColorBlueChannel = 0;
-
-                for (int I = 0; I < SeverityLevels.Length; I++)
+                if (Log.Severity.HasFlag(SeverityLevels[I]))
                 {
-                    if (Log.Severity.HasFlag(SeverityLevels[I]))
-                    {
-                        ColorRedChannel += TerminalColorLUT[SeverityLevels[I]].R;
-                        ColorGreenChannel += TerminalColorLUT[SeverityLevels[I]].G;
-                        ColorBlueChannel += TerminalColorLUT[SeverityLevels[I]].B;
-                        SeverityFlagCount++;
+                    ColorRedChannel += TerminalColorLUT[SeverityLevels[I]].R;
+                    ColorGreenChannel += TerminalColorLUT[SeverityLevels[I]].G;
+                    ColorBlueChannel += TerminalColorLUT[SeverityLevels[I]].B;
+                    SeverityFlagCount++;
 
-                        if (HighlightedSeverities.Contains(SeverityLevels[I]) && !InvertBackgroundColor) {
-                            InvertBackgroundColor = true;
-                        }
+                    if (HighlightedSeverities.Contains(SeverityLevels[I]) && !InvertBackgroundColor) {
+                        InvertBackgroundColor = true;
                     }
                 }
+            }
 
-                Color FinalColor = new Color(((Byte)(ColorRedChannel / SeverityFlagCount)), ((Byte)(ColorGreenChannel / SeverityFlagCount)), ((Byte)(ColorBlueChannel / SeverityFlagCount)));
-                bool MatchedOverride = false;
-                bool MatchedHighlight = false;
-                foreach (KeyValuePair<string, Object> Parameter in Log.Parameters)
+            Color FinalColor = new Color(((Byte)(ColorRedChannel / SeverityFlagCount)), ((Byte)(ColorGreenChannel / SeverityFlagCount)), ((Byte)(ColorBlueChannel / SeverityFlagCount)));
+            bool MatchedOverride = false;
+            bool MatchedHighlight = false;
+            if (Log.Context != null)
+            {
+                foreach (KeyValuePair<string, Object> ContextualProperty in Log.Context)
                 {
-                    if (Parameter.Key == "Color Override" && !MatchedOverride)
+                    if (ContextualProperty.Key == "Color Override" && !MatchedOverride)
                     {
-                        if (ColorOverrideRegex.IsMatch(Parameter.Value.ToString()))
+                        if (ColorOverrideRegex.IsMatch(ContextualProperty.Value.ToString()))
                         {
                             try
                             {
-                                string[] OverrideChannels = Parameter.Value.ToString().Split(new Char[] { ',', ' ', '-' }, StringSplitOptions.RemoveEmptyEntries);
+                                string[] OverrideChannels = ContextualProperty.Value.ToString().Split(new Char[] { ',', ' ', '-' }, StringSplitOptions.RemoveEmptyEntries);
                                 Byte OverrideRedChannel = Convert.ToByte(OverrideChannels[0]);
                                 Byte OverrideGreenChannel = Convert.ToByte(OverrideChannels[1]);
                                 Byte OverrideBlueChannel = Convert.ToByte(OverrideChannels[2]);
@@ -134,10 +138,10 @@ namespace PowerLog.Sinks.SpectreTerminal
                         MatchedOverride = true;
                     }
 
-                    if (Parameter.Key == "Highlight Override" && !MatchedHighlight)
+                    if (ContextualProperty.Key == "Highlight Override" && !MatchedHighlight)
                     {
                         try {
-                            InvertBackgroundColor = Convert.ToBoolean(Parameter.Value);
+                            InvertBackgroundColor = Convert.ToBoolean(ContextualProperty.Value);
                         }
 
                         catch (Exception) {
@@ -152,9 +156,9 @@ namespace PowerLog.Sinks.SpectreTerminal
                         break;
                     }
                 }
-
-                AnsiConsole.Write(new Text((Log.ComposedLog + Environment.NewLine), new Style(((EnableColors) ? FinalColor : AnsiConsole.Foreground), AnsiConsole.Background, ((InvertBackgroundColor) ? Decoration.Invert : Decoration.None))));
             }
+
+            AnsiConsole.Write(new Text((Log.ComposedLog + Environment.NewLine), new Style(((EnableColors) ? FinalColor : AnsiConsole.Foreground), AnsiConsole.Background, ((InvertBackgroundColor) ? Decoration.Invert : Decoration.None))));
         }
 
         #region Initialize Function XML
@@ -197,6 +201,9 @@ namespace PowerLog.Sinks.SpectreTerminal
             this.AllowedSeverities = AllowedSeverities;
             this.EnableColors = EnableColors;
             this.StrictFiltering = true;
+            this.IsEnabled = true;
+
+            SeverityLevels = Enum.GetValues<Severity>();
         }
     }
 
@@ -217,7 +224,7 @@ namespace PowerLog.Sinks.SpectreTerminal
         /// <param name="Identifier">The sink identifier.</param>
         /// <param name="EnableColors">Determines if console logs will be colored.</param>
         /// <param name="AllowedSeverities">The sink's allowed severity levels.</param>
-        /// <returns>The current logger, to allow for builder patterns.</returns>
+        /// <returns>The current logger, to allow for method chaining.</returns>
         #endregion
         public static Log PushSpectreConsole(this Log Logger, string Identifier, bool EnableColors = true, Severity AllowedSeverities = Verbosity.All)
         {

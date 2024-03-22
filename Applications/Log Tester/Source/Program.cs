@@ -2,13 +2,20 @@
 using System.IO;
 using System.Collections;
 using System.Collections.Generic;
-using System.Reflection;
-using System.Diagnostics;
+using System.Threading.Tasks;
+using System.Threading;
 using PowerLog.Sinks.Debugger;
 using PowerLog.Sinks.SpectreTerminal;
 using PowerLog.Sinks.Terminal;
 using PowerLog.Sinks.Markdown;
 using PowerLog.Sinks.IO;
+using PowerLog.Enrichers.Stacktrace;
+using PowerLog.Enrichers.Environment;
+using PowerLog.Enrichers.Process;
+using PowerLog.Enrichers.Thread;
+using PowerLog.Filters.Predicate;
+using PowerLog.Sinks.Asynchronous;
+using PowerLog.Sinks.Logger;
 using PowerLog;
 
 namespace LogTester
@@ -16,15 +23,52 @@ namespace LogTester
     class Program
     {
         public static Log Log;
+        public static Log Proxy;
 
         static void Main(string[] Args)
         {
             Log = new Log("Log", Verbosity.All);
-            Log.PushDebugger("Log DebuggerSink", Verbosity.All, true).
-                PushSpectreConsole("Log SpectreConsoleSink", true, Verbosity.All).
+            Log.PushDebugger("Log Debugger Sink", Verbosity.All).
+                PushSpectreConsole("Log Spectre Console Sink", true, Verbosity.All).
                 // PushConsole("Log ConsoleSink", true, Verbosity.All).
-                PushFile("Log FileSink").
-                PushMarkdown("Log MarkdownSink");
+                PushMarkdown("Log Markdown Sink").
+                PushFile("Log File Sink");
+                // PushAsynchronous("Log Asynchronous Sink", Verbosity.All);
+
+            Proxy = new Log("Proxy", Verbosity.All);
+            Proxy.PushLogger("Proxy Logger Sink", Log, Verbosity.All, false);
+
+            // List<AsynchronousSink> AsyncSinks = Log.Find<AsynchronousSink>();
+            // AsynchronousSink AsyncSink = ((AsyncSinks.Count > 0) ? AsyncSinks[0] : null);
+            /*if (AsyncSink != null)
+            {
+                DebuggerSink DebuggerSink = new DebuggerSink("Log Debugger Sink", Log, Verbosity.All);
+                SpectreConsoleSink SpectreConsoleSink = new SpectreConsoleSink("Log Spectre Console Sink", Log, true, Verbosity.All);
+                ConsoleSink ConsoleSink = new ConsoleSink("Log Console Sink", Log, true, Verbosity.All);
+                MarkdownSink MarkdownSink = new MarkdownSink("Log Markdown Sink", Log, Verbosity.All);
+                FileSink FileSink = new FileSink("Log File Sink", Log, Verbosity.All);
+
+                AsyncSink.Push(DebuggerSink);
+                AsyncSink.Push(SpectreConsoleSink);
+                // AsyncSink.Push(ConsoleSink);
+                AsyncSink.Push(MarkdownSink);
+                AsyncSink.Push(FileSink);
+            }*/
+
+            Log.FormattingTemplate = Template.Minimal;
+            Template PreviousTemplate = Log.FormattingTemplate;
+
+            Thread.CurrentThread.Name = "Bob";
+
+            Log.AppendStacktrace("Stacktrace Enricher").
+                AppendProcess("Process Enricher").
+                AppendThread("Thread Enricher").
+                AppendEnvironment("Environment Enricher", new List<(string, string)> { ("Path", "PATH"), ("AppData", "APPDATA"), ("Temp", "TEMP") });
+
+            // Log.Find<StacktraceEnricher>()[0].IsEnabled = false;
+
+            Log.FilterByPredicate("Predicate Filter", (Log) => { return Log.Enrichments.ContainsKey("Thread ID"); });
+            Log.Find<PredicateFilter>()[0].IsEnabled = false;
 
 
             Log.Verbose("Sinks added successfully.");
@@ -32,35 +76,50 @@ namespace LogTester
             Log.Verbose("Starting log severity demo..");
             Log.Write(String.Empty, Severity.Verbose);
 
-            Log.Verbose("Verbose message..", Template.Default, null, "Startup");
-            Log.Trace("Trace message..", Template.Default, null, "Startup");
-            Log.Debug("Debug message..", Template.Default, null, "Startup");
-            Log.Network("Network message..", Template.Default, null, "Startup");
-            Log.Information("Information message..", Template.Default, null, "Startup");
-            Log.Notice("Notice message..", Template.Default, null, "Startup");
-            Log.Caution("Caution message", Template.Default, null, "Startup");
-            Log.Warning("Warning message..", Template.Default, null, "Startup");
-            Log.Alert("Alert message..", Template.Default, null, "Startup");
-            Log.Error("Error message..", Template.Default, null, "Startup");
-            Log.Critical("Critical message..", Template.Default, null, "Startup");
-            Log.Emergency("Emergency message..", Template.Default, null, "Startup");
-            Log.Fatal("Fatal message..", Template.Default, null, "Startup");
-            Log.Generic("Generic (No-Header) message..", Template.Default, null, "Startup");
-            Log.Write("Flags message.." , (Severity.Fatal | Severity.Notice | Severity.Generic));
+            Log.Verbose("Verbose message..", null, "Startup");
+            Log.Trace("Trace message..", null, "Startup");
+            Log.Debug("Debug message..", null, "Startup");
+            Log.Network("Network message..", null, "Startup");
+            Log.Information("Information message..", null, "Startup");
+            Log.Notice("Notice message..", null, "Startup");
+            Log.Caution("Caution message", null, "Startup");
+            Log.Warning("Warning message..", null, "Startup");
+            Log.Alert("Alert message..", null, "Startup");
+            Log.Error("Error message..", null, "Startup");
+            Log.Critical("Critical message..", null, "Startup");
+            Log.Emergency("Emergency message..", null, "Startup");
+            Log.Fatal("Fatal message..", null, "Startup");
+            Log.Generic("Generic (No-Header) message..", null, "Startup");
+            Log.Write("Flags message.." , (Severity.Network | Severity.Error));
 
 
-            Array LogValues = Enum.GetValues(typeof(Severity));
+            Severity[] LogValues = Enum.GetValues<Severity>();
             Random RNG = new Random();
-            Log.Write("Dynamic log message..", (Severity)(LogValues.GetValue(RNG.Next(LogValues.Length))));
+            Log.Write("Dynamic log message..", LogValues[RNG.Next(LogValues.Length)]);
 
             Log.Generic(String.Empty);
 
-            Log.Information("Param test.. (~PARAM~, ~PARAM2~)", Template.Default, new Dictionary<string, Object> { { "PARAM", "Hello" }, { "PARAM2", "World!" } }, null);
-            Log.Information($"Application compiled at {File.GetLastWriteTime(Assembly.GetEntryAssembly().Location).ToString("HH-mm-ss tt, dd MMMM yyyy")}, in {typeof(Program).Assembly.GetCustomAttribute<AssemblyConfigurationAttribute>().Configuration} mode.", Template.Default, null, Process.GetCurrentProcess().ProcessName);
+            // Log.FormattingTemplate = Log.FormattingTemplate with { Flags = Log.FormattingTemplate.Flags & ~Template.Options.Parse };
+            Log.Generic($"Random Number: ~Random Number~", new Dictionary<string, Object> { { "Random Number", RNG.Next(0, 101) } }, RNG);
+            Log.FormattingTemplate = PreviousTemplate;
 
-            Log.Information($"Here's a fancy overridden colored log in Spectre.Console, however the normal console will use the default color. (Color: `~Color Override~`, Highlight: `~Highlight Override~`)", null, new Dictionary<string, Object> { { "Color Override", "84, 0, 255" }, { "Highlight Override", true } });
+            Log.Generic(String.Empty);
+
+            // Log.Information("Param test.. (~PARAM~, ~PARAM2~)", new Dictionary<string, Object> { { "PARAM", "Hello" }, { "PARAM2", "World!" } }, null);
+            // Log.Information($"Application compiled at {File.GetLastWriteTime(Assembly.GetEntryAssembly().Location).ToString("HH:mm:ss, dd MMMM yyyy")}, in {typeof(Program).Assembly.GetCustomAttribute<AssemblyConfigurationAttribute>().Configuration} mode.", null, Process.GetCurrentProcess().ProcessName);
+
+            Log.Context.Add("Color Override", "84, 0, 255");
+            Log.Context.Add("Highlight Override", true);
+            Log.Information($"Colored log via contextual properties.. (Color: `~$Color Override~`, Highlight: `~$Highlight Override~`)");
+            Log.Context.Clear();
+
             Log.Information("F |C|");
-            Log.Information("MD Sink Test", new Template("| |T| | |I| | |S| | |C| | |O| |"));
+
+            Log.FormattingTemplate = new Template("| |T| | |I| | |S| | |C| | |O| |", "HH:mm:ss", Template.Options.Analysis);
+            Log.Information("Markdown table syntax test.");
+            Log.FormattingTemplate = PreviousTemplate;
+
+            Proxy.Information("Information message.. (Sent through a logger sink to the main logger.)");
 
             Log.Verbose("Log severity demo ended.");
             Log.Generic(String.Empty);
@@ -69,7 +128,12 @@ namespace LogTester
             while (true)
             {
                 Console.Write("Enter message: ");
-                Log.Write(Console.ReadLine(), ((Severity)(LogValues.GetValue(RNG.Next(LogValues.Length)))));
+                string Message = Console.ReadLine();
+
+                Log.Context.Add("ID", RNG.Next(0, 101));
+                Log.Write(Message, ((Severity)(LogValues.GetValue(RNG.Next(LogValues.Length)))));
+                Log.Context.Remove("ID");
+
                 Console.WriteLine();
             }
         }

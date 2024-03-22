@@ -11,60 +11,82 @@ namespace PowerLog
     /// Holds data related to the formatting of the logs.
     /// </summary>
     #endregion
-    public struct Template
+    [Serializable] public record struct Template
     {
-        #region DateFormat String XML
+        #region Format String XML
         /// <summary>
-        /// The date formatting template.
+        /// Provides the log formatting template for the composer.
+        /// <br/><br/>
+        /// <code>
+        /// [ Not Conditional ]  |T| -> Timestamp.  (Refers to 'Time / Timestamp'.)<br/>
+        /// [   Conditional   ]  |I| -> Logger.     (Refers to 'Identifier'.)<br/>
+        /// [   Conditional   ]  |S| -> Severity.   (Refers to 'Severity'.)<br/>
+        /// [ Not Conditional ]  |C| -> Content.    (Refers to 'Content'.)<br/>
+        /// [   Conditional   ]  |O| -> Sender.     (Refers to 'Object'.)<br/>
+        /// </code>
         /// </summary>
         #endregion
-        public string DateFormat { get; private set; }
+        public string Format { get; init; }
 
-        #region LogFormat String XML
+        #region Date String XML
         /// <summary>
-        /// The log formatting template.
-        /// Examples:<br/> <br/>
-        /// Use `<c>|T|</c>` for the timestamp. (Refers to 'Time / Timestamp'.)<br/>
-        /// Use `<c>|I|</c>` for the logger identifier. (Refers to 'Identifier'.)<br/>
-        /// Use `<c>|S|</c>` for the severity. (Refers to 'Severity'.)<br/>
-        /// Use `<c>|C|</c>` for the content. (Refers to 'Content'.)<br/>
-        /// Use `<c>|O|</c>` for the sender.  (Refers to 'Object'.)<br/>
+        /// Provides the date format for the timestamp.
         /// </summary>
         #endregion
-        public string LogFormat { get; private set; }
+        public string Date { get; init; }
+
+        #region Flags Template.Options XML
+        /// <summary>
+        /// Provides various options for the formatter.
+        /// </summary>
+        #endregion
+        public Options Flags { get; init; }
 
 
         // Predefined profiles..
-        #region Default Template XML
+        #region Detailed Template XML
         /// <summary>
-        /// The default <see cref="Template"/> profile.
+        /// A detailed <see cref="Template"/> profile.
         /// </summary>
         #endregion
-        public static Template Default {
+        public static Template Detailed {
             get {
-                return new Template("|[T]| ||I |S: ||C|| (O)|", "HH:mm:ss");
+                return new Template("|[T] |||I |S: ||C|| (O)|", "HH:mm:ss", Options.Detailed);
+            }
+        }
+
+        #region Modern Template XML
+        /// <summary>
+        /// A modern <see cref="Template"/> profile.
+        /// </summary>
+        /// <remarks>If you're using a single <see cref="Log"/> object, you can probably use the <see cref="Minimal"/> template.</remarks>
+        #endregion
+        public static Template Modern {
+            get {
+                return new Template("|T ||[|I |S] ||C|| (O)|", "HH:mm:ss", Options.Compact);
+            }
+        }
+
+        #region Minimal Template XML
+        /// <summary>
+        /// A minimal <see cref="Template"/> profile.
+        /// </summary>
+        /// <remarks>If you're using multiple <see cref="Log"/> objects, you should probably use the <see cref="Modern"/> template.</remarks>
+        #endregion
+        public static Template Minimal {
+            get {
+                return new Template("|T ||[S] ||C|| (O)|", "HH:mm:ss", Options.Compact);
             }
         }
 
         #region Analysis Template XML
         /// <summary>
-        /// A <see cref="Template"/> profile, specifically made for analysis purposes.
+        /// A <see cref="Template"/> profile specifically made for analysis purposes, such as logging a log.
         /// </summary>
         #endregion
         public static Template Analysis {
             get {
-                return new Template("Received log from logger `|I|`| of severity `S`| at |T|, sent by `|O|`: `|C|`", "HH-mm-ss tt, dd MMMM yyyy");
-            }
-        }
-
-        #region Empty Template XML
-        /// <summary>
-        /// Empty <see cref="Template"/> profile.
-        /// </summary>
-        #endregion
-        public static Template Empty {
-            get {
-                return new Template(String.Empty);
+                return new Template("Received log from logger `|I|`| of severity `S`| at |T||, sent by `O`|: `|C|`", "HH:mm:ss, dd MMMM yyyy", Options.Compact);
             }
         }
 
@@ -74,12 +96,81 @@ namespace PowerLog
         /// <summary>
         /// The default <see cref="Template"/> constructor.
         /// </summary>
-        /// <param name="LogFormat">The log formatting template.</param>
-        /// <param name="DateFormat">The date formatting template.</param>
+        /// <param name="Format">Provides the log formatting template for the composer.</param>
+        /// <param name="Date">Provides the date format for the timestamp.</param>
+        /// <param name="Flags">Provides various options for the formatter.</param>
         #endregion
-        public Template(string LogFormat, string DateFormat = "HH:mm:ss") {
-            this.DateFormat = DateFormat;
-            this.LogFormat = LogFormat;
+        public Template(string Format, string Date = "HH:mm:ss", Template.Options Flags = Options.Detailed)
+        {
+            this.Format = Format;
+            this.Date = Date;
+            this.Flags = Flags;
+        }
+
+
+
+        #region Options Enum XML
+        /// <summary>
+        /// Formatting options enumeration.
+        /// </summary>
+        #endregion
+        [Flags] public enum Options
+        {
+            #region ConditionalObject Enum Entry XML
+            /// <summary>
+            /// Discards a <see langword="null"/> sender object's wildcard.
+            /// </summary>
+            #endregion
+            ConditionalObject = 1,
+
+            #region ConditionalSeverity Enum Entry XML
+            /// <summary>
+            /// Discards the severity wildcard if the log severity is / contains <see cref="Severity.Generic"/>.
+            /// </summary>
+            #endregion
+            ConditionalSeverity = 2,
+
+            #region ConditionalLogger Enum Entry XML
+            /// <summary>
+            /// Discards a <see langword="null"/> logger's wildcard.
+            /// </summary>
+            #endregion
+            ConditionalLogger = 4,
+
+            #region Parse Enum Entry XML
+            /// <summary>
+            /// Enables parameter parsing.
+            /// </summary>
+            #endregion
+            Parse = 8,
+
+            #region Compact Enum Entry XML
+            /// <summary>
+            /// A preset for compact logging templates.
+            /// </summary>
+            #endregion
+            Compact = (ConditionalObject | ConditionalSeverity | ConditionalLogger | Parse),
+
+            #region Detailed Enum Entry XML
+            /// <summary>
+            /// A preset for detailed logging templates.
+            /// </summary>
+            #endregion
+            Detailed = (ConditionalSeverity | ConditionalLogger | Parse),
+
+            #region Analysis Enum Entry XML
+            /// <summary>
+            /// A preset for disabling discarding, for semi-raw composed logging data.
+            /// </summary>
+            #endregion
+            Analysis = Parse,
+
+            #region Raw Enum Entry XML
+            /// <summary>
+            /// A preset for disabling discarding and parsing, for raw composed logging data.
+            /// </summary>
+            #endregion
+            Raw = 0
         }
     }
 }

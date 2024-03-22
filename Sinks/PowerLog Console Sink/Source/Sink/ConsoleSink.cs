@@ -1,8 +1,6 @@
-﻿using System.IO;
-using System;
-using PowerLog;
+﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
+using PowerLog;
 
 namespace PowerLog.Sinks.Terminal
 {
@@ -41,6 +39,13 @@ namespace PowerLog.Sinks.Terminal
         #endregion
         public bool StrictFiltering { get; set; }
 
+        #region IsEnabled Boolean XML
+        /// <summary>
+        /// Determines if the sink is enabled.
+        /// </summary>
+        #endregion
+        public bool IsEnabled { get; set; }
+
         #region EnableColors Boolean XML
         /// <summary>
         /// Determines if console logs will be colored.
@@ -50,6 +55,7 @@ namespace PowerLog.Sinks.Terminal
 
 
         // Private / Hidden variables..
+        private Severity[] SeverityLevels;
         private readonly List<Severity> HighlightedSeverities = new List<Severity>() {
             Severity.Critical,
             Severity.Emergency,
@@ -62,46 +68,46 @@ namespace PowerLog.Sinks.Terminal
         #endregion
         public void Emit(Arguments Log)
         {
-            if (Log.Severity.Passes(AllowedSeverities, StrictFiltering))
+            ConsoleColor OldForeground = Console.ForegroundColor;
+            ConsoleColor OldBackground = Console.BackgroundColor;
+
+            ConsoleColor TargetForegroundColor = OldForeground;
+            ConsoleColor TargetBackgroundColor = OldBackground;
+
+            if (EnableColors)
             {
-                ConsoleColor OldForeground = Console.ForegroundColor;
-                ConsoleColor OldBackground = Console.BackgroundColor;
+                // Compares the internal severity values, then matches it to a console color.
+                // Before you ask, I don't think you can do this with a 'switch' statement.
+                // goofy job security type ahh code type
+                if (Log.Severity >= Severity.Verbose && Log.Severity < Severity.Trace) TargetForegroundColor = ConsoleColor.DarkGray; // Verbose.
+                if (Log.Severity >= Severity.Trace && Log.Severity < Severity.Debug) TargetForegroundColor = ConsoleColor.Gray; // Trace.
+                if (Log.Severity >= Severity.Debug && Log.Severity < Severity.Network) TargetForegroundColor = ConsoleColor.Gray; // Debug.
+                if (Log.Severity >= Severity.Network && Log.Severity < Severity.Information) TargetForegroundColor = ConsoleColor.Blue; // Network.
+                if (Log.Severity >= Severity.Information && Log.Severity < Severity.Notice) TargetForegroundColor = ConsoleColor.White; // Information.
+                if (Log.Severity >= Severity.Notice && Log.Severity < Severity.Caution) TargetForegroundColor = ConsoleColor.White; // Notice.
+                if (Log.Severity >= Severity.Caution && Log.Severity < Severity.Warning) TargetForegroundColor = ConsoleColor.Yellow; // Caution.
+                if (Log.Severity >= Severity.Warning && Log.Severity < Severity.Alert) TargetForegroundColor = ConsoleColor.Yellow; // Warning.
+                if (Log.Severity >= Severity.Alert && Log.Severity < Severity.Error) TargetForegroundColor = ConsoleColor.DarkYellow; // Alert.
+                if (Log.Severity >= Severity.Error && Log.Severity < Severity.Critical) TargetForegroundColor = ConsoleColor.Red; // Error.
+                if (Log.Severity >= Severity.Critical && Log.Severity < Severity.Emergency) TargetForegroundColor = ConsoleColor.Red; // Critical.
+                if (Log.Severity >= Severity.Emergency && Log.Severity < Severity.Fatal) TargetForegroundColor = ConsoleColor.DarkRed; // Emergency.
+                if (Log.Severity >= Severity.Fatal && Log.Severity < Severity.Generic) TargetForegroundColor = ConsoleColor.DarkRed; // Fatal.
+                if (Log.Severity >= Severity.Generic) TargetForegroundColor = OldForeground; // Generic.
 
-                ConsoleColor TargetForegroundColor = OldForeground;
-                ConsoleColor TargetBackgroundColor = OldBackground;
 
-                if (EnableColors)
+
+                bool InvertBackgroundColor = false;
+                for (int I = 0; I < SeverityLevels.Length; I++)
                 {
-                    // Compares the internal severity values, then matches it to a console color.
-                    // Before you ask, I don't think you can do this with a 'switch' statement.
-                    if (Log.Severity >= Severity.Verbose && Log.Severity < Severity.Trace) TargetForegroundColor = ConsoleColor.DarkGray; // Verbose.
-                    if (Log.Severity >= Severity.Trace && Log.Severity < Severity.Debug) TargetForegroundColor = ConsoleColor.Gray; // Trace.
-                    if (Log.Severity >= Severity.Debug && Log.Severity < Severity.Network) TargetForegroundColor = ConsoleColor.Gray; // Debug.
-                    if (Log.Severity >= Severity.Network && Log.Severity < Severity.Information) TargetForegroundColor = ConsoleColor.Blue; // Network.
-                    if (Log.Severity >= Severity.Information && Log.Severity < Severity.Notice) TargetForegroundColor = ConsoleColor.White; // Information.
-                    if (Log.Severity >= Severity.Notice && Log.Severity < Severity.Caution) TargetForegroundColor = ConsoleColor.White; // Notice.
-                    if (Log.Severity >= Severity.Caution && Log.Severity < Severity.Warning) TargetForegroundColor = ConsoleColor.Yellow; // Caution.
-                    if (Log.Severity >= Severity.Warning && Log.Severity < Severity.Alert) TargetForegroundColor = ConsoleColor.Yellow; // Warning.
-                    if (Log.Severity >= Severity.Alert && Log.Severity < Severity.Error) TargetForegroundColor = ConsoleColor.DarkYellow; // Alert.
-                    if (Log.Severity >= Severity.Error && Log.Severity < Severity.Critical) TargetForegroundColor = ConsoleColor.Red; // Error.
-                    if (Log.Severity >= Severity.Critical && Log.Severity < Severity.Emergency) TargetForegroundColor = ConsoleColor.Red; // Critical.
-                    if (Log.Severity >= Severity.Emergency && Log.Severity < Severity.Fatal) TargetForegroundColor = ConsoleColor.DarkRed; // Emergency.
-                    if (Log.Severity >= Severity.Fatal && Log.Severity < Severity.Generic) TargetForegroundColor = ConsoleColor.DarkRed; // Fatal.
-                    if (Log.Severity >= Severity.Generic) TargetForegroundColor = OldForeground; // Generic.
-
-
-
-                    Severity[] SeverityLevels = Enum.GetValues(typeof(Severity)) as Severity[];
-                    bool InvertBackgroundColor = false;
-                    for (int I = 0; I < SeverityLevels.Length; I++)
+                    if (Log.Severity.HasFlag(SeverityLevels[I]) && HighlightedSeverities.Contains(SeverityLevels[I]))
                     {
-                        if (Log.Severity.HasFlag(SeverityLevels[I]) && HighlightedSeverities.Contains(SeverityLevels[I]))
-                        {
-                            InvertBackgroundColor = true;
-                            break;
-                        }
+                        InvertBackgroundColor = true;
+                        break;
                     }
+                }
 
+                if (Log.Parameters != null)
+                {
                     foreach (KeyValuePair<string, Object> Parameter in Log.Parameters)
                     {
                         if (Parameter.Key == "Highlight Override")
@@ -111,28 +117,28 @@ namespace PowerLog.Sinks.Terminal
                             }
 
                             catch (Exception) {
-                                Logger.Error("An error occured while trying to invert the color of the log.", null, null, this.Identifier);
+                                // don't care didn't ask
                             }
                         }
                     }
-
-                    if (InvertBackgroundColor)
-                    {
-                        ConsoleColor BackupColor = TargetForegroundColor;
-                        TargetForegroundColor = TargetBackgroundColor;
-                        TargetBackgroundColor = BackupColor;
-                    }
                 }
 
-
-                Console.ForegroundColor = TargetForegroundColor;
-                Console.BackgroundColor = TargetBackgroundColor;
-
-                Console.WriteLine(Log.ComposedLog);
-
-                Console.ForegroundColor = OldForeground;
-                Console.BackgroundColor = OldBackground;
+                if (InvertBackgroundColor)
+                {
+                    ConsoleColor BackupColor = TargetForegroundColor;
+                    TargetForegroundColor = TargetBackgroundColor;
+                    TargetBackgroundColor = BackupColor;
+                }
             }
+
+
+            Console.ForegroundColor = TargetForegroundColor;
+            Console.BackgroundColor = TargetBackgroundColor;
+
+            Console.WriteLine(Log.ComposedLog);
+
+            Console.ForegroundColor = OldForeground;
+            Console.BackgroundColor = OldBackground;
         }
 
         #region Initialize Function XML
@@ -175,6 +181,9 @@ namespace PowerLog.Sinks.Terminal
             this.AllowedSeverities = AllowedSeverities;
             this.EnableColors = EnableColors;
             this.StrictFiltering = true;
+            this.IsEnabled = true;
+
+            SeverityLevels = Enum.GetValues<Severity>();
         }
     }
 
@@ -195,7 +204,7 @@ namespace PowerLog.Sinks.Terminal
         /// <param name="Identifier">The sink identifier.</param>
         /// <param name="EnableColors">Determines if console logs will be colored.</param>
         /// <param name="AllowedSeverities">The sink's allowed severity levels.</param>
-        /// <returns>The current logger, to allow for builder patterns.</returns>
+        /// <returns>The current logger, to allow for method chaining.</returns>
         #endregion
         public static Log PushConsole(this Log Logger, string Identifier, bool EnableColors = true, Severity AllowedSeverities = Verbosity.All)
         {

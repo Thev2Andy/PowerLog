@@ -1,6 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
+using System.Collections;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using System.Diagnostics;
 
@@ -11,7 +13,7 @@ namespace PowerLog
     /// The class used for writing logs.
     /// </summary>
     #endregion
-    public class Log : IDisposable
+    public sealed class Log : IDisposable
     {
         // Public / Accessible variables.
         #region Identifier String XML
@@ -19,7 +21,7 @@ namespace PowerLog
         /// Contains the identifier / name of the current logger object.
         /// </summary>
         #endregion
-        public string Identifier { get; private set; }
+        public string Identifier { get; init; }
 
         #region AllowedSeverities Severity XML
         /// <summary>
@@ -30,10 +32,17 @@ namespace PowerLog
 
         #region StrictFiltering Boolean XML
         /// <summary>
-        /// Determines whether a log needs to fully or partially match the allowed severities.
+        /// Determines whether a log needs to fully or partially match filtering tests and the allowed severities.
         /// </summary>
         #endregion
         public bool StrictFiltering { get; set; }
+
+        #region FormattingTemplate Template XML
+        /// <summary>
+        /// Formatting template used by most sinks to compose the log.<br/>The <see cref="Template"/> structure provides some presets to use, such as <see cref="Template.Minimal"/>, <see cref="Template.Modern"/> or <see cref="Template.Detailed"/>.<br/>(Warning: Some sinks may use a custom formatting solution and ignore the <see cref="Arguments.ComposedLog"/> property and / or the formatting template.)
+        /// </summary>
+        #endregion
+        public Template FormattingTemplate { get; set; }
 
         #region IsDisposed Boolean XML
         /// <summary>
@@ -42,6 +51,13 @@ namespace PowerLog
         #endregion
         public bool IsDisposed { get; private set; }
 
+        #region Context Dictionary XML
+        /// <summary>
+        /// Contextual properties attached to the logger and automatically forwarded to each emitted log.
+        /// </summary>
+        #endregion
+        public Dictionary<string, Object> Context { get; init; }
+
 
         // Private / Hidden variables.
         #region Sinks ISink List XML
@@ -49,13 +65,27 @@ namespace PowerLog
         /// The sink stack.
         /// </summary>
         #endregion
-        private List<ISink> Sinks { get; set; }
+        private List<ISink> Sinks { get; init; }
+
+        #region Enrichers IEnricher List XML
+        /// <summary>
+        /// The enricher stack.
+        /// </summary>
+        #endregion
+        private List<IEnricher> Enrichers { get; init; }
+
+        #region Filters IFilter List XML
+        /// <summary>
+        /// The filter stack.
+        /// </summary>
+        #endregion
+        private List<IFilter> Filters { get; init; }
 
 
         // Public / Accessible Events.
         #region OnLog Event XML
         /// <summary>
-        /// Invoked in the <see cref="Log.Write(string, Severity, Template?, Dictionary{string, Object}, Object)"/> function.
+        /// Invoked in the <see cref="Log.Write(string, Severity, Dictionary{string, Object}, Object)"/> function.
         /// </summary>
         #endregion
         public event Action<Arguments> OnLog;
@@ -85,38 +115,101 @@ namespace PowerLog
 
         #region Write Function XML
         /// <summary>
-        /// Calls a dynamic <see cref="Severity"/> log, sent over to the current active sinks and the <see cref="Log.OnLog"/> event.
+        /// Calls a dynamic <see cref="Severity"/> log, sent over to the currently active sinks and the <see cref="Log.OnLog"/> event.
         /// </summary>
         /// <param name="Content">The actual content of the log.</param>
         /// <param name="Severity">The type / level / severity of the log.</param>
-        /// <param name="Template">Format template used by most sinks to compose the log. (Some sinks may use a custom formatting solution and ignore the <see cref="Arguments.ComposedLog"/> property.)</param>
         /// <param name="Parameters">Additional logging data.</param>
         /// <param name="Sender">The log sender.</param>
         /// <exception cref="ObjectDisposedException">Thrown when attempting to write logs with a disposed logger.</exception>
         #endregion
-        public void Write(string Content, Severity Severity, Template? Template = null, Dictionary<string, Object> Parameters = null, Object Sender = null)
+        public void Write(string Content, Severity Severity, Dictionary<string, Object> Parameters = null, Object Sender = null)
         {
             if (!IsDisposed)
             {
                 if (Severity.Passes(AllowedSeverities, StrictFiltering))
                 {
-                    Arguments ProducedLog = new Arguments();
-                    ProducedLog.Content = Content;
-                    ProducedLog.Severity = Severity;
-                    ProducedLog.Time = DateTime.Now;
-                    ProducedLog.Template = ((Template)((Template == null) ? ((!String.IsNullOrEmpty(Content)) ? PowerLog.Template.Default : PowerLog.Template.Empty) : Template));
-                    ProducedLog.Sender = Sender;
-                    ProducedLog.Stacktrace = new StackTrace(true);
-                    ProducedLog.Parameters = ((Parameters != null) ? Parameters : new Dictionary<string, Object>());
+                    Dictionary<string, Object> Enrichments = null;
+                    if (Enrichers.Count > 0)
+                    {
+                        Enrichments = new Dictionary<string, Object>();
 
-                    ProducedLog.Logger = this;
-
-
-                    foreach (ISink Sink in Sinks) {
-                        Sink.Emit(ProducedLog);
+                        foreach (IEnricher Enricher in Enrichers)
+                        {
+                            if (Enricher.IsEnabled) {
+                                Enricher.Enrich(in Enrichments);
+                            }
+                        }
                     }
 
-                    OnLog?.Invoke(ProducedLog);
+                    Dictionary<string, Object> Context = null;
+                    if (this.Context.Count > 0)
+                    {
+                        Context = new Dictionary<string, Object>();
+
+                        foreach (KeyValuePair<string, Object> ContextualProperty in this.Context) {
+                            Context.Add(ContextualProperty.Key, ContextualProperty.Value);
+                        }
+                    }
+
+
+                    Arguments ProducedLog = new Arguments()
+                    {
+                        Content = Content,
+                        Severity = Severity,
+                        Time = DateTime.Now,
+                        Template = FormattingTemplate,
+                        Sender = Sender,
+                        Parameters = Parameters,
+                        Enrichments = Enrichments,
+                        Context = Context,
+
+                        Logger = this,
+                    };
+
+                    this.Raw(ProducedLog);
+                }
+            }
+
+            else {
+                throw new ObjectDisposedException(Identifier);
+            }
+        }
+
+        #region Raw Function XML
+        /// <summary>
+        /// Calls a pre-constructed log, sent over to the currently active sinks and the <see cref="Log.OnLog"/> event.
+        /// </summary>
+        /// <param name="Log">The pre-constructed log to send.</param>
+        /// <exception cref="ObjectDisposedException">Thrown when attempting to write logs with a disposed logger.</exception>
+        #endregion
+        public void Raw(Arguments Log)
+        {
+            if (!IsDisposed)
+            {
+                if (Log.Severity.Passes(AllowedSeverities, StrictFiltering))
+                {
+                    bool PassesFilters = true;
+                    for (int I = 0; I < Filters.Count; I++)
+                    {
+                        if (Filters[I].IsEnabled)
+                        {
+                            bool FilterResult = Filters[I].Filter(Log);
+                            PassesFilters = ((StrictFiltering || I == 0) ? (PassesFilters && FilterResult) : (PassesFilters || FilterResult));
+                        }
+                    }
+
+                    if (PassesFilters)
+                    {
+                        foreach (ISink Sink in Sinks)
+                        {
+                            if (Sink.IsEnabled && Log.Severity.Passes(Sink.AllowedSeverities, Sink.StrictFiltering)) {
+                                Sink.Emit(Log);
+                            }
+                        }
+
+                        OnLog?.Invoke(Log);
+                    }
                 }
             }
 
@@ -128,198 +221,184 @@ namespace PowerLog
         #region Log Overloads
         #region Verbose Function XML
         /// <summary>
-        /// Calls a <see cref="Severity.Verbose"/> log, sent over to the current active sinks and the <see cref="Log.OnLog"/> event.
+        /// Calls a <see cref="Severity.Verbose"/> log, sent over to the currently active sinks and the <see cref="Log.OnLog"/> event.
         /// </summary>
         /// <param name="Content">The actual content of the log.</param>
-        /// <param name="Template">Format template used by most sinks to compose the log. (Some sinks may use a custom formatting solution and ignore the <see cref="Arguments.ComposedLog"/> property.)</param>
         /// <param name="Parameters">Additional logging data.</param>
         /// <param name="Sender">The log sender.</param>
         /// <exception cref="ObjectDisposedException">Thrown when attempting to write logs with a disposed logger.</exception>
         #endregion
-        public void Verbose(string Content, Template? Template = null, Dictionary<string, Object> Parameters = null, Object Sender = null) {
-            this.Write(Content, Severity.Verbose, Template, Parameters, Sender);
+        public void Verbose(string Content, Dictionary<string, Object> Parameters = null, Object Sender = null) {
+            this.Write(Content, Severity.Verbose, Parameters, Sender);
         }
 
         #region Trace Function XML
         /// <summary>
-        /// Calls a <see cref="Severity.Trace"/> log, sent over to the current active sinks and the <see cref="Log.OnLog"/> event.
+        /// Calls a <see cref="Severity.Trace"/> log, sent over to the currently active sinks and the <see cref="Log.OnLog"/> event.
         /// </summary>
         /// <param name="Content">The actual content of the log.</param>
-        /// <param name="Template">Format template used by most sinks to compose the log. (Some sinks may use a custom formatting solution and ignore the <see cref="Arguments.ComposedLog"/> property.)</param>
         /// <param name="Parameters">Additional logging data.</param>
         /// <param name="Sender">The log sender.</param>
         /// <exception cref="ObjectDisposedException">Thrown when attempting to write logs with a disposed logger.</exception>
         #endregion
-        public void Trace(string Content, Template? Template = null, Dictionary<string, Object> Parameters = null, Object Sender = null) {
-            this.Write(Content, Severity.Trace, Template, Parameters, Sender);
+        public void Trace(string Content, Dictionary<string, Object> Parameters = null, Object Sender = null) {
+            this.Write(Content, Severity.Trace, Parameters, Sender);
         }
 
         #region Debug Function XML
         /// <summary>
-        /// Calls a <see cref="Severity.Debug"/> log, sent over to the current active sinks and the <see cref="Log.OnLog"/> event.
+        /// Calls a <see cref="Severity.Debug"/> log, sent over to the currently active sinks and the <see cref="Log.OnLog"/> event.
         /// </summary>
         /// <param name="Content">The actual content of the log.</param>
-        /// <param name="Template">Format template used by most sinks to compose the log. (Some sinks may use a custom formatting solution and ignore the <see cref="Arguments.ComposedLog"/> property.)</param>
         /// <param name="Parameters">Additional logging data.</param>
         /// <param name="Sender">The log sender.</param>
         /// <exception cref="ObjectDisposedException">Thrown when attempting to write logs with a disposed logger.</exception>
         #endregion
-        public void Debug(string Content, Template? Template = null, Dictionary<string, Object> Parameters = null, Object Sender = null) {
-            this.Write(Content, Severity.Debug, Template, Parameters, Sender);
+        public void Debug(string Content, Dictionary<string, Object> Parameters = null, Object Sender = null) {
+            this.Write(Content, Severity.Debug, Parameters, Sender);
         }
 
         #region Network Function XML
         /// <summary>
-        /// Calls a <see cref="Severity.Network"/> log, sent over to the current active sinks and the <see cref="Log.OnLog"/> event.
+        /// Calls a <see cref="Severity.Network"/> log, sent over to the currently active sinks and the <see cref="Log.OnLog"/> event.
         /// </summary>
         /// <param name="Content">The actual content of the log.</param>
-        /// <param name="Template">Format template used by most sinks to compose the log. (Some sinks may use a custom formatting solution and ignore the <see cref="Arguments.ComposedLog"/> property.)</param>
         /// <param name="Parameters">Additional logging data.</param>
         /// <param name="Sender">The log sender.</param>
         /// <exception cref="ObjectDisposedException">Thrown when attempting to write logs with a disposed logger.</exception>
         #endregion
-        public void Network(string Content, Template? Template = null, Dictionary<string, Object> Parameters = null, Object Sender = null) {
-            this.Write(Content, Severity.Network, Template, Parameters, Sender);
+        public void Network(string Content, Dictionary<string, Object> Parameters = null, Object Sender = null) {
+            this.Write(Content, Severity.Network, Parameters, Sender);
         }
 
         #region Information Function XML
         /// <summary>
-        /// Calls an <see cref="Severity.Information"/> log, sent over to the current active sinks and the <see cref="Log.OnLog"/> event.
+        /// Calls an <see cref="Severity.Information"/> log, sent over to the currently active sinks and the <see cref="Log.OnLog"/> event.
         /// </summary>
         /// <param name="Content">The actual content of the log.</param>
-        /// <param name="Template">Format template used by most sinks to compose the log. (Some sinks may use a custom formatting solution and ignore the <see cref="Arguments.ComposedLog"/> property.)</param>
         /// <param name="Parameters">Additional logging data.</param>
         /// <param name="Sender">The log sender.</param>
         /// <exception cref="ObjectDisposedException">Thrown when attempting to write logs with a disposed logger.</exception>
         #endregion
-        public void Information(string Content, Template? Template = null, Dictionary<string, Object> Parameters = null, Object Sender = null) {
-            this.Write(Content, Severity.Information, Template, Parameters, Sender);
+        public void Information(string Content, Dictionary<string, Object> Parameters = null, Object Sender = null) {
+            this.Write(Content, Severity.Information, Parameters, Sender);
         }
 
         #region Notice Function XML
         /// <summary>
-        /// Calls a <see cref="Severity.Notice"/> log, sent over to the current active sinks and the <see cref="Log.OnLog"/> event.
+        /// Calls a <see cref="Severity.Notice"/> log, sent over to the currently active sinks and the <see cref="Log.OnLog"/> event.
         /// </summary>
         /// <param name="Content">The actual content of the log.</param>
-        /// <param name="Template">Format template used by most sinks to compose the log. (Some sinks may use a custom formatting solution and ignore the <see cref="Arguments.ComposedLog"/> property.)</param>
         /// <param name="Parameters">Additional logging data.</param>
         /// <param name="Sender">The log sender.</param>
         /// <exception cref="ObjectDisposedException">Thrown when attempting to write logs with a disposed logger.</exception>
         #endregion
-        public void Notice(string Content, Template? Template = null, Dictionary<string, Object> Parameters = null, Object Sender = null) {
-            this.Write(Content, Severity.Notice, Template, Parameters, Sender);
+        public void Notice(string Content, Dictionary<string, Object> Parameters = null, Object Sender = null) {
+            this.Write(Content, Severity.Notice, Parameters, Sender);
         }
 
         #region Caution Function XML
         /// <summary>
-        /// Calls a <see cref="Severity.Caution"/> log, sent over to the current active sinks and the <see cref="Log.OnLog"/> event.
+        /// Calls a <see cref="Severity.Caution"/> log, sent over to the currently active sinks and the <see cref="Log.OnLog"/> event.
         /// </summary>
         /// <param name="Content">The actual content of the log.</param>
-        /// <param name="Template">Format template used by most sinks to compose the log. (Some sinks may use a custom formatting solution and ignore the <see cref="Arguments.ComposedLog"/> property.)</param>
         /// <param name="Parameters">Additional logging data.</param>
         /// <param name="Sender">The log sender.</param>
         /// <exception cref="ObjectDisposedException">Thrown when attempting to write logs with a disposed logger.</exception>
         #endregion
-        public void Caution(string Content, Template? Template = null, Dictionary<string, Object> Parameters = null, Object Sender = null) {
-            this.Write(Content, Severity.Caution, Template, Parameters, Sender);
+        public void Caution(string Content, Dictionary<string, Object> Parameters = null, Object Sender = null) {
+            this.Write(Content, Severity.Caution, Parameters, Sender);
         }
 
         #region Warning Function XML
         /// <summary>
-        /// Calls a <see cref="Severity.Warning"/> log, sent over to the current active sinks and the <see cref="Log.OnLog"/> event.
+        /// Calls a <see cref="Severity.Warning"/> log, sent over to the currently active sinks and the <see cref="Log.OnLog"/> event.
         /// </summary>
         /// <param name="Content">The actual content of the log.</param>
-        /// <param name="Template">Format template used by most sinks to compose the log. (Some sinks may use a custom formatting solution and ignore the <see cref="Arguments.ComposedLog"/> property.)</param>
         /// <param name="Parameters">Additional logging data.</param>
         /// <param name="Sender">The log sender.</param>
         /// <exception cref="ObjectDisposedException">Thrown when attempting to write logs with a disposed logger.</exception>
         #endregion
-        public void Warning(string Content, Template? Template = null, Dictionary<string, Object> Parameters = null, Object Sender = null) {
-            this.Write(Content, Severity.Warning, Template, Parameters, Sender);
+        public void Warning(string Content, Dictionary<string, Object> Parameters = null, Object Sender = null) {
+            this.Write(Content, Severity.Warning, Parameters, Sender);
         }
 
         #region Alert Function XML
         /// <summary>
-        /// Calls an <see cref="Severity.Alert"/> log, sent over to the current active sinks and the <see cref="Log.OnLog"/> event.
+        /// Calls an <see cref="Severity.Alert"/> log, sent over to the currently active sinks and the <see cref="Log.OnLog"/> event.
         /// </summary>
         /// <param name="Content">The actual content of the log.</param>
-        /// <param name="Template">Format template used by most sinks to compose the log. (Some sinks may use a custom formatting solution and ignore the <see cref="Arguments.ComposedLog"/> property.)</param>
         /// <param name="Parameters">Additional logging data.</param>
         /// <param name="Sender">The log sender.</param>
         /// <exception cref="ObjectDisposedException">Thrown when attempting to write logs with a disposed logger.</exception>
         #endregion
-        public void Alert(string Content, Template? Template = null, Dictionary<string, Object> Parameters = null, Object Sender = null) {
-            this.Write(Content, Severity.Alert, Template, Parameters, Sender);
+        public void Alert(string Content, Dictionary<string, Object> Parameters = null, Object Sender = null) {
+            this.Write(Content, Severity.Alert, Parameters, Sender);
         }
 
         #region Error Function XML
         /// <summary>
-        /// Calls an <see cref="Severity.Error"/> log, sent over to the current active sinks and the <see cref="Log.OnLog"/> event.
+        /// Calls an <see cref="Severity.Error"/> log, sent over to the currently active sinks and the <see cref="Log.OnLog"/> event.
         /// </summary>
         /// <param name="Content">The actual content of the log.</param>
-        /// <param name="Template">Format template used by most sinks to compose the log. (Some sinks may use a custom formatting solution and ignore the <see cref="Arguments.ComposedLog"/> property.)</param>
         /// <param name="Parameters">Additional logging data.</param>
         /// <param name="Sender">The log sender.</param>
         /// <exception cref="ObjectDisposedException">Thrown when attempting to write logs with a disposed logger.</exception>
         #endregion
-        public void Error(string Content, Template? Template = null, Dictionary<string, Object> Parameters = null, Object Sender = null) {
-            this.Write(Content, Severity.Error, Template, Parameters, Sender);
+        public void Error(string Content, Dictionary<string, Object> Parameters = null, Object Sender = null) {
+            this.Write(Content, Severity.Error, Parameters, Sender);
         }
 
         #region Critical Function XML
         /// <summary>
-        /// Calls a <see cref="Severity.Critical"/> log, sent over to the current active sinks and the <see cref="Log.OnLog"/> event.
+        /// Calls a <see cref="Severity.Critical"/> log, sent over to the currently active sinks and the <see cref="Log.OnLog"/> event.
         /// </summary>
         /// <param name="Content">The actual content of the log.</param>
-        /// <param name="Template">Format template used by most sinks to compose the log. (Some sinks may use a custom formatting solution and ignore the <see cref="Arguments.ComposedLog"/> property.)</param>
         /// <param name="Parameters">Additional logging data.</param>
         /// <param name="Sender">The log sender.</param>
         /// <exception cref="ObjectDisposedException">Thrown when attempting to write logs with a disposed logger.</exception>
         #endregion
-        public void Critical(string Content, Template? Template = null, Dictionary<string, Object> Parameters = null, Object Sender = null) {
-            this.Write(Content, Severity.Critical, Template, Parameters, Sender);
+        public void Critical(string Content, Dictionary<string, Object> Parameters = null, Object Sender = null) {
+            this.Write(Content, Severity.Critical, Parameters, Sender);
         }
 
         #region Emergency Function XML
         /// <summary>
-        /// Calls an <see cref="Severity.Emergency"/> log, sent over to the current active sinks and the <see cref="Log.OnLog"/> event.
+        /// Calls an <see cref="Severity.Emergency"/> log, sent over to the currently active sinks and the <see cref="Log.OnLog"/> event.
         /// </summary>
         /// <param name="Content">The actual content of the log.</param>
-        /// <param name="Template">Format template used by most sinks to compose the log. (Some sinks may use a custom formatting solution and ignore the <see cref="Arguments.ComposedLog"/> property.)</param>
         /// <param name="Parameters">Additional logging data.</param>
         /// <param name="Sender">The log sender.</param>
         /// <exception cref="ObjectDisposedException">Thrown when attempting to write logs with a disposed logger.</exception>
         #endregion
-        public void Emergency(string Content, Template? Template = null, Dictionary<string, Object> Parameters = null, Object Sender = null) {
-            this.Write(Content, Severity.Emergency, Template, Parameters, Sender);
+        public void Emergency(string Content, Dictionary<string, Object> Parameters = null, Object Sender = null) {
+            this.Write(Content, Severity.Emergency, Parameters, Sender);
         }
 
         #region Fatal Function XML
         /// <summary>
-        /// Calls a <see cref="Severity.Fatal"/> log, sent over to the current active sinks and the <see cref="Log.OnLog"/> event.
+        /// Calls a <see cref="Severity.Fatal"/> log, sent over to the currently active sinks and the <see cref="Log.OnLog"/> event.
         /// </summary>
         /// <param name="Content">The actual content of the log.</param>
-        /// <param name="Template">Format template used by most sinks to compose the log. (Some sinks may use a custom formatting solution and ignore the <see cref="Arguments.ComposedLog"/> property.)</param>
         /// <param name="Parameters">Additional logging data.</param>
         /// <param name="Sender">The log sender.</param>
         /// <exception cref="ObjectDisposedException">Thrown when attempting to write logs with a disposed logger.</exception>
         #endregion
-        public void Fatal(string Content, Template? Template = null, Dictionary<string, Object> Parameters = null, Object Sender = null) {
-            this.Write(Content, Severity.Fatal, Template, Parameters, Sender);
+        public void Fatal(string Content, Dictionary<string, Object> Parameters = null, Object Sender = null) {
+            this.Write(Content, Severity.Fatal, Parameters, Sender);
         }
 
         #region Generic Function XML
         /// <summary>
-        /// Calls a <see cref="Severity.Generic"/> log, sent over to the current active sinks and the <see cref="Log.OnLog"/> event.
+        /// Calls a <see cref="Severity.Generic"/> log, sent over to the currently active sinks and the <see cref="Log.OnLog"/> event.
         /// </summary>
         /// <param name="Content">The actual content of the log.</param>
-        /// <param name="Template">Format template used by most sinks to compose the log. (Some sinks may use a custom formatting solution and ignore the <see cref="Arguments.ComposedLog"/> property.)</param>
         /// <param name="Parameters">Additional logging data.</param>
         /// <param name="Sender">The log sender.</param>
         /// <exception cref="ObjectDisposedException">Thrown when attempting to write logs with a disposed logger.</exception>
         #endregion
-        public void Generic(string Content, Template? Template = null, Dictionary<string, Object> Parameters = null, Object Sender = null) {
-            this.Write(Content, Severity.Generic, Template, Parameters, Sender);
+        public void Generic(string Content, Dictionary<string, Object> Parameters = null, Object Sender = null) {
+            this.Write(Content, Severity.Generic, Parameters, Sender);
         }
         #endregion
 
@@ -334,8 +413,11 @@ namespace PowerLog
         {
             if (!IsDisposed)
             {
-                foreach (ISink Sink in Sinks) {
-                    Sink.Save();
+                foreach (ISink Sink in Sinks)
+                {
+                    if (Sink.IsEnabled) {
+                        Sink.Save();
+                    }
                 }
 
                 OnSave?.Invoke();
@@ -343,6 +425,7 @@ namespace PowerLog
 
             else {
                 throw new ObjectDisposedException(Identifier);
+        
             }
         }
 
@@ -356,8 +439,11 @@ namespace PowerLog
         {
             if (!IsDisposed)
             {
-                foreach (ISink Sink in Sinks) {
-                    Sink.Clear();
+                foreach (ISink Sink in Sinks)
+                {
+                    if (Sink.IsEnabled) {
+                        Sink.Clear();
+                    }
                 }
 
                 OnClear?.Invoke();
@@ -369,33 +455,57 @@ namespace PowerLog
         }
 
 
-        #region Find<Sink> Function XML
+        #region Find<Component> Function XML
         /// <summary>
-        /// Finds and returns matching sinks based on their type and identifier.
+        /// Finds and returns matching components based on their type and identifier.
         /// </summary>
-        /// <param name="Identifier">A name filter for sinks, used if there are multiple sinks of the same type.<br/>If <see langword="null"/> or equal to <see cref="String.Empty"/>, only filters sinks by type.</param>
-        /// <param name="CaseSensitive">Determines if the name filter considers capitalization.</param>
-        /// <typeparam name="Sink">Type filter for sinks, supports any type that implements <see cref="ISink"/>.</typeparam>
-        /// <returns>A list containing the matching sinks, or an empty list if nothing is found.</returns>
-        /// <exception cref="ObjectDisposedException">Thrown when attempting to find sinks pushed to a disposed logger.</exception>
+        /// <param name="Identifier">A name filter for components, used if there are multiple components of the same type.<br/>If <see langword="null"/> or equal to <see cref="String.Empty"/>, only filters components by type.</param>
+        /// <typeparam name="Component">Type filter for components, supports any type that implements <see cref="IComponent"/> based types.</typeparam>
+        /// <returns>A list containing the matching components, or an empty list if nothing is found.</returns>
+        /// <exception cref="ArgumentException">Thrown if the <typeparamref name="Component"/> doesn't exclusively match a single component type.</exception>
+        /// <exception cref="ObjectDisposedException">Thrown when attempting to find components pushed to a disposed logger.</exception>
         #endregion
-        public List<Sink> Find<Sink>(string Identifier = null, bool CaseSensitive = true) where Sink : ISink
+        public List<Component> Find<Component>(string Identifier = null) where Component : IComponent
         {
             if (!IsDisposed)
             {
-                if (String.IsNullOrEmpty(Identifier)) {
-                    Identifier = String.Empty;
-                }
+                Identifier ??= String.Empty;
 
-                List<Sink> Return = new List<Sink>();
-                foreach (ISink ProbedSink in Sinks)
+                bool IsSink = typeof(Component).IsAssignableTo(typeof(ISink));
+                bool IsEnricher = typeof(Component).IsAssignableTo(typeof(IEnricher));
+                bool IsFilter = typeof(Component).IsAssignableTo(typeof(IFilter));
+
+                if (((IsSink ^ IsEnricher ^ IsFilter) && !(IsSink && IsEnricher && IsFilter)))
                 {
-                    if (ProbedSink is Sink && ProbedSink.Identifier.Contains(Identifier, ((CaseSensitive) ? StringComparison.CurrentCulture : StringComparison.CurrentCultureIgnoreCase))) {
-                        Return.Add(((Sink)(ProbedSink)));
+                    List<Component> Return = new List<Component>();
+                    dynamic SearchCollection = null;
+
+                    if (IsSink) {
+                        SearchCollection = Sinks;
                     }
+
+                    if (IsEnricher) {
+                        SearchCollection = Enrichers;
+                    }
+
+                    if (IsFilter) {
+                        SearchCollection = Filters;
+                    }
+
+
+                    foreach (IComponent ProbedComponent in SearchCollection)
+                    {
+                        if (ProbedComponent is Component && ProbedComponent.Identifier.Contains(Identifier)) {
+                            Return.Add(((Component)(ProbedComponent)));
+                        }
+                    }
+
+                    return Return;
                 }
 
-                return Return;
+                else {
+                    throw new ArgumentException($"Invalid type parameter `{typeof(Component)}`! Type parameter `{typeof(Component)}` must exclusively be a single component type and not a raw `{nameof(IComponent)}` type.");
+                }
             }
 
             else {
@@ -405,24 +515,60 @@ namespace PowerLog
 
         #region Push Function XML
         /// <summary>
-        /// Adds a sink to the sink stack.
+        /// Pushes a component to its appropriate stack.
         /// </summary>
-        /// <param name="Sink">The sink instance to add.</param>
-        /// <exception cref="ObjectDisposedException">Thrown when attempting to push sinks on a disposed logger.</exception>
-        /// <exception cref="ArgumentException">Thrown if the logger reference in the sink is not the current logger.</exception>
+        /// <param name="Component">The component instance to push.</param>
+        /// <exception cref="ObjectDisposedException">Thrown when attempting to push a component on a disposed logger.</exception>
+        /// <exception cref="ArgumentException">Thrown if the logger reference in the component is not the current logger, or if the component implements multiple <see cref="IComponent"/> types.</exception>
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name="Component"/> is <see langword="null"/>.</exception>
         #endregion
-        public void Push(ISink Sink)
+        public void Push(IComponent Component)
         {
             if (!IsDisposed)
             {
-                if (Sink.Logger == this)
+                if (Component != null)
                 {
-                    Sinks.Add(Sink);
-                    Sink.Initialize();
+                    bool IsSink = Component is ISink;
+                    bool IsEnricher = Component is IEnricher;
+                    bool IsFilter = Component is IFilter;
+
+                    if (((IsSink ^ IsEnricher ^ IsFilter) && !(IsSink && IsEnricher && IsFilter)))
+                    {
+                        if (Component.Logger == this)
+                        {
+                            if (IsSink)
+                            {
+                                ISink Sink = ((ISink)(Component));
+
+                                Sinks.Add(Sink);
+                                Sink.Initialize();
+                            }
+
+                            if (IsEnricher)
+                            {
+                                IEnricher Enricher = ((IEnricher)(Component));
+                                Enrichers.Add(Enricher);
+                            }
+
+                            if (IsFilter)
+                            {
+                                IFilter Filter = ((IFilter)(Component));
+                                Filters.Add(Filter);
+                            }
+                        }
+
+                        else {
+                            throw new ArgumentException($"Invalid logger instance `{Component.Logger.Identifier}` in component `{Component.Identifier}`, should be `{this.Identifier}`.");
+                        }
+                    }
+
+                    else {
+                        throw new ArgumentException($"Invalid component type `{Component.GetType()}`! Component type `{Component.GetType()}` must exclusively be a single component type and not a raw `{nameof(IComponent)}` type.");
+                    }
                 }
 
                 else {
-                    throw new ArgumentException($"Invalid logger instance `{Sink.Logger.Identifier}` in sink `{Sink.Identifier}`, should be `{this.Identifier}`.");
+                    throw new ArgumentNullException(nameof(Component));
                 }
             }
 
@@ -433,17 +579,57 @@ namespace PowerLog
 
         #region Pop Function XML
         /// <summary>
-        /// Removes a sink from the sink stack.
+        /// Pops a component off its stack.
         /// </summary>
-        /// <param name="Sink">The sink to remove.</param>
-        /// <exception cref="ObjectDisposedException">Thrown when attempting to pop a sink from a disposed logger.</exception>
+        /// <param name="Component">The component instance to remove.</param>
+        /// <exception cref="ObjectDisposedException">Thrown when attempting to remove a component from a disposed logger.</exception>
+        /// <exception cref="ArgumentException">Thrown if the logger reference in the component is not the current logger, or if the component implements multiple <see cref="IComponent"/> types.</exception>
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name="Component"/> is <see langword="null"/>.</exception>
         #endregion
-        public void Pop(ISink Sink)
+        public void Pop(IComponent Component)
         {
             if (!IsDisposed)
             {
-                Sink.Shutdown();
-                Sinks.Remove(Sink);
+                if (Component != null)
+                {
+                    bool IsSink = Component is ISink;
+                    bool IsEnricher = Component is IEnricher;
+                    bool IsFilter = Component is IFilter;
+
+                    if (((IsSink ^ IsEnricher ^ IsFilter) && !(IsSink && IsEnricher && IsFilter)))
+                    {
+                        if (Component.Logger == this)
+                        {
+                            if (IsSink)
+                            {
+                                ISink Sink = ((ISink)(Component));
+
+                                Sinks.Remove(Sink);
+                                Sink.Shutdown();
+                            }
+
+                            if (IsEnricher)
+                            {
+                                IEnricher Enricher = ((IEnricher)(Component));
+                                Enrichers.Remove(Enricher);
+                            }
+
+                            if (IsFilter)
+                            {
+                                IFilter Enricher = ((IFilter)(Component));
+                                Filters.Remove(Enricher);
+                            }
+                        }
+                    }
+
+                    else {
+                        throw new ArgumentException($"Invalid component type `{Component.GetType()}`! Component type `{Component.GetType()}` must exclusively be a single component type and not a raw `{nameof(IComponent)}` type.");
+                    }
+                }
+
+                else {
+                    throw new ArgumentNullException(nameof(Component));
+                }
             }
 
             else {
@@ -455,7 +641,7 @@ namespace PowerLog
 
         #region Dispose Function XML
         /// <summary>
-        /// Marks the logger as disposed and pops off all of the sinks off the sink stack.
+        /// Marks the logger as disposed and removes all of the components attached to the different stacks.
         /// </summary>
         /// <exception cref="ObjectDisposedException">Thrown on double-disposal of the current logger.</exception>
         #endregion
@@ -479,18 +665,27 @@ namespace PowerLog
 
         }
 
+
+
         #region Log Constructor XML
         /// <summary>
         /// The default <see cref="Log"/> constructor.
         /// </summary>
         /// <param name="Identifier">The identifier / name of this logger.</param>
+        /// <param name="FormattingTemplate">Formatting template used by most sinks to compose the log.<br/>The <see cref="Template"/> structure provides some presets to use, such as <see cref="Template.Minimal"/>, <see cref="Template.Modern"/> or <see cref="Template.Detailed"/>.<br/>(Warning: Some sinks may use a custom formatting solution and ignore the <see cref="Arguments.ComposedLog"/> property.)</param>
         /// <param name="AllowedSeverities">The logger's allowed severity levels.</param>
         #endregion
         public Log(string Identifier, Severity AllowedSeverities = Verbosity.All)
         {
             this.Identifier = Identifier;
-            this.Sinks = new List<ISink>();
+            this.FormattingTemplate = Template.Modern;
             this.AllowedSeverities = AllowedSeverities;
+
+            this.Context = new Dictionary<string, Object>();
+            this.Sinks = new List<ISink>();
+            this.Enrichers = new List<IEnricher>();
+            this.Filters = new List<IFilter>();
+
             this.StrictFiltering = true;
         }
     }

@@ -33,21 +33,25 @@ namespace PowerLog
         #endregion
         public static string Compose(this Arguments Log, Template Template, bool Evaluate)
         {
-            if (Evaluate) {
+            if (String.IsNullOrEmpty(Log.Content)) {
+                return String.Empty;
+            }
+
+            if (Evaluate && Template.Flags.HasFlag(Template.Options.Parse)) {
                 Log = Log.Parse();
             }
 
             Dictionary<char, string> Replacements = new Dictionary<char, string>
             {
-                { 'T', Log.Time.ToString(Template.DateFormat) },
+                { 'T', Log.Time.ToString(Template.Date) },
                 { 'I', Log.Logger?.Identifier ?? "N/A"  },
                 { 'S', Log.Severity.ToString() },
-                { 'C', Log.Content },
+                { 'C', Log.Content ?? String.Empty },
                 { 'O', Log.Sender?.ToString() ?? "N/A" },
             };
 
             
-            string Result = Template.LogFormat;
+            string Result = Template.Format;
             foreach (KeyValuePair<char, string> Replacement in Replacements)
             {
                 Regex WildcardRegex = null;
@@ -79,8 +83,21 @@ namespace PowerLog
                 }
 
                 Result = WildcardRegex.Replace(Result, new MatchEvaluator((Match Match) => {
-                    bool IsSkippingSeverityHeader = (Replacement.Key == 'S' && Log.Severity.HasFlag(Severity.Generic));
-                    return ((!IsSkippingSeverityHeader) ? ($"{Match.Groups[1].Value}" + $"{Replacement.Value}" + $"{Match.Groups[3].Value}") : String.Empty);
+                    bool IsDiscarding = false;
+
+                    if (Replacement.Key == 'I' && Log.Template.Flags.HasFlag(Template.Options.ConditionalLogger) && Log.Logger == null) {
+                        IsDiscarding = true;
+                    }
+
+                    if (Replacement.Key == 'S' && Log.Template.Flags.HasFlag(Template.Options.ConditionalSeverity) && Log.Severity.HasFlag(Severity.Generic)) {
+                        IsDiscarding = true;
+                    }
+
+                    if (Replacement.Key == 'O' && Log.Template.Flags.HasFlag(Template.Options.ConditionalObject) && Log.Sender == null) {
+                        IsDiscarding = true;
+                    }
+
+                    return ((!IsDiscarding) ? ($"{Match.Groups[1].Value}" + $"{Replacement.Value}" + $"{Match.Groups[3].Value}") : String.Empty);
                 }));
             }
 
@@ -96,31 +113,42 @@ namespace PowerLog
         #endregion
         public static Arguments Parse(this Arguments Log)
         {
+            string ParsedContent = Log.Content;
+
             if (Log.Parameters != null)
             {
-                Arguments PreprocessedLog = new Arguments() {
-                    Content = Log.Content,
-                    Severity = Log.Severity,
-                    Time = Log.Time,
-                    Template = Log.Template,
-                    Sender = Log.Sender,
-                    Stacktrace = Log.Stacktrace,
-                    Parameters = Log.Parameters,
-
-                    Logger = Log.Logger
-                };
-
-
-                foreach (KeyValuePair<string, Object> Parameter in PreprocessedLog.Parameters) {
-                    PreprocessedLog.Content = PreprocessedLog.Content.Replace($"~{Parameter.Key}~", Parameter.Value.ToString());
+                foreach (KeyValuePair<string, Object> Parameter in Log.Parameters) {
+                    ParsedContent = ParsedContent.Replace($"~{Parameter.Key}~", ((Parameter.Value != null) ? Parameter.Value.ToString() : String.Empty));
                 }
-
-                return PreprocessedLog;
             }
 
-            else {
-                return Log;
+            if (Log.Context != null)
+            {
+                foreach (KeyValuePair<string, Object> ContextualProperty in Log.Context) {
+                    ParsedContent = ParsedContent.Replace($"~${ContextualProperty.Key}~", ((ContextualProperty.Value != null) ? ContextualProperty.Value.ToString() : String.Empty));
+                }
             }
+
+            if (Log.Enrichments != null)
+            {
+                foreach (KeyValuePair<string, Object> Enrichment in Log.Enrichments) {
+                    ParsedContent = ParsedContent.Replace($"~@{Enrichment.Key}~", ((Enrichment.Value != null) ? Enrichment.Value.ToString() : String.Empty));
+                }
+            }
+
+            Arguments ParsedLog = new Arguments()
+            {
+                Content = ParsedContent,
+                Severity = Log.Severity,
+                Time = Log.Time,
+                Template = Log.Template,
+                Sender = Log.Sender,
+                Parameters = Log.Parameters,
+
+                Logger = Log.Logger
+            };
+
+            return ParsedLog;
         }
     }
 }

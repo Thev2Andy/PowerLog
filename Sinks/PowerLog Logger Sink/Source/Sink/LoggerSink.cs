@@ -1,15 +1,15 @@
 ﻿using System;
-using System.IO;
+using System.Diagnostics;
 using PowerLog;
 
-namespace PowerLog.Sinks.IO
+namespace PowerLog.Sinks.Logger
 {
-    #region FileSink Class XML
+    #region LoggerSink Class XML
     /// <summary>
-    /// Writes logs to a file.
+    /// Writes logs to another <see cref="Log"/> instance.
     /// </summary>
     #endregion
-    public class FileSink : ISink
+    public class LoggerSink : ISink
     {
         #region Identifier String XML
         /// <summary>
@@ -20,10 +20,17 @@ namespace PowerLog.Sinks.IO
 
         #region Logger Log XML
         /// <summary>
-        /// The sink logger.
+        /// The sink logger. (The one this sink is attached to.)
         /// </summary>
         #endregion
         public Log Logger { get; }
+
+        #region TargetLogger Log XML
+        /// <summary>
+        /// The sink's target logger. (The one this sink pushes messages to.)
+        /// </summary>
+        #endregion
+        public Log TargetLogger { get; }
 
         #region AllowedSeverities Severity XML
         /// <summary>
@@ -46,17 +53,12 @@ namespace PowerLog.Sinks.IO
         #endregion
         public bool IsEnabled { get; set; }
 
-
-        #region LogPath LogIO XML
+        #region NormalizeTemplate Boolean XML
         /// <summary>
-        /// Holds data regarding log file paths.
+        /// If <see langword="true"/>, will override the template in logs sent by the current logger and instead use target logger's template.
         /// </summary>
         #endregion
-        public LogIO LogPath { get; internal set; }
-
-
-        // Private / Hidden variables..
-        private StreamWriter LogStream;
+        public bool NormalizeTemplate { get; set; }
 
 
         #region Emit Function XML
@@ -64,95 +66,79 @@ namespace PowerLog.Sinks.IO
         #endregion
         public void Emit(Arguments Log)
         {
-            LogStream.Write($"{Log.ComposedLog}{Environment.NewLine}");
-        }
+            if (NormalizeTemplate) {
+                Log = Log with { Template = TargetLogger.FormattingTemplate };
+            }
 
-        #region Save Function XML
-        /// <summary>
-        /// <inheritdoc/>
-        /// </summary>
-        #endregion
-        public void Save() {
-            LogStream.Flush();
+            TargetLogger.Raw(Log);
         }
 
         #region Initialize Function XML
         /// <inheritdoc/>
         #endregion
-        public void Initialize()
-        {
-            if (!Directory.Exists(LogPath.Path)) Directory.CreateDirectory(LogPath.Path);
-            LogStream = new StreamWriter(LogPath.Get(), true);
-            LogStream.AutoFlush = true;
-        }
+        public void Initialize() { }
 
         #region Shutdown Function XML
         /// <inheritdoc/>
         #endregion
-        public void Shutdown()
-        {
-            LogStream.Flush();
-            LogStream.Close();
-            LogStream.Dispose();
-        }
+        public void Shutdown() { }
+
+        #region Save Function XML
+        /// <inheritdoc/>
+        #endregion
+        public void Save() { }
 
         #region Clear Function XML
         /// <inheritdoc/>
         #endregion
         public void Clear() { }
 
-        private void HandleExit(Object S, EventArgs A) {
-            Shutdown();
-        }
 
-
-
-        #region FileSink Constructor XML
+        #region LoggerSink Constructor XML
         /// <summary>
-        /// The default <see cref="FileSink"/> constructor.
+        /// The default <see cref="LoggerSink"/> constructor.
         /// </summary>
         /// <param name="Identifier">The sink identifier.</param>
+        /// <param name="TargetLogger">The logger to emit messages to.</param>
         /// <param name="Logger">The logger to push the sink to.</param>
         /// <param name="AllowedSeverities">The sink's allowed severity levels.</param>
-        /// <param name="LogPath">The log file path.</param>
+        /// <param name="NormalizeTemplate">If <see langword="true"/>, will override the template in logs sent by the current logger and instead use target logger's template.</param>
         #endregion
-        public FileSink(string Identifier, Log Logger, Severity AllowedSeverities = Verbosity.All, LogIO LogPath = null)
+        public LoggerSink(string Identifier, Log TargetLogger, Log Logger, Severity AllowedSeverities = Verbosity.All, bool NormalizeTemplate = false)
         {
             this.Identifier = Identifier;
             this.Logger = Logger;
+            this.TargetLogger = TargetLogger;
             this.AllowedSeverities = AllowedSeverities;
             this.StrictFiltering = true;
             this.IsEnabled = true;
-
-            AppDomain.CurrentDomain.ProcessExit += HandleExit;
-
-            this.LogPath = ((LogPath != null) ? LogPath : new LogIO(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $"Logs", $"{((Logger.Identifier.IndexOfAny(Path.GetInvalidPathChars()) == -1) ? Logger.Identifier : "Miscellaneous")}"),
-                 $"{((Logger.Identifier.IndexOfAny(Path.GetInvalidFileNameChars()) == -1) ? Logger.Identifier : "Log")} Output - ({DateTime.Now.ToString("HH-mm-ss tt, dd MMMM yyyy")})", "txt"));
+            this.NormalizeTemplate = NormalizeTemplate;
         }
     }
 
 
 
-    #region FileSinkUtilities Class XML
+    #region LoggerSinkUtilities Class XML
     /// <summary>
     /// Contains extension methods.
     /// </summary>
     #endregion
-    public static class FileSinkUtilities
+    public static class LoggerSinkUtilities
     {
-        #region PushFile Function XML
+        #region PushLogger Function XML
         /// <summary>
-        /// Pushes a new file sink on the logger sink stack.
+        /// Pushes a new logger sink on the logger sink stack.
         /// </summary>
         /// <param name="Logger">The logger to push the sink to.</param>
         /// <param name="Identifier">The sink identifier.</param>
+        /// <param name="TargetLogger">The logger to emit messages to.</param>
         /// <param name="AllowedSeverities">The sink's allowed severity levels.</param>
-        /// <param name="LogPath">The log file path.</param>
+        /// <param name="NormalizeTemplate">If <see langword="true"/>, will override the template in logs sent by the current logger and instead use target logger's template.</param>
         /// <returns>The current logger, to allow for method chaining.</returns>
         #endregion
-        public static Log PushFile(this Log Logger, string Identifier, Severity AllowedSeverities = Verbosity.All, LogIO LogPath = null)
+        public static Log PushLogger(this Log Logger, string Identifier, Log TargetLogger, Severity AllowedSeverities = Verbosity.All, bool NormalizeTemplate = false)
         {
-            FileSink Sink = new FileSink(Identifier, Logger, AllowedSeverities, LogPath);
+            LoggerSink Sink = new LoggerSink(Identifier, TargetLogger, Logger, AllowedSeverities, NormalizeTemplate);
             Logger.Push(Sink);
 
             return Logger;

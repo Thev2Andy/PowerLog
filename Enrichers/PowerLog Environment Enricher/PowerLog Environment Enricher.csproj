@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<RootNamespace>PowerLog.Enrichers.Environment</RootNamespace>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+
+		<Nullable>disable</Nullable>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+		<DocumentationFile>..\..\Enrichers\PowerLog Environment Enricher\PowerLog Environment Enricher\XML Docs\PowerLog Environment Enricher XML.xml</DocumentationFile>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\Library\PowerLog\PowerLog.csproj"/>
+	</ItemGroup>
+
+</Project>
