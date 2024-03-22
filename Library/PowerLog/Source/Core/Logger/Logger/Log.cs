@@ -122,11 +122,16 @@ namespace PowerLog
         /// <param name="Parameters">Additional logging data.</param>
         /// <param name="Sender">The log sender.</param>
         /// <exception cref="ObjectDisposedException">Thrown when attempting to write logs with a disposed logger.</exception>
+        /// <exception cref="ArgumentException">Thrown when attempting to write a log with an invalid <paramref name="Severity"/> value.</exception>
         #endregion
         public void Write(string Content, Severity Severity, Dictionary<string, Object> Parameters = null, Object Sender = null)
         {
             if (!IsDisposed)
             {
+                if (!Severity.Validate()) {
+                    throw new ArgumentException($"Invalid `{nameof(Severity)}` value!");
+                }
+
                 if (Severity.Passes(AllowedSeverities, StrictFiltering))
                 {
                     Dictionary<string, Object> Enrichments = null;

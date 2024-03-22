@@ -98,6 +98,18 @@ namespace PowerLog
             return ((StrictFiltering) ? ((Verbosity & Severity) == Severity) : ((Verbosity & Severity) != 0));
         }
 
+        #region Validate Function XML
+        /// <summary>
+        /// Validates a severity value to be within the <see cref="Severity"/> enumeration's expected range and returns the result.
+        /// </summary>
+        /// <param name="Severity">The value to validate.</param>
+        /// <returns>A boolean indicating <see langword="true"/> if the severity value is a valid <see cref="Severity"/> value.</returns>
+        #endregion
+        public static bool Validate(this Severity Severity)
+        {
+            return ((Severity & ~Verbosity.All) == 0);
+        }
+
 
 
         #region Verbosity Static Constructor XML
