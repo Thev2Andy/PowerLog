@@ -681,7 +681,6 @@ namespace PowerLog
         /// The default <see cref="Log"/> constructor.
         /// </summary>
         /// <param name="Identifier">The identifier / name of this logger.</param>
-        /// <param name="FormattingTemplate">Formatting template used by most sinks to compose the log.<br/>The <see cref="Template"/> structure provides some presets to use, such as <see cref="Template.Minimal"/>, <see cref="Template.Modern"/> or <see cref="Template.Detailed"/>.<br/>(Warning: Some sinks may use a custom formatting solution and ignore the <see cref="Arguments.ComposedLog"/> property.)</param>
         /// <param name="AllowedSeverities">The logger's allowed severity levels.</param>
         #endregion
         public Log(string Identifier, Severity AllowedSeverities = Verbosity.All)

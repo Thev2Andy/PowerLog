@@ -261,6 +261,8 @@ namespace PowerLog.Sinks.Asynchronous
             for (int I = 0; I < Sinks.Count; I++) {
                 Sinks[I].Save();
             }
+
+            OnSave?.Invoke();
         }
 
         private async Task ClearAsync()
@@ -271,6 +273,8 @@ namespace PowerLog.Sinks.Asynchronous
             {
                 Sinks[I].Clear();
             }
+
+            OnClear?.Invoke();
         }
 
 
