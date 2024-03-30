@@ -237,7 +237,6 @@ namespace PowerLog.Sinks.Asynchronous
         }
 
 
-        // TODO: wait method..
 
         private async Task EmitAsync(Arguments Log)
         {

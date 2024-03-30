@@ -2,14 +2,18 @@
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
-    <RootNamespace>PowerLog.Sinks.Terminal</RootNamespace>
-	<GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <RootNamespace>PowerLog.Sinks.Console</RootNamespace>
+	<Authors>Thev2Andy</Authors>
+	  
+	  <AssemblyName>$(RootNameSpace)</AssemblyName>
 	  
     <Nullable>disable</Nullable>
   </PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-		<DocumentationFile>..\..\Sinks\PowerLog Console Sink\PowerLog Console Sink\XML Docs\PowerLog Console Sink XML.xml</DocumentationFile>
+		<DocumentationFile>..\..\Sinks\PowerLog Console Sink\PowerLog Console Sink\XML Documentation\PowerLog Console Sink XML.xml</DocumentationFile>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<DebugType>None</DebugType>
 	</PropertyGroup>
 
 	<ItemGroup>

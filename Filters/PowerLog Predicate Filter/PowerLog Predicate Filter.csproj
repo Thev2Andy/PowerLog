@@ -2,14 +2,18 @@
 
 	<PropertyGroup>
 		<TargetFramework>net8.0</TargetFramework>
-		<RootNamespace>PowerLog.Enrichers.Stacktrace</RootNamespace>
-		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<RootNamespace>PowerLog.Filters.Predicate</RootNamespace>
+		<Authors>Thev2Andy</Authors>
 
+		<AssemblyName>$(RootNameSpace)</AssemblyName>
+		
 		<Nullable>disable</Nullable>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-		<DocumentationFile>..\..\Enrichers\PowerLog Stacktrace Enricher\PowerLog Stacktrace Enricher\XML Docs\PowerLog Stacktrace Enricher XML.xml</DocumentationFile>
+		<DocumentationFile>..\..\Filters\PowerLog Predicate Filter\PowerLog Predicate Filter\XML Documentation\PowerLog Predicate Filter XML.xml</DocumentationFile>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<DebugType>None</DebugType>
 	</PropertyGroup>
 
 	<ItemGroup>

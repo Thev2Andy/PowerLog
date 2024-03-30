@@ -3,13 +3,17 @@
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <RootNamespace>PowerLog.Sinks.Markdown</RootNamespace>
-	<GenerateDocumentationFile>true</GenerateDocumentationFile>
+	<Authors>Thev2Andy</Authors>
+	  
+	  <AssemblyName>$(RootNameSpace)</AssemblyName>
 	  
     <Nullable>disable</Nullable>
   </PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-		<DocumentationFile>..\..\Sinks\PowerLog Markdown Sink\PowerLog Markdown Sink\XML Docs\PowerLog Markdown Sink XML.xml</DocumentationFile>
+		<DocumentationFile>..\..\Sinks\PowerLog Markdown Sink\PowerLog Markdown Sink\XML Documentation\PowerLog Markdown Sink XML.xml</DocumentationFile>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<DebugType>None</DebugType>
 	</PropertyGroup>
 
 	<ItemGroup>

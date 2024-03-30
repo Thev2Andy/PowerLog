@@ -3,14 +3,17 @@
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <RootNamespace>PowerLog.Sinks.SpectreTerminal</RootNamespace>
-	<GenerateDocumentationFile>true</GenerateDocumentationFile>
+	<Authors>Thev2Andy</Authors>
 
+	  <AssemblyName>$(RootNameSpace)</AssemblyName>
 	  
     <Nullable>disable</Nullable>
   </PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-		<DocumentationFile>..\..\Sinks\PowerLog Spectre Console Sink\PowerLog Spectre Console Sink\XML Docs\PowerLog Spectre Console Sink XML.xml</DocumentationFile>
+		<DocumentationFile>..\..\Sinks\PowerLog Spectre Console Sink\PowerLog Spectre Console Sink\XML Documentation\PowerLog Spectre Console Sink XML.xml</DocumentationFile>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<DebugType>None</DebugType>
 	</PropertyGroup>
 
 	<ItemGroup>

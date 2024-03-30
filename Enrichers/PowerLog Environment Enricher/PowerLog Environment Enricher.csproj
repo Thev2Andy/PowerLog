@@ -3,13 +3,17 @@
 	<PropertyGroup>
 		<TargetFramework>net8.0</TargetFramework>
 		<RootNamespace>PowerLog.Enrichers.Environment</RootNamespace>
-		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<Authors>Thev2Andy</Authors>
 
+		<AssemblyName>$(RootNameSpace)</AssemblyName>
+		
 		<Nullable>disable</Nullable>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-		<DocumentationFile>..\..\Enrichers\PowerLog Environment Enricher\PowerLog Environment Enricher\XML Docs\PowerLog Environment Enricher XML.xml</DocumentationFile>
+		<DocumentationFile>..\..\Enrichers\PowerLog Environment Enricher\PowerLog Environment Enricher\XML Documentation\PowerLog Environment Enricher XML.xml</DocumentationFile>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<DebugType>None</DebugType>
 	</PropertyGroup>
 
 	<ItemGroup>

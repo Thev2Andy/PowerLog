@@ -3,13 +3,17 @@
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <RootNamespace>PowerLog.Sinks.Logger</RootNamespace>
-	<GenerateDocumentationFile>true</GenerateDocumentationFile>
+	<Authors>Thev2Andy</Authors>
+	  
+	  <AssemblyName>$(RootNameSpace)</AssemblyName>
 	  
     <Nullable>disable</Nullable>
   </PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-		<DocumentationFile>..\..\Sinks\PowerLog Logger Sink\PowerLog Logger Sink\XML Docs\PowerLog Logger Sink XML.xml</DocumentationFile>
+		<DocumentationFile>..\..\Sinks\PowerLog Logger Sink\PowerLog Logger Sink\XML Documentation\PowerLog Logger Sink XML.xml</DocumentationFile>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<DebugType>None</DebugType>
 	</PropertyGroup>
 
 	<ItemGroup>

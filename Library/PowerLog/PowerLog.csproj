@@ -5,13 +5,13 @@
     <RootNamespace>PowerLog</RootNamespace>
     <Authors>Thev2Andy</Authors>
 	  
-	<GenerateDocumentationFile>true</GenerateDocumentationFile>
-	  
 	<Nullable>disable</Nullable>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>..\PowerLog\PowerLog\XML Docs\PowerLog XML.xml</DocumentationFile>
+    <DocumentationFile>..\PowerLog\PowerLog\XML Documentation\PowerLog XML.xml</DocumentationFile>
+	<GenerateDocumentationFile>true</GenerateDocumentationFile>
+	<DebugType>None</DebugType>
   </PropertyGroup>
 
   <ItemGroup>

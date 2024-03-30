@@ -3,13 +3,17 @@
 	<PropertyGroup>
 		<TargetFramework>net8.0</TargetFramework>
 		<RootNamespace>PowerLog.Enrichers.Stacktrace</RootNamespace>
-		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<Authors>Thev2Andy</Authors>
+
+		<AssemblyName>$(RootNameSpace)</AssemblyName>
 
 		<Nullable>disable</Nullable>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-		<DocumentationFile>..\..\Enrichers\PowerLog Stacktrace Enricher\PowerLog Stacktrace Enricher\XML Docs\PowerLog Stacktrace Enricher XML.xml</DocumentationFile>
+		<DocumentationFile>..\..\Enrichers\PowerLog Stacktrace Enricher\PowerLog Stacktrace Enricher\XML Documentation\PowerLog Stacktrace Enricher XML.xml</DocumentationFile>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<DebugType>None</DebugType>
 	</PropertyGroup>
 
 	<ItemGroup>
