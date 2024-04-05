@@ -5,15 +5,13 @@
     <RootNamespace>PowerLog.Sinks.Logger</RootNamespace>
 	<Authors>Thev2Andy</Authors>
 	  
-	  <AssemblyName>$(RootNameSpace)</AssemblyName>
+	  <AssemblyName>PowerLog.Sinks.Logger</AssemblyName>
 	  
     <Nullable>disable</Nullable>
   </PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-		<DocumentationFile>..\..\Sinks\PowerLog Logger Sink\PowerLog Logger Sink\XML Documentation\PowerLog Logger Sink XML.xml</DocumentationFile>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
-		<DebugType>None</DebugType>
 	</PropertyGroup>
 
 	<ItemGroup>

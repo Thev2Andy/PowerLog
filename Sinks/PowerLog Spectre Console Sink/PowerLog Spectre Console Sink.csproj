@@ -5,19 +5,17 @@
     <RootNamespace>PowerLog.Sinks.SpectreTerminal</RootNamespace>
 	<Authors>Thev2Andy</Authors>
 
-	  <AssemblyName>$(RootNameSpace)</AssemblyName>
+	  <AssemblyName>PowerLog.Sinks.SpectreTerminal</AssemblyName>
 	  
     <Nullable>disable</Nullable>
   </PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-		<DocumentationFile>..\..\Sinks\PowerLog Spectre Console Sink\PowerLog Spectre Console Sink\XML Documentation\PowerLog Spectre Console Sink XML.xml</DocumentationFile>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
-		<DebugType>None</DebugType>
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <PackageReference Include="Spectre.Console" Version="0.46.0" />
+	  <PackageReference Include="Spectre.Console" Version="0.48.0" />
 	</ItemGroup>
 
 	<ItemGroup>

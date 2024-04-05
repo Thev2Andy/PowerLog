@@ -5,15 +5,13 @@
 		<RootNamespace>PowerLog.Enrichers.Thread</RootNamespace>
 		<Authors>Thev2Andy</Authors>
 
-		<AssemblyName>$(RootNameSpace)</AssemblyName>
+		<AssemblyName>PowerLog.Enrichers.Thread</AssemblyName>
 
 		<Nullable>disable</Nullable>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-		<DocumentationFile>..\..\Enrichers\PowerLog Thread Enricher\PowerLog Thread Enricher\XML Documentation\PowerLog Thread Enricher XML.xml</DocumentationFile>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
-		<DebugType>None</DebugType>
 	</PropertyGroup>
 
 	<ItemGroup>

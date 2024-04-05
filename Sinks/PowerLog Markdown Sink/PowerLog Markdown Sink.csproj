@@ -5,15 +5,13 @@
     <RootNamespace>PowerLog.Sinks.Markdown</RootNamespace>
 	<Authors>Thev2Andy</Authors>
 	  
-	  <AssemblyName>$(RootNameSpace)</AssemblyName>
+	  <AssemblyName>PowerLog.Sinks.Markdown</AssemblyName>
 	  
     <Nullable>disable</Nullable>
   </PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-		<DocumentationFile>..\..\Sinks\PowerLog Markdown Sink\PowerLog Markdown Sink\XML Documentation\PowerLog Markdown Sink XML.xml</DocumentationFile>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
-		<DebugType>None</DebugType>
 	</PropertyGroup>
 
 	<ItemGroup>

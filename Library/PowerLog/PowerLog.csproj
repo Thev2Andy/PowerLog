@@ -9,9 +9,7 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>..\PowerLog\PowerLog\XML Documentation\PowerLog XML.xml</DocumentationFile>
 	<GenerateDocumentationFile>true</GenerateDocumentationFile>
-	<DebugType>None</DebugType>
   </PropertyGroup>
 
   <ItemGroup>
