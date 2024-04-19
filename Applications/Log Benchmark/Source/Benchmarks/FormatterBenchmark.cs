@@ -33,12 +33,25 @@ namespace LogBenchmark
             Format.Compose(Arguments, Arguments.Template, true);
         }
 
-        [Benchmark(Baseline = true)]
+        [Benchmark]
         public string CustomCompose_NoParse()
         {
             string Result = String.Empty;
             if (!String.IsNullOrEmpty(Arguments.Content)) {
                 Result = $"{Arguments.Time.ToString(Arguments.Template.Date)} {((!Arguments.Severity.HasFlag(Severity.Generic)) ? $"[{Arguments.Severity}] " : String.Empty)}{Arguments.Content} ({Arguments.Sender ?? "N/A"})";
+            }
+
+            return Result;
+        }
+
+        [Benchmark(Baseline = true)]
+        public string CustomCompose_Parse()
+        {
+            Arguments FlattenedLog = Arguments.Flatten();
+            string Result = String.Empty;
+            if (!String.IsNullOrEmpty(FlattenedLog.Content))
+            {
+                Result = $"{Arguments.Time.ToString(Arguments.Template.Date)} {((!Arguments.Severity.HasFlag(Severity.Generic)) ? $"[{Arguments.Severity}] " : String.Empty)}{FlattenedLog.Content} ({Arguments.Sender ?? "N/A"})";
             }
 
             return Result;
@@ -51,9 +64,9 @@ namespace LogBenchmark
         }
 
         [Benchmark]
-        public void Parse()
+        public void Flatten()
         {
-            Format.Parse(Arguments);
+            Format.Flatten(Arguments);
         }
     }
 }

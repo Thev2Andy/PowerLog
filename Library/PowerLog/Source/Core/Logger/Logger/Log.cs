@@ -167,7 +167,7 @@ namespace PowerLog
                         Enrichments = Enrichments,
                         Context = Context,
 
-                        Logger = this,
+                        Logger = this
                     };
 
                     this.Raw(ProducedLog);

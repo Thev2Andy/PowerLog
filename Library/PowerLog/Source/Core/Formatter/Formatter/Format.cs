@@ -38,7 +38,7 @@ namespace PowerLog
             }
 
             if (Evaluate && Template.Flags.HasFlag(Template.Options.Parse)) {
-                Log = Log.Parse();
+                Log = Log.Flatten();
             }
 
             Dictionary<char, string> Replacements = new Dictionary<char, string>
@@ -104,14 +104,14 @@ namespace PowerLog
             return Result;
         }
 
-        #region Parse Function XML
+        #region Flatten Function XML
         /// <summary>
-        /// Parses a raw log argument object's parameters, then returns it.
+        /// Parses and flattens a raw log argument object's parameters, then returns it.
         /// </summary>
         /// <returns>The processed log.</returns>
         /// <param name="Log">The log to parse the parameters of.</param>
         #endregion
-        public static Arguments Parse(this Arguments Log)
+        public static Arguments Flatten(this Arguments Log)
         {
             string ParsedContent = Log.Content;
 
@@ -136,19 +136,22 @@ namespace PowerLog
                 }
             }
 
-            Arguments ParsedLog = new Arguments()
+            Arguments FlattenedLog = new Arguments()
             {
                 Content = ParsedContent,
                 Severity = Log.Severity,
                 Time = Log.Time,
                 Template = Log.Template,
                 Sender = Log.Sender,
-                Parameters = Log.Parameters,
+
+                Parameters = null,
+                Enrichments = null,
+                Context = null,
 
                 Logger = Log.Logger
             };
 
-            return ParsedLog;
+            return FlattenedLog;
         }
     }
 }

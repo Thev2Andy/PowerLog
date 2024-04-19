@@ -99,7 +99,7 @@ namespace PowerLog.Sinks.Markdown
         public void Emit(Arguments Log)
         {
             // Manual formatting into a markdown table row.
-            Arguments ProcessedLog = Log.Parse();
+            Arguments ProcessedLog = Log.Flatten();
 
             bool InvertBackgroundColor = false;
             int SeverityFlagCount = 0;
